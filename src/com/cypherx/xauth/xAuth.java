@@ -25,7 +25,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 
-import com.cypherx.xauth.Settings.Keys;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
@@ -39,7 +38,8 @@ public class xAuth extends JavaPlugin
 	private final xAuthPlayerListener playerListener = new xAuthPlayerListener(this);
 	private final xAuthBlockListener blockListener = new xAuthBlockListener(this);
 	private final xAuthEntityListener entityListener = new xAuthEntityListener(this);
-	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();    
+	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
+	private static PluginDescriptionFile pdfFile;
 
 	private static final String DIR = "plugins/xAuth/";
 	private static final String CONFIG_FILE = "config.yml";
@@ -60,15 +60,16 @@ public class xAuth extends JavaPlugin
 	private ConcurrentHashMap<Player, Date> lastNotifyTimes = new ConcurrentHashMap<Player, Date>();
 
 	public void onEnable()
-	{		
+	{
+		pdfFile = this.getDescription();
+
 		/*Whirlpool w = new Whirlpool();
 		byte[] digest = new byte[Whirlpool.DIGESTBYTES];
 		w.NESSIEinit();
 		w.NESSIEadd("The quick brown fox jumps over the lazy dog");
 		w.NESSIEfinalize(digest);
 		System.out.println(Whirlpool.display(digest));*/
-	
-		PluginDescriptionFile pdfFile = this.getDescription();
+
 		PropertyManager props = new PropertyManager(new File("server.properties"));
 		if (props.a("online-mode", true))
 		{
@@ -119,7 +120,7 @@ public class xAuth extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Lowest, this);
 
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
 		//pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Highest, this);
@@ -129,7 +130,6 @@ public class xAuth extends JavaPlugin
 		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener, Priority.Highest, this);
 
-		//PluginDescriptionFile pdfFile = this.getDescription();
 		System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Enabled!");
 
 		//autosave stuff
@@ -138,7 +138,6 @@ public class xAuth extends JavaPlugin
 	
 	public void getAuths()
 	{
-		PluginDescriptionFile pdfFile = this.getDescription();
 		System.out.println("[" + pdfFile.getName() + "] Loading player accounts..");
 
 		try
@@ -174,7 +173,6 @@ public class xAuth extends JavaPlugin
 		if (fullyEnabled)
 			updateAuthFile();
 
-		PluginDescriptionFile pdfFile = this.getDescription();
 		System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Disabled");
 	}
 	
@@ -199,7 +197,7 @@ public class xAuth extends JavaPlugin
 		String hash = md5(pass);
 		auths.put(pName.toLowerCase(), pName.toLowerCase() + ":" + hash);
 	
-		if (settings.getBool(Keys.AUTOSAVE))
+		if (settings.getBool("misc.autosave"))
 			updateAuthFile();
 	}
 	
@@ -218,7 +216,7 @@ public class xAuth extends JavaPlugin
 		auths.remove(pName.toLowerCase());
 		auths.put(pName.toLowerCase(), pName.toLowerCase() + ":" + hash);
 	
-		if (settings.getBool(Keys.AUTOSAVE))
+		if (settings.getBool("misc.autosave"))
 			updateAuthFile();
 	}
 	
@@ -230,7 +228,7 @@ public class xAuth extends JavaPlugin
 		if (sessionExists(pName))
 			removeSession(pName);
 	
-		if (settings.getBool(Keys.AUTOSAVE))
+		if (settings.getBool("misc.autosave"))
 			updateAuthFile();
 	}
 	
@@ -276,7 +274,7 @@ public class xAuth extends JavaPlugin
 		{
 			Session session = sessions.get(pName.toLowerCase());
 	
-			if (session.isExpired(new Date(session.getLoginTime() + (settings.getInt(Keys.SESSION_TIMEOUT) * 1000))))
+			if (session.isExpired(new Date(session.getLoginTime() + (settings.getInt("session.timeout") * 1000))))
 				removeSession(pName);
 		}
 		else
@@ -297,9 +295,9 @@ public class xAuth extends JavaPlugin
 	
 	public Boolean isCmdAllowed(String cmd)
 	{
-		if (settings.getStrArr(Keys.ALLOWED_CMDS).contains(cmd))
+		if (settings.getStrList("misc.allowed-cmds").contains(cmd))
 			return true;
-		
+
 		return false;
 	}
 	
@@ -308,7 +306,7 @@ public class xAuth extends JavaPlugin
 		if (lastNotifyTimes.get(player) == null)
 			return true;
 	
-		Date nextNotifyTime = new Date(lastNotifyTimes.get(player).getTime() + (settings.getInt(Keys.NOTIFY_LIMIT) * 1000));
+		Date nextNotifyTime = new Date(lastNotifyTimes.get(player).getTime() + (settings.getInt("notify.limit") * 1000));
 		if (nextNotifyTime.compareTo(new Date()) < 0)
 			return true;
 	
@@ -323,9 +321,8 @@ public class xAuth extends JavaPlugin
 	
 	public void updateNotifyTime(Player player, Date date)
 	{
-		lastNotifyTimes.replace(player, date);
-		//lastNotifyTimes.remove(player);
-		//lastNotifyTimes.put(player, date);
+		lastNotifyTimes.remove(player);
+		lastNotifyTimes.put(player, date);
 	}
 	
 	//INVENTORY FUNCTIONS
@@ -395,7 +392,7 @@ public class xAuth extends JavaPlugin
 	public Boolean isSessionValid(Player player)
 	{
 		Session session = sessions.get(player.getName().toLowerCase());
-		if (session.isExpired(new Date(session.getLoginTime() + (settings.getInt(Keys.SESSION_TIMEOUT) * 1000))))
+		if (session.isExpired(new Date(session.getLoginTime() + (settings.getInt("session.timeout") * 1000))))
 			return false;
 		
 		if (!session.isValidAddr(player.getAddress().getAddress().getHostAddress()))
@@ -414,7 +411,6 @@ public class xAuth extends JavaPlugin
 	//MISC FUNCTIONS
 	private void setupPermissions()
 	{
-		PluginDescriptionFile pdfFile = this.getDescription();
 		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
 		
 		if (xAuth.Permissions == null)
@@ -465,7 +461,6 @@ public class xAuth extends JavaPlugin
 	
 	public void reload()
 	{
-		PluginDescriptionFile pdfFile = this.getDescription();
 		updateAuthFile();
 		settings = new Settings(new File(DIR + CONFIG_FILE));
 		strings = new Strings(new File(DIR + STRINGS_FILE));

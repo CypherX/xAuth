@@ -18,10 +18,7 @@ public class Strings
 		"register.success2"
 	};
 
-	private static final String[][] keyUpdates =
-	{
-		
-	};
+	private static final String[][] keyUpdates = {};
 
 	private static Configuration config;
 	private static final ConcurrentHashMap<String, String> defaults = new ConcurrentHashMap<String, String>();

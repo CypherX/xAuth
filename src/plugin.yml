@@ -4,20 +4,25 @@ version: 1.1.4
 
 commands:
     register:
-        description:
-        usage:
+        description: Register your player name
+        usage: /register <password>
     login:
-        description:
-        usage:
+        description: Authenticate yourself
+        usage: /login <password>
     changepw:
-        description:
-        usage:
+        description: Change your or another players password
+        usage: |
+                /changepw <password>
+                /changepw <player> <password>
     unregister:
-        description:
-        usage:
+        description: Remove a players registration
+        usage: /unregister <player>
     authreload:
-        description:
-        usage:
+        description: Reload the account, configuration, and string files
+        usage: /authreload
     toggle:
-        description:
-        usage:
+        description: Toggle various commands on/off
+        usage: |
+                /toggle reg
+                /toggle changepw
+                /toggle autosave

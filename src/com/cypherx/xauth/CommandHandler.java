@@ -5,12 +5,10 @@ import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import com.cypherx.xauth.Settings.Keys;
-
 public class CommandHandler
 {
 	private final xAuth plugin;
-	PluginDescriptionFile pdfFile;
+	private final PluginDescriptionFile pdfFile;
 
 	public CommandHandler(final xAuth instance)
 	{
@@ -24,25 +22,18 @@ public class CommandHandler
     	{
 			if (args.length != 1)
 				player.sendMessage(xAuth.strings.getString("register.usage"));
-				//player.sendMessage(ChatColor.RED + "Correct Usage: /register <password>");
-			else if (!xAuth.settings.getBool(Keys.REG_ENABLED))
+			else if (!xAuth.settings.getBool("registration.enabled"))
 				player.sendMessage(xAuth.strings.getString("register.err.disabled"));
-				//player.sendMessage(ChatColor.RED + "Registrations are currently disabled.");
 			else if (plugin.isRegistered(player.getName()))
 				player.sendMessage(xAuth.strings.getString("register.err.registered"));
-				//player.sendMessage(ChatColor.RED + "You are already registered.");
-			else if (args[0].length() < xAuth.settings.getInt(Keys.PW_MIN_LENGTH))
-				//player.sendMessage(xAuth.strings.get(Strings.Keys.REG_ERR_REGISTERED, xAuth.settings.getInt(Keys.PW_MIN_LENGTH)));
-				player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt(Keys.PW_MIN_LENGTH)));
-				//player.sendMessage(ChatColor.RED + "Your password must contain " + xAuth.settings.getInt(Keys.PW_MIN_LENGTH) + " or more characters.");
+			else if (args[0].length() < xAuth.settings.getInt("registration.pw-min-length"))
+				player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt("registration.pw-min-length")));
 			else
 			{
 				plugin.addAuth(player.getName(), args[0]);
 				plugin.login(player);
 				player.sendMessage(xAuth.strings.getString("register.success1"));
 				player.sendMessage(xAuth.strings.getString("register.success2", args[0]));
-				//player.sendMessage(ChatColor.GREEN + "You have successfully registered!");
-				//player.sendMessage(ChatColor.GREEN + "Your password is: " + ChatColor.WHITE + args[0]);
 				System.out.println("[" + pdfFile.getName() + "] Player '" + player.getName() + "' has registered");
 			}
     	}
@@ -74,10 +65,10 @@ public class CommandHandler
 				{
 					if (!plugin.sessionExists(player.getName()))
 						player.sendMessage(ChatColor.RED + "You must login before changing your password!");
-					else if (!xAuth.settings.getBool(Keys.ALLOW_CHANGEPW))
+					else if (!xAuth.settings.getBool("misc.allow-changepw"))
 						player.sendMessage(ChatColor.RED + "Password changes are currently disabled.");
-					else if (args[0].length() < xAuth.settings.getInt(Keys.PW_MIN_LENGTH))
-						player.sendMessage(ChatColor.RED + "Your password must contain " + xAuth.settings.getInt(Keys.PW_MIN_LENGTH) + " or more characters.");
+					else if (args[0].length() < xAuth.settings.getInt("registration.pw-min-length"))
+						player.sendMessage(ChatColor.RED + "Your password must contain " + xAuth.settings.getInt("registration.pw-min-length") + " or more characters.");
 					else
 					{
 						plugin.changePass(player.getName(), args[0]);
@@ -107,10 +98,10 @@ public class CommandHandler
 					player.sendMessage(ChatColor.RED + "Correct Usage: /changepw <newpassword>");
 				else if (!plugin.sessionExists(player.getName()))
 					player.sendMessage(ChatColor.RED + "You must login before changing your password!");
-				else if (!xAuth.settings.getBool(Keys.ALLOW_CHANGEPW))
+				else if (!xAuth.settings.getBool("misc.allow-changepw"))
 					player.sendMessage(ChatColor.RED + "Password changes are currently disabled.");
-				else if (args[0].length() < xAuth.settings.getInt(Keys.PW_MIN_LENGTH))
-					player.sendMessage(ChatColor.RED + "Your password must contain " + xAuth.settings.getInt(Keys.PW_MIN_LENGTH) + " or more characters.");
+				else if (args[0].length() < xAuth.settings.getInt("registration.pw-min-length"))
+					player.sendMessage(ChatColor.RED + "Your password must contain " + xAuth.settings.getInt("registration.pw-min-length") + " or more characters.");
 				else
 				{
 					plugin.changePass(player.getName(), args[0]);
@@ -159,8 +150,8 @@ public class CommandHandler
 						player.sendMessage(ChatColor.RED + "You aren't allow to toggle that!");
 					else
 					{
-						Boolean b = xAuth.settings.getBool(Keys.REG_ENABLED);
-						xAuth.settings.update(Keys.REG_ENABLED, (b ? false : true));
+						Boolean b = xAuth.settings.getBool("registration.enabled");
+						xAuth.settings.updateValue("registration.enabled", (b ? false : true));
 						player.sendMessage(ChatColor.YELLOW + "[" + pdfFile.getName() + "] Registrations are now " + (b ? "disabled." : "enabled."));
 						System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has " + (b ? "disabled" : "enabled") + " registrations");
 					}
@@ -172,8 +163,8 @@ public class CommandHandler
 						player.sendMessage(ChatColor.RED + "You aren't allow to toggle that!");
 					else
 					{
-						Boolean b = xAuth.settings.getBool(Keys.ALLOW_CHANGEPW);
-						xAuth.settings.update(Keys.ALLOW_CHANGEPW, (b ? false : true));
+						Boolean b = xAuth.settings.getBool("misc.allow-changepw");
+						xAuth.settings.updateValue("misc.allow-changepw", (b ? false : true));
 						player.sendMessage(ChatColor.YELLOW + "[" + pdfFile.getName() + "] Password changes are now " + (b ? "disabled." : "enabled."));
 						System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has " + (b ? "disabled" : "enabled") + " password changes");
 					}
@@ -184,8 +175,8 @@ public class CommandHandler
 						player.sendMessage(ChatColor.RED + "You aren't allow to toggle that!");
 					else
 					{
-						Boolean b = xAuth.settings.getBool(Keys.AUTOSAVE);
-						xAuth.settings.update(Keys.AUTOSAVE, (b ? false : true));
+						Boolean b = xAuth.settings.getBool("misc.autosave");
+						xAuth.settings.updateValue("misc.autosave", (b ? false : true));
 						player.sendMessage(ChatColor.YELLOW + "[" + pdfFile.getName() + "] Autosaving of account modifications is now " + (b ? "disabled." : "enabled."));
 						System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has " + (b ? "disabled" : "enabled") + " autosave");
 					}
@@ -242,20 +233,20 @@ public class CommandHandler
 				System.out.println("Correct Usage: /toggle <reg|changepw|autosave>");
 			else if (args[0].equalsIgnoreCase("reg"))
 			{
-				Boolean b = xAuth.settings.getBool(Keys.REG_ENABLED);
-				xAuth.settings.update(Keys.REG_ENABLED, (b ? false : true));
+				Boolean b = xAuth.settings.getBool("registration.enabled");
+				xAuth.settings.updateValue("registration.enabled", (b ? false : true));
 				System.out.println("[" + pdfFile.getName() + "] Registrations are now " + (b ? "disabled" : "enabled"));
 			}
 			else if (args[0].equalsIgnoreCase("changepw"))
 			{
-				Boolean b = xAuth.settings.getBool(Keys.ALLOW_CHANGEPW);
-				xAuth.settings.update(Keys.ALLOW_CHANGEPW, (b ? false : true));
+				Boolean b = xAuth.settings.getBool("misc.allow-changepw");
+				xAuth.settings.updateValue("misc.allow-changepw", (b ? false : true));
 				System.out.println("[" + pdfFile.getName() + "] Password changes are now " + (b ? "disabled" : "enabled"));
 			}
 			else if (args[0].equalsIgnoreCase("autosave"))
 			{
-				Boolean b = xAuth.settings.getBool(Keys.AUTOSAVE);
-				xAuth.settings.update(Keys.AUTOSAVE, (b ? false : true));
+				Boolean b = xAuth.settings.getBool("misc.autosave");
+				xAuth.settings.updateValue("misc.autosave", (b ? false : true));
 				System.out.println("[" + pdfFile.getName() + "] Autosaving of account modifications is now " + (b ? "disabled" : "enabled"));
 			}
 			else
