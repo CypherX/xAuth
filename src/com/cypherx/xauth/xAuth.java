@@ -36,10 +36,10 @@ import com.nijikokun.bukkit.Permissions.Permissions;
  */
 public class xAuth extends JavaPlugin
 {
-    private final xAuthPlayerListener playerListener = new xAuthPlayerListener(this);
-    private final xAuthBlockListener blockListener = new xAuthBlockListener(this);
-    private final xAuthEntityListener entityListener = new xAuthEntityListener(this);
-    private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();    
+	private final xAuthPlayerListener playerListener = new xAuthPlayerListener(this);
+	private final xAuthBlockListener blockListener = new xAuthBlockListener(this);
+	private final xAuthEntityListener entityListener = new xAuthEntityListener(this);
+	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();    
 
 	private static final String DIR = "plugins/xAuth/";
 	private static final String CONFIG_FILE = "config.yml";
@@ -49,64 +49,64 @@ public class xAuth extends JavaPlugin
 	public static Settings settings;
 	public static Strings strings;
 	public static PermissionHandler Permissions;
-
+	
 	public static Plugin multiInv = null;
 	private static Boolean fullyEnabled = false;
-
+	
 	private ConcurrentHashMap<String, String> auths = new ConcurrentHashMap<String, String>();
 	private ConcurrentHashMap<Player, ItemStack[]> inventory = new ConcurrentHashMap<Player, ItemStack[]>();
 	private ConcurrentHashMap<Player, ItemStack[]> armor = new ConcurrentHashMap<Player, ItemStack[]>();
 	private ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 	private ConcurrentHashMap<Player, Date> lastNotifyTimes = new ConcurrentHashMap<Player, Date>();
 
-    public void onEnable()
-    {    	
-    	multiInv = getServer().getPluginManager().getPlugin("MultiInv");
-  
-    	if (multiInv != null)
-    	{
-    		System.out.println("[xAuth] MultiInv detected, switching to compatibility mode");
-    	}
-    	
-    	/*Whirlpool w = new Whirlpool();
-    	byte[] digest = new byte[Whirlpool.DIGESTBYTES];
-    	w.NESSIEinit();
-    	w.NESSIEadd("The quick brown fox jumps over the lazy dog");
-    	w.NESSIEfinalize(digest);
-    	System.out.println(Whirlpool.display(digest));*/
-
-    	PluginDescriptionFile pdfFile = this.getDescription();
-    	PropertyManager props = new PropertyManager(new File("server.properties"));
-    	if (props.a("online-mode", true))
-    	{
-    		System.out.println("[" + pdfFile.getName() + "] Stopping - Server is running in online-mode");
-    		this.setEnabled(false);
-    		this.getServer().getPluginManager().disablePlugin(this);
-    		return;
-    	}
-
-    	File fDir = new File(DIR);
-
-    	if (!fDir.exists())
-    		fDir.mkdir();
-
-    	try
-    	{
-    		File fAuths = new File(DIR + AUTH_FILE);
-
-    		if (!fAuths.exists())
-    			fAuths.createNewFile();
-    	}
-    	catch (Exception e)
-    	{
-    		System.out.println(e.getMessage());
-    	}
-
-    	settings = new Settings(new File(DIR + CONFIG_FILE));
-    	strings = new Strings(new File(DIR + STRINGS_FILE));
+	public void onEnable()
+	{    	
+		multiInv = getServer().getPluginManager().getPlugin("MultiInv");
+	  
+	    	if (multiInv != null)
+	    	{
+	    		System.out.println("[xAuth] MultiInv detected, switching to compatibility mode");
+		}
+		
+		/*Whirlpool w = new Whirlpool();
+		byte[] digest = new byte[Whirlpool.DIGESTBYTES];
+		w.NESSIEinit();
+		w.NESSIEadd("The quick brown fox jumps over the lazy dog");
+		w.NESSIEfinalize(digest);
+		System.out.println(Whirlpool.display(digest));*/
+	
+		PluginDescriptionFile pdfFile = this.getDescription();
+		PropertyManager props = new PropertyManager(new File("server.properties"));
+		if (props.a("online-mode", true))
+		{
+			System.out.println("[" + pdfFile.getName() + "] Stopping - Server is running in online-mode");
+			this.setEnabled(false);
+			this.getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+	
+		File fDir = new File(DIR);
+	
+		if (!fDir.exists())
+			fDir.mkdir();
+	
+		try
+		{
+			File fAuths = new File(DIR + AUTH_FILE);
+	
+			if (!fAuths.exists())
+				fAuths.createNewFile();
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
+	
+		settings = new Settings(new File(DIR + CONFIG_FILE));
+		strings = new Strings(new File(DIR + STRINGS_FILE));
 		getAuths();
 		setupPermissions();
-
+	
 		//REMOVE WHEN PERSISTENT SESSIONS ARE ADDED
 		//Hide inventory of any players online while server is starting (means /reload was used)
 		Player[] players = getServer().getOnlinePlayers();
@@ -119,39 +119,39 @@ public class xAuth extends JavaPlugin
 			}
 		}
 		//END REMOVE
-
-        PluginManager pm = getServer().getPluginManager();
-        pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener, Priority.Highest, this);
-        pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Normal, this);
-        pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Event.Priority.Highest, this);
-        pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Event.Priority.Highest, this);
-        pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Event.Priority.Highest, this);
+	
+	    PluginManager pm = getServer().getPluginManager();
+	    pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener, Priority.Highest, this);
+	    pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Normal, this);
+	    pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Event.Priority.Highest, this);
+	    pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Event.Priority.Highest, this);
+	    pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Highest, this);
-
+	
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
 		//pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Highest, this);
-
+	
 		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener, Priority.Highest, this);
-
+	
 		//PluginDescriptionFile pdfFile = this.getDescription();
-        System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Enabled!");
-        fullyEnabled = true;
-    }
-
-    public void getAuths()
+	    System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Enabled!");
+	    fullyEnabled = true;
+	}
+	
+	public void getAuths()
 	{
-    	PluginDescriptionFile pdfFile = this.getDescription();
-    	System.out.println("[" + pdfFile.getName() + "] Loading player accounts..");
-
+		PluginDescriptionFile pdfFile = this.getDescription();
+		System.out.println("[" + pdfFile.getName() + "] Loading player accounts..");
+	
 		try
 		{
 			BufferedReader authReader = new BufferedReader(new FileReader(DIR + AUTH_FILE));
-
+	
 			String line;
 			while ((line = authReader.readLine()) != null)
 			{
@@ -166,69 +166,69 @@ public class xAuth extends JavaPlugin
 			System.out.println(e.getMessage());
 		}
 	}
-
-    public void onDisable()
-    {
-    	//Restore players inventories so they are not lost
-    	Player[] players = getServer().getOnlinePlayers();
-    	if (players.length > 0)
-    	{
-    		for (Player player : players)
-    			if (!sessionExists(player.getName()))
-    				restoreInventory(player);
-    	}
-
-    	if (fullyEnabled)
-    		updateAuthFile();
-
-    	PluginDescriptionFile pdfFile = this.getDescription();
-    	System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Disabled");
-    }
-
-    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args)
-    {
-    	if (!this.isEnabled())
-    		return false;
-
-    	CommandHandler cmdHandler = new CommandHandler(this);
-
-    	if (sender instanceof Player)
-    		cmdHandler.handlePlayerCommand((Player)sender, cmd, args);
-    	else if (sender instanceof ConsoleCommandSender)
-    		cmdHandler.handleConsoleCommand(cmd, args);
-
-    	return true;
-    }
-
-    //AUTH / REGISTER FUNCTIONS
+	
+	public void onDisable()
+	{
+		//Restore players inventories so they are not lost
+		Player[] players = getServer().getOnlinePlayers();
+		if (players.length > 0)
+		{
+			for (Player player : players)
+				if (!sessionExists(player.getName()))
+					restoreInventory(player);
+		}
+	
+		if (fullyEnabled)
+			updateAuthFile();
+	
+		PluginDescriptionFile pdfFile = this.getDescription();
+		System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Disabled");
+	}
+	
+	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args)
+	{
+		if (!this.isEnabled())
+			return false;
+	
+		CommandHandler cmdHandler = new CommandHandler(this);
+	
+		if (sender instanceof Player)
+			cmdHandler.handlePlayerCommand((Player)sender, cmd, args);
+		else if (sender instanceof ConsoleCommandSender)
+			cmdHandler.handleConsoleCommand(cmd, args);
+	
+		return true;
+	}
+	
+	//AUTH / REGISTER FUNCTIONS
 	public void addAuth(String pName, String pass)
 	{
 		String hash = md5(pass);
 		auths.put(pName.toLowerCase(), pName.toLowerCase() + ":" + hash);
-
+	
 		if (settings.getBool(Keys.AUTOSAVE))
 			updateAuthFile();
 	}
-
+	
 	public Boolean isRegistered(String pName)
 	{
 		if (auths.containsKey(pName.toLowerCase()))
 			return true;
-
+	
 		return false;
 	}
-
+	
 	public void changePass(String pName, String pass)
 	{
 		String hash = md5(pass);
-
+	
 		auths.remove(pName.toLowerCase());
 		auths.put(pName.toLowerCase(), pName.toLowerCase() + ":" + hash);
-
+	
 		if (settings.getBool(Keys.AUTOSAVE))
 			updateAuthFile();
 	}
-
+	
 	public void removeAuth(String pName)
 	{
 		pName = pName.toLowerCase();
@@ -236,11 +236,11 @@ public class xAuth extends JavaPlugin
 		
 		if (sessionExists(pName))
 			removeSession(pName);
-
+	
 		if (settings.getBool(Keys.AUTOSAVE))
 			updateAuthFile();
 	}
-
+	
 	public void updateAuthFile()
 	{
 		try
@@ -258,14 +258,14 @@ public class xAuth extends JavaPlugin
 			System.out.println(e.getMessage());
 		}
 	}
-
+	
 	//LOGIN / LOGOUT FUNCTIONS
 	public void login(Player player)
 	{
 		startSession(player);
 		restoreInventory(player);
 	}
-
+	
 	public Boolean checkPass(Player player, String pass)
 	{
 		String hash = md5(pass);
@@ -274,34 +274,34 @@ public class xAuth extends JavaPlugin
 		else
 			return false;
 	}
-
+	
 	public void logout(Player player)
 	{
 		String pName = player.getName();
-
+	
 		if (sessionExists(pName))
 		{
 			Session session = sessions.get(pName.toLowerCase());
-
+	
 			if (session.isExpired(new Date(session.getLoginTime() + (settings.getInt(Keys.SESSION_TIMEOUT) * 1000))))
 				removeSession(pName);
 		}
 		else
 			restoreInventory(player);
 	}
-
+	
 	//NOTIFY FUNCTIONS
 	public void handleEvent(Player player, Cancellable event)
 	{
 		if (!sessionExists(player.getName()))
 		{
 			event.setCancelled(true);
-
+	
 			if (canNotify(player))
 				notifyPlayer(player);
 		}
 	}
-
+	
 	public Boolean isCmdAllowed(String cmd)
 	{
 		if (settings.getStrArr(Keys.ALLOWED_CMDS).contains(cmd))
@@ -309,31 +309,31 @@ public class xAuth extends JavaPlugin
 		
 		return false;
 	}
-
+	
 	public Boolean canNotify(Player player)
 	{
 		if (lastNotifyTimes.get(player) == null)
 			return true;
-
+	
 		Date nextNotifyTime = new Date(lastNotifyTimes.get(player).getTime() + (settings.getInt(Keys.NOTIFY_LIMIT) * 1000));
 		if (nextNotifyTime.compareTo(new Date()) < 0)
 			return true;
-
+	
 		return false;
 	}
-
+	
 	public void notifyPlayer(Player player)
 	{
 		player.sendMessage(ChatColor.GRAY + "You must be logged in to do that!");
 		updateNotifyTime(player, new Date());
 	}
-
+	
 	public void updateNotifyTime(Player player, Date date)
 	{
 		lastNotifyTimes.remove(player);
 		lastNotifyTimes.put(player, date);
 	}
-
+	
 	//INVENTORY FUNCTIONS
 	public void saveInventory(Player player)
 	{
@@ -346,17 +346,17 @@ public class xAuth extends JavaPlugin
 		playerInv.setLeggings(null);
 		playerInv.setBoots(null);
 	}
-
+	
 	public void restoreInventory(Player player)
 	{
 		PlayerInventory playerInv = player.getInventory();
-
+	
 		if (inventory.containsKey(player))
 		{
 			playerInv.setContents(inventory.get(player));
 			inventory.remove(player);
 		}
-
+	
 		if (armor.containsKey(player))
 		{
 			playerInv.setBoots(armor.get(player)[0].getTypeId() == 0 ? null : armor.get(player)[0]);
@@ -365,39 +365,39 @@ public class xAuth extends JavaPlugin
 			playerInv.setHelmet(armor.get(player)[3].getTypeId() == 0 ? null : armor.get(player)[3]);
 			armor.remove(player);
 		}
-
+	
 		CraftWorld cWorld = (CraftWorld)player.getWorld();
 		CraftPlayer cPlayer = (CraftPlayer)player;
 		cWorld.getHandle().m().d().a(cPlayer.getHandle());
 	}
-
+	
 	//SESSION FUNCTIONS
 	public void startSession(Player player)
 	{
 		sessions.put(player.getName().toLowerCase(), new Session(player));
 	}
-
+	
 	public Boolean sessionExists(String pName)
 	{
 		if (sessions.containsKey(pName.toLowerCase()))
 			return true;
-
+	
 		return false;
 	}
-
+	
 	public Boolean isLoggedIn(Player player)
 	{
 		if (sessionExists(player.getName()))
 		{
 			if (isSessionValid(player))
 				return true;
-
+	
 			removeSession(player.getName());
 		}
-
+	
 		return false;
 	}
-
+	
 	public Boolean isSessionValid(Player player)
 	{
 		Session session = sessions.get(player.getName().toLowerCase());
@@ -409,14 +409,14 @@ public class xAuth extends JavaPlugin
 		
 		return true;
 	}
-
+	
 	public void removeSession(String pName)
 	{
 		pName = pName.toLowerCase();
 		if (sessionExists(pName))
 			sessions.remove(pName);
 	}
-
+	
 	//MISC FUNCTIONS
 	private void setupPermissions()
 	{
@@ -431,64 +431,64 @@ public class xAuth extends JavaPlugin
 	        	System.out.println("[" + pdfFile.getName() + "] Permissions plugin not detected, defaulting to ops.txt");
 	    }
 	}
-
+	
 	public String md5(String str)
 	{
 		try
 		{
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] messageDigest = md.digest(str.getBytes());
-            BigInteger number = new BigInteger(1, messageDigest);
-            String hashtext = number.toString(16);
-            while (hashtext.length() < 32)
-                hashtext = "0" + hashtext;
-
-            return hashtext;
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
+	        MessageDigest md = MessageDigest.getInstance("MD5");
+	        byte[] messageDigest = md.digest(str.getBytes());
+	        BigInteger number = new BigInteger(1, messageDigest);
+	        String hashtext = number.toString(16);
+	        while (hashtext.length() < 32)
+	            hashtext = "0" + hashtext;
+	
+	        return hashtext;
+	    }
+	    catch (Exception e)
+	    {
+	        System.out.println(e.getMessage());
+	    }
+	
 		return null;
 	}
-
+	
 	public boolean canUseCommand(Player player, String node)
-    {
-    	if (xAuth.Permissions == null)
-    	{
-    		if (!player.isOp())
-    			return false;
-
-    		return true;
-    	}
-
-    	if (!xAuth.Permissions.has(player, node))
-    		return false;
-
-    	return true;
-    }
-
+	{
+		if (xAuth.Permissions == null)
+		{
+			if (!player.isOp())
+				return false;
+	
+			return true;
+		}
+	
+		if (!xAuth.Permissions.has(player, node))
+			return false;
+	
+		return true;
+	}
+	
 	public void reload()
-    {
-    	PluginDescriptionFile pdfFile = this.getDescription();
-    	updateAuthFile();
-    	settings = new Settings(new File(DIR + CONFIG_FILE));
-    	strings = new Strings(new File(DIR + STRINGS_FILE));
-    	getAuths();
-    	System.out.println("[" + pdfFile.getName() + "] Configuration & Accounts reloaded");
-    }
-
-    public boolean isDebugging(final Player player)
-    {
-        if (debugees.containsKey(player))
-            return debugees.get(player);
-        else
-            return false;
-    }
-
-    public void setDebugging(final Player player, final boolean value)
-    {
-        debugees.put(player, value);
-    }
+	{
+		PluginDescriptionFile pdfFile = this.getDescription();
+		updateAuthFile();
+		settings = new Settings(new File(DIR + CONFIG_FILE));
+		strings = new Strings(new File(DIR + STRINGS_FILE));
+		getAuths();
+		System.out.println("[" + pdfFile.getName() + "] Configuration & Accounts reloaded");
+	}
+	
+	public boolean isDebugging(final Player player)
+	{
+	    if (debugees.containsKey(player))
+	        return debugees.get(player);
+	    else
+	        return false;
+	}
+	
+	public void setDebugging(final Player player, final boolean value)
+	{
+	    debugees.put(player, value);
+	}
 }
