@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import net.minecraft.server.PropertyManager;
-import org.bukkit.ChatColor;
+//import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -41,7 +41,8 @@ public class xAuth extends JavaPlugin
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	private static PluginDescriptionFile pdfFile;
 
-	private static final String DIR = "plugins/xAuth/";
+	//private static final String DIR = "plugins/xAuth/";
+	private static final String DIR = "plugins" + File.separator + "xAuth" + File.separator;
 	private static final String CONFIG_FILE = "config.yml";
 	private static final String STRINGS_FILE = "strings.yml";
 	private static final String AUTH_FILE = "auths.txt";
@@ -52,7 +53,7 @@ public class xAuth extends JavaPlugin
 
 	//autosave test code
 	private static Boolean fullyEnabled = false;
-	
+
 	private ConcurrentHashMap<String, String> auths = new ConcurrentHashMap<String, String>();
 	private ConcurrentHashMap<Player, ItemStack[]> inventory = new ConcurrentHashMap<Player, ItemStack[]>();
 	private ConcurrentHashMap<Player, ItemStack[]> armor = new ConcurrentHashMap<Player, ItemStack[]>();
@@ -78,12 +79,12 @@ public class xAuth extends JavaPlugin
 			this.getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
-	
+
 		File fDir = new File(DIR);
 	
 		if (!fDir.exists())
 			fDir.mkdir();
-	
+
 		try
 		{
 			File fAuths = new File(DIR + AUTH_FILE);
@@ -95,7 +96,7 @@ public class xAuth extends JavaPlugin
 		{
 			System.out.println(e.getMessage());
 		}
-	
+
 		settings = new Settings(new File(DIR + CONFIG_FILE));
 		strings = new Strings(new File(DIR + STRINGS_FILE));
 		getAuths();
@@ -108,7 +109,8 @@ public class xAuth extends JavaPlugin
 			for (Player player : players)
 			{
 				saveInventory(player);
-				player.sendMessage(ChatColor.RED + "Server reloaded! You must log in again.");
+				player.sendMessage(strings.getString("misc.reloaded"));
+				//player.sendMessage(ChatColor.RED + "Server reloaded! You must log in again.");
 			}
 		}
 
@@ -315,7 +317,8 @@ public class xAuth extends JavaPlugin
 	
 	public void notifyPlayer(Player player)
 	{
-		player.sendMessage(ChatColor.GRAY + "You must be logged in to do that!");
+		player.sendMessage(strings.getString("misc.illegal"));
+		//player.sendMessage(ChatColor.GRAY + "You must be logged in to do that!");
 		updateNotifyTime(player, new Date());
 	}
 	

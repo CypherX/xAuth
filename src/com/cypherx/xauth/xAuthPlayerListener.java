@@ -2,9 +2,7 @@ package com.cypherx.xauth;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.*;
-//import org.bukkit.inventory.ItemStack;
-//import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.ChatColor;
+//import org.bukkit.ChatColor;
 
 /**
  * Handle events for all Player related events
@@ -28,9 +26,11 @@ public class xAuthPlayerListener extends PlayerListener
     		plugin.saveInventory(player);
 
     		if (!plugin.isRegistered(player.getName()))
-    			player.sendMessage(ChatColor.RED + "You are not registered. Please register using /register <password>.");
+    			player.sendMessage(xAuth.strings.getString("register.login"));
+    			//player.sendMessage(ChatColor.RED + "You are not registered. Please register using /register <password>.");
     		else
-    			player.sendMessage(ChatColor.RED + "Please log in using /login <password>.");
+    			player.sendMessage(xAuth.strings.getString("login.login"));
+    			//player.sendMessage(ChatColor.RED + "Please log in using /login <password>.");
     	}
     }
 
