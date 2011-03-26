@@ -21,65 +21,22 @@ public class xAuthPlayerListener extends PlayerListener
 
     public void onPlayerJoin(PlayerEvent event)
     {
-    	//PlayerInventory inv;
-		//ItemStack[] is;
     	Player player = event.getPlayer();
 
     	if (!plugin.isLoggedIn(player))
     	{
-    		/*System.out.println("[xAuth] :: Join - Before saving inventory");
-
-    		inv = event.getPlayer().getInventory();
-    		is = inv.getContents();
-    		for (ItemStack item : is)
-    			System.out.println(item.getType() + " : " + item.getAmount());*/
-
     		plugin.saveInventory(player);
-
-    		/*System.out.println("[xAuth] :: Join - After saving inventory");
-
-    		inv = event.getPlayer().getInventory();
-    		is = inv.getContents();
-    		for (ItemStack item : is)
-    			System.out.println(item.getType() + " : " + item.getAmount());*/
 
     		if (!plugin.isRegistered(player.getName()))
     			player.sendMessage(ChatColor.RED + "You are not registered. Please register using /register <password>.");
     		else
     			player.sendMessage(ChatColor.RED + "Please log in using /login <password>.");
     	}
-
-    	/*if (!plugin.isRegistered(player.getName()))
-    	{
-    		plugin.saveInventory(player);
-			player.sendMessage(ChatColor.RED + "You are not registered. Please register using /register <password>.");
-    	}
-    	else if (!plugin.isLoggedIn(player))
-    	{
-    		plugin.saveInventory(player);
-			player.sendMessage(ChatColor.RED + "Please log in using /login <password>.");
-    	}*/
     }
 
 	public void onPlayerQuit(PlayerEvent event)
 	{
-		/*PlayerInventory inv;
-		ItemStack[] is;
-
-		System.out.println("[xAuth] :: Quit - Before restoring inventory");
-
-		inv = event.getPlayer().getInventory();
-		is = inv.getContents();
-		for (ItemStack item : is)
-			System.out.println(item.getType() + " : " + item.getAmount());*/
-
 		plugin.logout(event.getPlayer());
-
-		/*System.out.println("[xAuth] :: Quit - After restoring inventory");
-		inv = event.getPlayer().getInventory();
-		is = inv.getContents();
-		for (ItemStack item : is)
-			System.out.println(item.getType() + " : " + item.getAmount());*/
 	}
 
 	//Prevents players from executing commands

@@ -1,3 +1,5 @@
+package com.cypherx.xauth;
+
 /**
  * The Whirlpool hashing function.
  *

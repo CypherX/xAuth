@@ -49,8 +49,8 @@ public class xAuth extends JavaPlugin
 	public static Settings settings;
 	public static Strings strings;
 	public static PermissionHandler Permissions;
-	
-	public static Plugin multiInv = null;
+
+	//autosave test code
 	private static Boolean fullyEnabled = false;
 	
 	private ConcurrentHashMap<String, String> auths = new ConcurrentHashMap<String, String>();
@@ -60,14 +60,7 @@ public class xAuth extends JavaPlugin
 	private ConcurrentHashMap<Player, Date> lastNotifyTimes = new ConcurrentHashMap<Player, Date>();
 
 	public void onEnable()
-	{    	
-		multiInv = getServer().getPluginManager().getPlugin("MultiInv");
-	  
-	    	if (multiInv != null)
-	    	{
-	    		System.out.println("[xAuth] MultiInv detected, switching to compatibility mode");
-		}
-		
+	{		
 		/*Whirlpool w = new Whirlpool();
 		byte[] digest = new byte[Whirlpool.DIGESTBYTES];
 		w.NESSIEinit();
@@ -106,8 +99,7 @@ public class xAuth extends JavaPlugin
 		strings = new Strings(new File(DIR + STRINGS_FILE));
 		getAuths();
 		setupPermissions();
-	
-		//REMOVE WHEN PERSISTENT SESSIONS ARE ADDED
+
 		//Hide inventory of any players online while server is starting (means /reload was used)
 		Player[] players = getServer().getOnlinePlayers();
 		if (players.length > 0)
@@ -118,36 +110,37 @@ public class xAuth extends JavaPlugin
 				player.sendMessage(ChatColor.RED + "Server reloaded! You must log in again.");
 			}
 		}
-		//END REMOVE
-	
-	    PluginManager pm = getServer().getPluginManager();
-	    pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener, Priority.Highest, this);
-	    pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Normal, this);
-	    pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Event.Priority.Highest, this);
-	    pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Event.Priority.Highest, this);
-	    pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Event.Priority.Highest, this);
+
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Event.Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Event.Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Highest, this);
-	
+
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
 		//pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Highest, this);
-	
+
 		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener, Priority.Highest, this);
-	
+
 		//PluginDescriptionFile pdfFile = this.getDescription();
-	    System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Enabled!");
-	    fullyEnabled = true;
+		System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Enabled!");
+
+		//autosave stuff
+		fullyEnabled = true;
 	}
 	
 	public void getAuths()
 	{
 		PluginDescriptionFile pdfFile = this.getDescription();
 		System.out.println("[" + pdfFile.getName() + "] Loading player accounts..");
-	
+
 		try
 		{
 			BufferedReader authReader = new BufferedReader(new FileReader(DIR + AUTH_FILE));
@@ -166,7 +159,7 @@ public class xAuth extends JavaPlugin
 			System.out.println(e.getMessage());
 		}
 	}
-	
+
 	public void onDisable()
 	{
 		//Restore players inventories so they are not lost
@@ -177,10 +170,10 @@ public class xAuth extends JavaPlugin
 				if (!sessionExists(player.getName()))
 					restoreInventory(player);
 		}
-	
+
 		if (fullyEnabled)
 			updateAuthFile();
-	
+
 		PluginDescriptionFile pdfFile = this.getDescription();
 		System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Disabled");
 	}
@@ -330,8 +323,9 @@ public class xAuth extends JavaPlugin
 	
 	public void updateNotifyTime(Player player, Date date)
 	{
-		lastNotifyTimes.remove(player);
-		lastNotifyTimes.put(player, date);
+		lastNotifyTimes.replace(player, date);
+		//lastNotifyTimes.remove(player);
+		//lastNotifyTimes.put(player, date);
 	}
 	
 	//INVENTORY FUNCTIONS
