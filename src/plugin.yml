@@ -1,0 +1,23 @@
+name: xAuth
+main: com.cypherx.xauth.xAuth
+version: 1.1.4
+
+commands:
+    register:
+        description:
+        usage:
+    login:
+        description:
+        usage:
+    changepw:
+        description:
+        usage:
+    unregister:
+        description:
+        usage:
+    authreload:
+        description:
+        usage:
+    toggle:
+        description:
+        usage:

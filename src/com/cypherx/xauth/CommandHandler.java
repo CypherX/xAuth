@@ -1,0 +1,265 @@
+package com.cypherx.xauth;
+
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginDescriptionFile;
+
+import com.cypherx.xauth.Settings.Keys;
+
+public class CommandHandler
+{
+	private final xAuth plugin;
+	PluginDescriptionFile pdfFile;
+
+	public CommandHandler(final xAuth instance)
+	{
+		plugin = instance;
+		pdfFile = plugin.getDescription();
+	}
+
+	public void handlePlayerCommand(Player player, Command cmd, String[] args)
+	{
+		if (cmd.getName().equalsIgnoreCase("register"))
+    	{
+			if (args.length != 1)
+				player.sendMessage(xAuth.strings.getString("register.usage"));
+				//player.sendMessage(ChatColor.RED + "Correct Usage: /register <password>");
+			else if (!xAuth.settings.getBool(Keys.REG_ENABLED))
+				player.sendMessage(xAuth.strings.getString("register.err.disabled"));
+				//player.sendMessage(ChatColor.RED + "Registrations are currently disabled.");
+			else if (plugin.isRegistered(player.getName()))
+				player.sendMessage(xAuth.strings.getString("register.err.registered"));
+				//player.sendMessage(ChatColor.RED + "You are already registered.");
+			else if (args[0].length() < xAuth.settings.getInt(Keys.PW_MIN_LENGTH))
+				//player.sendMessage(xAuth.strings.get(Strings.Keys.REG_ERR_REGISTERED, xAuth.settings.getInt(Keys.PW_MIN_LENGTH)));
+				player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt(Keys.PW_MIN_LENGTH)));
+				//player.sendMessage(ChatColor.RED + "Your password must contain " + xAuth.settings.getInt(Keys.PW_MIN_LENGTH) + " or more characters.");
+			else
+			{
+				plugin.addAuth(player.getName(), args[0]);
+				plugin.login(player);
+				player.sendMessage(xAuth.strings.getString("register.success1"));
+				player.sendMessage(xAuth.strings.getString("register.success2", args[0]));
+				//player.sendMessage(ChatColor.GREEN + "You have successfully registered!");
+				//player.sendMessage(ChatColor.GREEN + "Your password is: " + ChatColor.WHITE + args[0]);
+				System.out.println("[" + pdfFile.getName() + "] Player '" + player.getName() + "' has registered");
+			}
+    	}
+		else if (cmd.getName().equalsIgnoreCase("login"))
+    	{
+			if (args.length != 1)
+				player.sendMessage(ChatColor.RED + "Correct Usage: /login <password>");
+			else if (!plugin.isRegistered(player.getName()))
+				player.sendMessage(ChatColor.RED + "You are not registered.");
+			else if (plugin.sessionExists(player.getName()))
+				player.sendMessage(ChatColor.RED + "You are already logged in.");
+			else
+			{
+				if (plugin.checkPass(player, args[0]))
+				{
+					plugin.login(player);
+					player.sendMessage(ChatColor.GREEN + "You are now logged in.");
+					System.out.println("[" + pdfFile.getName() + "] Player '" + player.getName() + "' has authenticated");
+				}
+				else
+					player.sendMessage(ChatColor.RED + "Incorrect password!");
+			}
+    	}
+		else if (cmd.getName().equalsIgnoreCase("changepw"))
+    	{
+			if (plugin.canUseCommand(player, "xauth.admin.changepw"))
+			{
+				if (args.length == 1)
+				{
+					if (!plugin.sessionExists(player.getName()))
+						player.sendMessage(ChatColor.RED + "You must login before changing your password!");
+					else if (!xAuth.settings.getBool(Keys.ALLOW_CHANGEPW))
+						player.sendMessage(ChatColor.RED + "Password changes are currently disabled.");
+					else if (args[0].length() < xAuth.settings.getInt(Keys.PW_MIN_LENGTH))
+						player.sendMessage(ChatColor.RED + "Your password must contain " + xAuth.settings.getInt(Keys.PW_MIN_LENGTH) + " or more characters.");
+					else
+					{
+						plugin.changePass(player.getName(), args[0]);
+						player.sendMessage(ChatColor.GREEN + "Your password has been changed to: " + ChatColor.WHITE + args[0]);
+						System.out.println("[" + pdfFile.getName() + "] Player '" + player.getName() + "' has changed their password");
+					}
+				}
+				else if (args.length == 2)
+				{
+					if (!plugin.isRegistered(args[0]))
+						player.sendMessage(ChatColor.RED + "This player is not registered");
+					else
+					{
+						plugin.changePass(args[0], args[1]);
+						player.sendMessage(ChatColor.GREEN + args[0] + "'s password has been changed to: " + ChatColor.WHITE + args[1]);
+						System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has changed " + args[0] + "'s password");
+					}
+				}
+				else
+				{
+					player.sendMessage(ChatColor.RED + "Correct usage: /changepw [player] <newpassword>");
+				}
+			}
+			else
+			{
+				if (args.length != 1)
+					player.sendMessage(ChatColor.RED + "Correct Usage: /changepw <newpassword>");
+				else if (!plugin.sessionExists(player.getName()))
+					player.sendMessage(ChatColor.RED + "You must login before changing your password!");
+				else if (!xAuth.settings.getBool(Keys.ALLOW_CHANGEPW))
+					player.sendMessage(ChatColor.RED + "Password changes are currently disabled.");
+				else if (args[0].length() < xAuth.settings.getInt(Keys.PW_MIN_LENGTH))
+					player.sendMessage(ChatColor.RED + "Your password must contain " + xAuth.settings.getInt(Keys.PW_MIN_LENGTH) + " or more characters.");
+				else
+				{
+					plugin.changePass(player.getName(), args[0]);
+					player.sendMessage(ChatColor.GREEN + "Your password has been changed to: " + ChatColor.WHITE + args[0]);
+					System.out.println("[" + pdfFile.getName() + "] Player '" + player.getName() + "' has changed their password");
+				}
+			}
+    	}
+		else if (cmd.getName().equalsIgnoreCase("unregister"))
+		{
+			if (plugin.canUseCommand(player, "xauth.admin.unregister"))
+			{
+				if (args.length != 1)
+					player.sendMessage(ChatColor.RED + "Correct Usage: /unregister <player>");
+				else if (!plugin.isRegistered(args[0]))
+					player.sendMessage(ChatColor.RED + "This player is not registered!");
+				else
+				{
+					plugin.removeAuth(args[0]);
+					player.sendMessage(ChatColor.GREEN + args[0] + " has been unregistered.");
+					System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has unregistered " + args[0]);
+				}
+			}
+		}
+		else if (cmd.getName().equalsIgnoreCase("authreload"))
+    	{
+			if (plugin.canUseCommand(player, "xauth.admin.reload"))
+			{
+				plugin.reload();
+				player.sendMessage(ChatColor.YELLOW + "[" + pdfFile.getName() + "] Configuration & Accounts reloaded");
+			}
+    	}
+		else if (cmd.getName().equalsIgnoreCase("toggle"))
+		{
+			Boolean canToggleReg = plugin.canUseCommand(player, "xauth.admin.toggle.reg");
+			Boolean canTogglePw = plugin.canUseCommand(player, "xauth.admin.toggle.changepw");
+			Boolean canToggleSave = plugin.canUseCommand(player, "xauth.admin.toggle.autosave");
+
+			if (canToggleReg || canTogglePw || canToggleSave)
+			{
+				if (args.length != 1)
+					player.sendMessage(ChatColor.RED + "Correct Usage: /toggle <reg|changepw|autosave>");
+				else if (args[0].equalsIgnoreCase("reg"))
+				{
+					if (!canToggleReg)
+						player.sendMessage(ChatColor.RED + "You aren't allow to toggle that!");
+					else
+					{
+						Boolean b = xAuth.settings.getBool(Keys.REG_ENABLED);
+						xAuth.settings.update(Keys.REG_ENABLED, (b ? false : true));
+						player.sendMessage(ChatColor.YELLOW + "[" + pdfFile.getName() + "] Registrations are now " + (b ? "disabled." : "enabled."));
+						System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has " + (b ? "disabled" : "enabled") + " registrations");
+					}
+						
+				}
+				else if (args[0].equalsIgnoreCase("changepw"))
+				{
+					if (!canTogglePw)
+						player.sendMessage(ChatColor.RED + "You aren't allow to toggle that!");
+					else
+					{
+						Boolean b = xAuth.settings.getBool(Keys.ALLOW_CHANGEPW);
+						xAuth.settings.update(Keys.ALLOW_CHANGEPW, (b ? false : true));
+						player.sendMessage(ChatColor.YELLOW + "[" + pdfFile.getName() + "] Password changes are now " + (b ? "disabled." : "enabled."));
+						System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has " + (b ? "disabled" : "enabled") + " password changes");
+					}
+				}
+				else if (args[0].equalsIgnoreCase("autosave"))
+				{
+					if (!canToggleSave)
+						player.sendMessage(ChatColor.RED + "You aren't allow to toggle that!");
+					else
+					{
+						Boolean b = xAuth.settings.getBool(Keys.AUTOSAVE);
+						xAuth.settings.update(Keys.AUTOSAVE, (b ? false : true));
+						player.sendMessage(ChatColor.YELLOW + "[" + pdfFile.getName() + "] Autosaving of account modifications is now " + (b ? "disabled." : "enabled."));
+						System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has " + (b ? "disabled" : "enabled") + " autosave");
+					}
+				}
+				else
+					player.sendMessage(ChatColor.RED + "Correct Usage: /toggle <reg|changepw|autosave>");
+			}
+		}
+	}
+
+	public void handleConsoleCommand(Command cmd, String[] args)
+	{
+		if (cmd.getName().equalsIgnoreCase("register"))
+    	{
+			if (args.length != 2)
+				System.out.println("Correct Usage: /register <player> <password>");
+			else if (plugin.isRegistered(args[0]))
+				System.out.println("Player '" + args[0] + "' is already registered");
+			else
+			{
+				plugin.addAuth(args[0], args[1]);
+				System.out.println(args[0] + " has been registered with password: " + args[1]);
+			}
+    	}
+		else if (cmd.getName().equalsIgnoreCase("changepw"))
+    	{
+			if (args.length != 2)
+				System.out.println("Correct Usage: /changepw <player> <newpassword>");
+			else if (!plugin.isRegistered(args[0]))
+				System.out.println("Player '" + args[0] + "' is not registered");
+			else
+			{
+				plugin.changePass(args[0], args[1]);
+				System.out.println(args[0] + "'s password has been changed to: " + args[1]);
+			}
+    	}
+		else if (cmd.getName().equalsIgnoreCase("unregister"))
+		{
+			if (args.length != 1)
+				System.out.println("Correct Usage: /unregister <player>");
+			else if (!plugin.isRegistered(args[0]))
+				System.out.println("Player '" + args[0] + "' is not registered");
+			else
+			{
+				plugin.removeAuth(args[0]);
+				System.out.println(args[0] + " has been unregistered");
+			}
+		}
+		else if (cmd.getName().equalsIgnoreCase("authreload"))
+			plugin.reload();
+		else if (cmd.getName().equalsIgnoreCase("toggle"))
+		{
+			if (args.length != 1)
+				System.out.println("Correct Usage: /toggle <reg|changepw|autosave>");
+			else if (args[0].equalsIgnoreCase("reg"))
+			{
+				Boolean b = xAuth.settings.getBool(Keys.REG_ENABLED);
+				xAuth.settings.update(Keys.REG_ENABLED, (b ? false : true));
+				System.out.println("[" + pdfFile.getName() + "] Registrations are now " + (b ? "disabled" : "enabled"));
+			}
+			else if (args[0].equalsIgnoreCase("changepw"))
+			{
+				Boolean b = xAuth.settings.getBool(Keys.ALLOW_CHANGEPW);
+				xAuth.settings.update(Keys.ALLOW_CHANGEPW, (b ? false : true));
+				System.out.println("[" + pdfFile.getName() + "] Password changes are now " + (b ? "disabled" : "enabled"));
+			}
+			else if (args[0].equalsIgnoreCase("autosave"))
+			{
+				Boolean b = xAuth.settings.getBool(Keys.AUTOSAVE);
+				xAuth.settings.update(Keys.AUTOSAVE, (b ? false : true));
+				System.out.println("[" + pdfFile.getName() + "] Autosaving of account modifications is now " + (b ? "disabled" : "enabled"));
+			}
+			else
+				System.out.println("Correct Usage: /toggle <reg|changepw|autosave>");
+		}
+	}
+}
