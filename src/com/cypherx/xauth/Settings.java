@@ -16,7 +16,9 @@ public class Settings
 		"session.timeout",
 		"notify.limit",
 		"registration.pw-min-length",
-		"misc.allowed-cmds"
+		"misc.allowed-cmds",
+		"login.strikes.enabled",
+		"login.strikes.amount",
 	};
 
 	private static final String[][] keyUpdates =
@@ -51,6 +53,8 @@ public class Settings
 		defaults.put("misc.allow-changepw", true);
 		defaults.put("misc.allowed-cmds", new String[]{"/register", "/login"});
 		defaults.put("misc.autosave", true);
+		defaults.put("login.strikes.enabled", true);
+		defaults.put("login.strikes.amount", 5);
 	}
 
 	public void updateKeys()
@@ -100,6 +104,7 @@ public class Settings
 	@SuppressWarnings("unchecked")
 	public List<String> getStrList(String key)
 	{
+		//List<String> cmds = (List<String>)settings.get(key);
 		return (List<String>)settings.get(key);
 	}
 }

@@ -2,7 +2,6 @@ package com.cypherx.xauth;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.*;
-//import org.bukkit.ChatColor;
 
 /**
  * Handle events for all Player related events
@@ -27,10 +26,8 @@ public class xAuthPlayerListener extends PlayerListener
 
     		if (!plugin.isRegistered(player.getName()))
     			player.sendMessage(xAuth.strings.getString("register.login"));
-    			//player.sendMessage(ChatColor.RED + "You are not registered. Please register using /register <password>.");
     		else
     			player.sendMessage(xAuth.strings.getString("login.login"));
-    			//player.sendMessage(ChatColor.RED + "Please log in using /login <password>.");
     	}
     }
 
@@ -49,7 +46,10 @@ public class xAuthPlayerListener extends PlayerListener
 		String[] msg = event.getMessage().split(" ");
 
 		if (!plugin.isCmdAllowed(msg[0]))
+		{
 			plugin.handleEvent(player, event);
+			event.setMessage("/");
+		}
 	}
 
 	//Prevents player from being able to chat

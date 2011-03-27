@@ -26,13 +26,6 @@ public class xAuthBlockListener extends BlockListener
     	plugin.handleEvent(player, event);
     }
 
-	//Prevents player from damaging a block
-    /*public void onBlockDamage(BlockDamageEvent event)
-    {
-    	Player player = event.getPlayer();
-    	plugin.handleEvent(player, event);
-    }*/
-
 	//Prevents player from using switches, buttons, etc.
     public void onBlockInteract(BlockInteractEvent event)
     {

@@ -1,3 +1,6 @@
+//xAuth 1.1.4
+//Built against Bukkit #461 and CraftBukkit #556
+
 package com.cypherx.xauth;
 
 import java.io.*;
@@ -8,7 +11,6 @@ import java.util.Date;
 import java.util.HashMap;
 
 import net.minecraft.server.PropertyManager;
-//import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -41,27 +43,28 @@ public class xAuth extends JavaPlugin
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	private static PluginDescriptionFile pdfFile;
 
-	//private static final String DIR = "plugins/xAuth/";
 	private static final String DIR = "plugins" + File.separator + "xAuth" + File.separator;
 	private static final String CONFIG_FILE = "config.yml";
 	private static final String STRINGS_FILE = "strings.yml";
 	private static final String AUTH_FILE = "auths.txt";
-	
+
 	public static Settings settings;
 	public static Strings strings;
 	public static PermissionHandler Permissions;
 
 	//autosave test code
-	private static Boolean fullyEnabled = false;
+	private static Boolean fullyEnabled;
 
 	private ConcurrentHashMap<String, String> auths = new ConcurrentHashMap<String, String>();
 	private ConcurrentHashMap<Player, ItemStack[]> inventory = new ConcurrentHashMap<Player, ItemStack[]>();
 	private ConcurrentHashMap<Player, ItemStack[]> armor = new ConcurrentHashMap<Player, ItemStack[]>();
 	private ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 	private ConcurrentHashMap<Player, Date> lastNotifyTimes = new ConcurrentHashMap<Player, Date>();
+	private ConcurrentHashMap<String, Integer> strikes = new ConcurrentHashMap<String, Integer>();
 
 	public void onEnable()
 	{
+		fullyEnabled = false;
 		pdfFile = this.getDescription();
 
 		/*Whirlpool w = new Whirlpool();
@@ -110,13 +113,12 @@ public class xAuth extends JavaPlugin
 			{
 				saveInventory(player);
 				player.sendMessage(strings.getString("misc.reloaded"));
-				//player.sendMessage(ChatColor.RED + "Server reloaded! You must log in again.");
 			}
 		}
 
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Lowest, this);
 		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Event.Priority.Highest, this);
@@ -125,7 +127,6 @@ public class xAuth extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Lowest, this);
 
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
-		//pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Highest, this);
 
@@ -282,6 +283,35 @@ public class xAuth extends JavaPlugin
 		else
 			restoreInventory(player);
 	}
+
+	public void addStrike(Player player)
+	{
+		String addr = player.getAddress().getAddress().getHostAddress();
+		int newCount = 1;
+		if (strikes.containsKey(addr))
+		{
+			newCount = strikes.get(addr) + 1;
+			strikes.remove(addr);
+		}
+		
+		strikes.put(addr, newCount);
+	}
+
+	public int getStrikes(Player player)
+	{
+		String addr = player.getAddress().getAddress().getHostAddress();
+
+		if (!strikes.containsKey(addr))
+			return 0;
+
+		return strikes.get(addr);
+	}
+
+	public void clearStrikes(Player player)
+	{
+		String addr = player.getAddress().getAddress().getHostAddress();
+		strikes.remove(addr);
+	}
 	
 	//NOTIFY FUNCTIONS
 	public void handleEvent(Player player, Cancellable event)
@@ -318,7 +348,6 @@ public class xAuth extends JavaPlugin
 	public void notifyPlayer(Player player)
 	{
 		player.sendMessage(strings.getString("misc.illegal"));
-		//player.sendMessage(ChatColor.GRAY + "You must be logged in to do that!");
 		updateNotifyTime(player, new Date());
 	}
 	
