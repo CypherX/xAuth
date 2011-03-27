@@ -319,7 +319,7 @@ public class xAuth extends JavaPlugin
 		if (!sessionExists(player.getName()))
 		{
 			event.setCancelled(true);
-	
+
 			if (canNotify(player))
 				notifyPlayer(player);
 		}

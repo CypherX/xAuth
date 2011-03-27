@@ -46,10 +46,10 @@ public class xAuthPlayerListener extends PlayerListener
 		String[] msg = event.getMessage().split(" ");
 
 		if (!plugin.isCmdAllowed(msg[0]))
-		{
 			plugin.handleEvent(player, event);
+
+		if (event.isCancelled())
 			event.setMessage("/");
-		}
 	}
 
 	//Prevents player from being able to chat
