@@ -1,5 +1,5 @@
-//xAuth 1.1.4
-//Built against Bukkit #461 and CraftBukkit #556
+//xAuth 1.1.5a
+//Built against Bukkit #486 and CraftBukkit #602
 
 package com.cypherx.xauth;
 
@@ -7,6 +7,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -61,6 +62,7 @@ public class xAuth extends JavaPlugin
 	private ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 	private ConcurrentHashMap<Player, Date> lastNotifyTimes = new ConcurrentHashMap<Player, Date>();
 	private ConcurrentHashMap<String, Integer> strikes = new ConcurrentHashMap<String, Integer>();
+	private ArrayList<String> illegalNames = new ArrayList<String>();
 
 	public void onEnable()
 	{
@@ -121,15 +123,19 @@ public class xAuth extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Lowest, this);
 		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Event.Priority.Highest, this);
+		//pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Lowest, this);
 
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.Highest, this);
+		//pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Highest, this);
 
+		//pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener, Priority.Highest, this);
 
@@ -453,7 +459,7 @@ public class xAuth extends JavaPlugin
 	        	System.out.println("[" + pdfFile.getName() + "] Permissions plugin not detected, defaulting to ops.txt");
 	    }
 	}
-	
+
 	public String md5(String str)
 	{
 		try
@@ -490,7 +496,26 @@ public class xAuth extends JavaPlugin
 	
 		return true;
 	}
-	
+
+	public Boolean isNameLegal(String pName)
+	{
+		pName = pName.toLowerCase();
+
+		if (illegalNames.contains(pName))
+			return false;
+
+		String allowed = settings.getStr("security.filter.allowed");
+
+		for(int i = 0; i < pName.length(); i++)
+			if (allowed.indexOf(pName.charAt(i)) == -1)
+			{
+				illegalNames.add(pName);
+				return false;
+			}
+
+		return true;
+	}
+
 	public void reload()
 	{
 		updateAuthFile();

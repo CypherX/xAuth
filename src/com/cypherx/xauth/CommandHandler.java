@@ -50,26 +50,32 @@ public class CommandHandler
 			{
 				if (plugin.checkPass(player, args[0]))
 				{
-					plugin.clearStrikes(player);
+					if (xAuth.settings.getBool("login.strikes.enabled"))
+						plugin.clearStrikes(player);
+
 					plugin.login(player);
 					player.sendMessage(xAuth.strings.getString("login.success"));
 					System.out.println("[" + pdfFile.getName() + "] Player '" + player.getName() + "' has authenticated");
 				}
 				else
 				{
-					plugin.addStrike(player);
+					player.sendMessage(xAuth.strings.getString("login.err.password"));
 
-					if (plugin.getStrikes(player) >= xAuth.settings.getInt("login.strikes.amount"))
+					if (xAuth.settings.getBool("login.strikes.enabled"))
 					{
-						String addr = player.getAddress().getAddress().getHostAddress();
-						Server server = plugin.getServer();
-						server.dispatchCommand(((CraftServer)server).getServer().console, "ban-ip " + addr);
-						server.dispatchCommand(((CraftServer)server).getServer().console, "kick " + player.getName());
-						plugin.clearStrikes(player);
-						System.out.println("[" + pdfFile.getName() + "] " + addr + " banned by Strike system");
+						plugin.addStrike(player);
+
+						if (plugin.getStrikes(player) >= xAuth.settings.getInt("login.strikes.amount"))
+						{
+							String addr = player.getAddress().getAddress().getHostAddress();
+							Server server = plugin.getServer();
+							server.dispatchCommand(((CraftServer)server).getServer().console, "ban-ip " + addr);
+							//server.dispatchCommand(((CraftServer)server).getServer().console, "kick " + player.getName());
+							player.kickPlayer(xAuth.strings.getString("login.err.kick"));
+							plugin.clearStrikes(player);
+							System.out.println("[" + pdfFile.getName() + "] " + addr + " banned by Strike system");
+						}
 					}
-					else
-						player.sendMessage(xAuth.strings.getString("login.err.password"));
 				}
 			}
     	}

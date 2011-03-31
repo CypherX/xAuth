@@ -1,6 +1,6 @@
 name: xAuth
 main: com.cypherx.xauth.xAuth
-version: 1.1.4
+version: 1.1.5a
 
 commands:
     register:

@@ -19,6 +19,9 @@ public class Settings
 		"misc.allowed-cmds",
 		"login.strikes.enabled",
 		"login.strikes.amount",
+		"security.filter.enabled",
+		"security.filter.allowed",
+		"security.filter.blankname"
 	};
 
 	private static final String[][] keyUpdates =
@@ -55,6 +58,9 @@ public class Settings
 		defaults.put("misc.autosave", true);
 		defaults.put("login.strikes.enabled", true);
 		defaults.put("login.strikes.amount", 5);
+		defaults.put("security.filter.enabled", true);
+		defaults.put("security.filter.allowed", "abcdefghijklmnopqrstuvwxyz0123456789_- ()[]{}");
+		defaults.put("security.filter.blankname", true);
 	}
 
 	public void updateKeys()
@@ -82,6 +88,9 @@ public class Settings
 				config.setProperty(key, defaults.get(key));
 			settings.put(key, config.getProperty(key));
 		}
+
+		//clear defaults to free memory
+		defaults.clear();
 	}
 
 	public void updateValue(String key, Object value)
@@ -99,6 +108,11 @@ public class Settings
 	public int getInt(String key)
 	{
 		return (Integer)settings.get(key);
+	}
+
+	public String getStr(String key)
+	{
+		return (String)settings.get(key);
 	}
 
 	@SuppressWarnings("unchecked")

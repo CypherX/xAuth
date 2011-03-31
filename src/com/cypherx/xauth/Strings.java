@@ -11,10 +11,11 @@ public class Strings
 	{
 		"register.login", "register.usage",	"register.err.disabled", "register.err.registered",	"register.err.password",
 		"register.success1", "register.success2", "login.login", "login.usage",	"login.err.registered",	"login.err.logged",
-		"login.err.password", "login.success", "changepw.usage1", "changepw.usage2", "changepw.err.login", "changepw.err.disabled",
-		"changepw.err.registered", "changepw.success.self",	"changepw.success.other", "unregister.usage", "unregister.success",
-		"reload.success", "toggle.usage", "toggle.err.permission", "toggle.success.reg", "toggle.success.pw", 
-		"toggle.success.save", "misc.illegal", "misc.reloaded",	"misc.enabled",	"misc.disabled"
+		"login.err.password", "login.err.kick", "login.success", "changepw.usage1", "changepw.usage2", "changepw.err.login", 
+		"changepw.err.disabled", "changepw.err.registered", "changepw.success.self",	"changepw.success.other",
+		"unregister.usage", "unregister.success", "reload.success", "toggle.usage", "toggle.err.permission", "toggle.success.reg",
+		"toggle.success.pw", "toggle.success.save", "misc.illegal", "misc.reloaded",	"misc.enabled",	"misc.disabled",
+		"misc.filterkickmsg", "misc.blankkickmsg"
 	};
 
 	private static final String[][] keyUpdates = {};
@@ -51,6 +52,7 @@ public class Strings
 		defaults.put("login.err.registered", "&cYou are not registered.");
 		defaults.put("login.err.logged", "&cYou are already logged in.");
 		defaults.put("login.err.password", "&cIncorrect password!");
+		defaults.put("login.err.kick", "Too many incorrect passwords!");
 		defaults.put("login.success", "&aYou are now logged in.");
 
 		defaults.put("changepw.usage1", "&cCorrect Usage: /changepw <newpassword>");
@@ -76,6 +78,8 @@ public class Strings
 		defaults.put("misc.reloaded", "&cServer reloaded! You must log in again.");
 		defaults.put("misc.enabled", "enabled");
 		defaults.put("misc.disabled", "disabled");
+		defaults.put("misc.filterkickmsg", "Your name contains one or more illegal characters.");
+		defaults.put("misc.blankkickmsg", "Blank names are not allowed.");
 	}
 
 	private void updateKeys()
