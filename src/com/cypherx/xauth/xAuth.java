@@ -1,5 +1,5 @@
-//xAuth 1.1.5a
-//Built against Bukkit #486 and CraftBukkit #602
+//xAuth 1.1.6
+//Built against Bukkit #493 and CraftBukkit #612
 
 package com.cypherx.xauth;
 
@@ -123,20 +123,20 @@ public class xAuth extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Lowest, this);
 		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Event.Priority.Highest, this);
-		//pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Event.Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Highest, this);
+		//pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Lowest, this);
 
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.Highest, this);
-		//pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Highest, this);
+		//pm.registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Highest, this);
+		//pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Highest, this);
 
-		//pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Highest, this);
+		//pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener, Priority.Highest, this);
 
 		System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Enabled!");
@@ -144,7 +144,7 @@ public class xAuth extends JavaPlugin
 		//autosave stuff
 		fullyEnabled = true;
 	}
-	
+
 	public void getAuths()
 	{
 		System.out.println("[" + pdfFile.getName() + "] Loading player accounts..");
@@ -397,7 +397,8 @@ public class xAuth extends JavaPlugin
 	
 		CraftWorld cWorld = (CraftWorld)player.getWorld();
 		CraftPlayer cPlayer = (CraftPlayer)player;
-		cWorld.getHandle().m().d().a(cPlayer.getHandle());
+		//cWorld.getHandle().m().d().a(cPlayer.getHandle());
+		cWorld.getHandle().o().d().a(cPlayer.getHandle());
 	}
 	
 	//SESSION FUNCTIONS

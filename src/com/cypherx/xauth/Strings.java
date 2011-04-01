@@ -15,7 +15,7 @@ public class Strings
 		"changepw.err.disabled", "changepw.err.registered", "changepw.success.self",	"changepw.success.other",
 		"unregister.usage", "unregister.success", "reload.success", "toggle.usage", "toggle.err.permission", "toggle.success.reg",
 		"toggle.success.pw", "toggle.success.save", "misc.illegal", "misc.reloaded",	"misc.enabled",	"misc.disabled",
-		"misc.filterkickmsg", "misc.blankkickmsg"
+		"misc.filterkickmsg"/*, "misc.blankkickmsg"*/
 	};
 
 	private static final String[][] keyUpdates = {};
@@ -79,7 +79,7 @@ public class Strings
 		defaults.put("misc.enabled", "enabled");
 		defaults.put("misc.disabled", "disabled");
 		defaults.put("misc.filterkickmsg", "Your name contains one or more illegal characters.");
-		defaults.put("misc.blankkickmsg", "Blank names are not allowed.");
+		//defaults.put("misc.blankkickmsg", "Blank names are not allowed.");
 	}
 
 	private void updateKeys()

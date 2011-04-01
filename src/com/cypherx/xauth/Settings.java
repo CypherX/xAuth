@@ -20,8 +20,8 @@ public class Settings
 		"login.strikes.enabled",
 		"login.strikes.amount",
 		"security.filter.enabled",
-		"security.filter.allowed",
-		"security.filter.blankname"
+		"security.filter.allowed"
+		//"security.filter.blankname"
 	};
 
 	private static final String[][] keyUpdates =
@@ -60,7 +60,7 @@ public class Settings
 		defaults.put("login.strikes.amount", 5);
 		defaults.put("security.filter.enabled", true);
 		defaults.put("security.filter.allowed", "abcdefghijklmnopqrstuvwxyz0123456789_- ()[]{}");
-		defaults.put("security.filter.blankname", true);
+		//defaults.put("security.filter.blankname", true);
 	}
 
 	public void updateKeys()

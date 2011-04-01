@@ -27,7 +27,7 @@ public class xAuthBlockListener extends BlockListener
     }
 
 	//Prevents player from using switches, buttons, etc.
-    public void onBlockInteract(BlockInteractEvent event)
+    /*public void onBlockInteract(BlockInteractEvent event)
     {
     	if (event.isCancelled())
 			return;
@@ -37,7 +37,7 @@ public class xAuthBlockListener extends BlockListener
 			Player player = (Player)event.getEntity();
 			plugin.handleEvent(player, event);
 		}
-    }
+    }*/
 
 	//Prevents player from placing blocks
 	public void onBlockPlace(BlockPlaceEvent event)
