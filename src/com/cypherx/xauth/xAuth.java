@@ -1,5 +1,5 @@
-//xAuth 1.1.6
-//Built against Bukkit #493 and CraftBukkit #612
+//xAuth 1.2
+//Built against Bukkit #493 and CraftBukkit #617
 
 package com.cypherx.xauth;
 
@@ -86,7 +86,7 @@ public class xAuth extends JavaPlugin
 		}
 
 		File fDir = new File(DIR);
-	
+
 		if (!fDir.exists())
 			fDir.mkdir();
 
@@ -113,8 +113,11 @@ public class xAuth extends JavaPlugin
 		{
 			for (Player player : players)
 			{
-				saveInventory(player);
-				player.sendMessage(strings.getString("misc.reloaded"));
+				if (isRegistered(player.getName()))
+				{
+					saveInventory(player);
+					player.sendMessage(strings.getString("misc.reloaded"));
+				}
 			}
 		}
 
@@ -189,14 +192,14 @@ public class xAuth extends JavaPlugin
 	{
 		if (!this.isEnabled())
 			return false;
-	
+
 		CommandHandler cmdHandler = new CommandHandler(this);
 	
 		if (sender instanceof Player)
 			cmdHandler.handlePlayerCommand((Player)sender, cmd, args);
 		else if (sender instanceof ConsoleCommandSender)
 			cmdHandler.handleConsoleCommand(cmd, args);
-	
+
 		return true;
 	}
 	
@@ -322,6 +325,9 @@ public class xAuth extends JavaPlugin
 	//NOTIFY FUNCTIONS
 	public void handleEvent(Player player, Cancellable event)
 	{
+		if (!settings.getBool("registration.forced") && !isRegistered(player.getName()))
+			return;
+
 		if (!sessionExists(player.getName()))
 		{
 			event.setCancelled(true);
@@ -424,7 +430,7 @@ public class xAuth extends JavaPlugin
 	
 			removeSession(player.getName());
 		}
-	
+
 		return false;
 	}
 	
@@ -433,10 +439,10 @@ public class xAuth extends JavaPlugin
 		Session session = sessions.get(player.getName().toLowerCase());
 		if (session.isExpired(new Date(session.getLoginTime() + (settings.getInt("session.timeout") * 1000))))
 			return false;
-		
-		if (!session.isValidAddr(player.getAddress().getAddress().getHostAddress()))
+
+		if (settings.getBool("session.verifyip") && !session.isValidAddr(player.getAddress().getAddress().getHostAddress()))
 			return false;
-		
+
 		return true;
 	}
 	
@@ -445,6 +451,18 @@ public class xAuth extends JavaPlugin
 		pName = pName.toLowerCase();
 		if (sessionExists(pName))
 			sessions.remove(pName);
+	}
+
+	public void killSession(Player player)
+	{
+		String pName = player.getName();
+		removeSession(pName);
+
+		if (player != null)
+		{
+			saveInventory(player);
+			player.sendMessage(strings.getString("logout.success.ended"));
+		}
 	}
 	
 	//MISC FUNCTIONS

@@ -27,8 +27,8 @@ public class CommandHandler
 				player.sendMessage(xAuth.strings.getString("register.err.disabled"));
 			else if (plugin.isRegistered(player.getName()))
 				player.sendMessage(xAuth.strings.getString("register.err.registered"));
-			else if (args[0].length() < xAuth.settings.getInt("registration.pw-min-length"))
-				player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt("registration.pw-min-length")));
+			else if (args[0].length() < xAuth.settings.getInt("security.password.min-length"))
+				player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt("security.password.min-length")));
 			else
 			{
 				plugin.addAuth(player.getName(), args[0]);
@@ -89,8 +89,8 @@ public class CommandHandler
 						player.sendMessage(xAuth.strings.getString("changepw.err.login"));
 					else if (!xAuth.settings.getBool("misc.allow-changepw"))
 						player.sendMessage(xAuth.strings.getString("changepw.err.disabled"));
-					else if (args[0].length() < xAuth.settings.getInt("registration.pw-min-length"))
-						player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt("registration.pw-min-length")));
+					else if (args[0].length() < xAuth.settings.getInt("security.password.min-length"))
+						player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt("security.password.min-length")));
 					else
 					{
 						plugin.changePass(player.getName(), args[0]);
@@ -120,8 +120,8 @@ public class CommandHandler
 					player.sendMessage(xAuth.strings.getString("changepw.err.login"));
 				else if (!xAuth.settings.getBool("misc.allow-changepw"))
 					player.sendMessage(xAuth.strings.getString("changepw.err.disabled"));
-				else if (args[0].length() < xAuth.settings.getInt("registration.pw-min-length"))
-					player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt("registration.pw-min-length")));
+				else if (args[0].length() < xAuth.settings.getInt("security.password.min-length"))
+					player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt("security.password.min-length")));
 				else
 				{
 					plugin.changePass(player.getName(), args[0]);
@@ -141,6 +141,15 @@ public class CommandHandler
 				else
 				{
 					plugin.removeAuth(args[0]);
+					Player target = plugin.getServer().getPlayer(args[0]);
+
+					if (target != null)
+					{
+						if (xAuth.settings.getBool("registration.forced"))
+							plugin.saveInventory(target);
+						target.sendMessage(xAuth.strings.getString("unregister.target"));
+					}
+
 					player.sendMessage(xAuth.strings.getString("unregister.success", args[0]));
 					System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has unregistered " + args[0]);
 				}
@@ -208,6 +217,35 @@ public class CommandHandler
 					player.sendMessage(xAuth.strings.getString("toggle.usage"));
 			}
 		}
+		else if (cmd.getName().equalsIgnoreCase("logout"))
+		{
+			//logout current player
+			if (args.length == 0)
+				plugin.killSession(player);
+			//logout other player
+			else
+			{
+				if (plugin.canUseCommand(player, "xauth.admin.logout"))
+				{
+					String target = buildName(args);
+					if (!plugin.sessionExists(target))
+						player.sendMessage(xAuth.strings.getString("logout.err.session"));
+					else
+					{
+						Player pTarget = plugin.getServer().getPlayer(target);
+						plugin.removeSession(target);
+						
+						if (pTarget != null)
+						{
+							plugin.saveInventory(pTarget);
+							pTarget.sendMessage(xAuth.strings.getString("logout.success.ended"));
+						}
+
+						player.sendMessage(xAuth.strings.getString("logout.success.other", target));
+					}
+				}
+			}
+		}
 	}
 
 	public void handleConsoleCommand(Command cmd, String[] args)
@@ -245,6 +283,15 @@ public class CommandHandler
 			else
 			{
 				plugin.removeAuth(args[0]);
+				Player target = plugin.getServer().getPlayer(args[0]);
+
+				if (target != null)
+				{
+					if (xAuth.settings.getBool("registration.forced"))
+						plugin.saveInventory(target);
+					target.sendMessage(xAuth.strings.getString("unregister.target"));
+				}
+
 				System.out.println(args[0] + " has been unregistered");
 			}
 		}
@@ -275,5 +322,44 @@ public class CommandHandler
 			else
 				System.out.println("Correct Usage: /toggle <reg|changepw|autosave>");
 		}
+		else if (cmd.getName().equalsIgnoreCase("logout"))
+		{
+			if (args.length < 1)
+				System.out.println("Correct Usage: /logout <player>");
+			else
+			{
+				String target = buildName(args);
+				if (!plugin.sessionExists(target))
+					System.out.println("[" + pdfFile.getName() + "] This player does not have an active session.");
+				else
+				{
+					Player pTarget = plugin.getServer().getPlayer(target);
+					plugin.removeSession(target);
+					
+					if (pTarget != null)
+					{
+						plugin.saveInventory(pTarget);
+						pTarget.sendMessage(xAuth.strings.getString("logout.success.ended"));
+					}
+					
+					System.out.println("[" + pdfFile.getName() + "] " + target + "'s session has been terminated");
+				}
+			}
+		}
+	}
+
+	private String buildName(String[] args)
+	{
+		String s = "";
+
+		for (int i = 0; i < args.length; i++)
+		{
+			if (args[i] == null)
+				continue;
+
+			s += args[i] + " ";
+		}
+		
+		return s.trim();
 	}
 }

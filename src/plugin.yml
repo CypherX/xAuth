@@ -1,6 +1,6 @@
 name: xAuth
 main: com.cypherx.xauth.xAuth
-version: 1.1.6
+version: 1.2
 
 commands:
     register:
@@ -26,3 +26,8 @@ commands:
                 /toggle reg
                 /toggle changepw
                 /toggle autosave
+    logout:
+        description: End a players session and force them to re-authenticate
+        usage: |
+            /logout
+            /logout <player>

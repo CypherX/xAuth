@@ -13,9 +13,10 @@ public class Strings
 		"register.success1", "register.success2", "login.login", "login.usage",	"login.err.registered",	"login.err.logged",
 		"login.err.password", "login.err.kick", "login.success", "changepw.usage1", "changepw.usage2", "changepw.err.login", 
 		"changepw.err.disabled", "changepw.err.registered", "changepw.success.self",	"changepw.success.other",
-		"unregister.usage", "unregister.success", "reload.success", "toggle.usage", "toggle.err.permission", "toggle.success.reg",
-		"toggle.success.pw", "toggle.success.save", "misc.illegal", "misc.reloaded",	"misc.enabled",	"misc.disabled",
-		"misc.filterkickmsg"/*, "misc.blankkickmsg"*/
+		"unregister.usage", "unregister.target", "unregister.success", "reload.success", "toggle.usage", "toggle.err.permission",
+		"toggle.success.reg", "toggle.success.pw", "toggle.success.save", "logout.err.session", "logout.success.ended",
+		"logout.success.other",	"misc.illegal", "misc.reloaded", "misc.enabled",	"misc.disabled", "misc.filterkickmsg",
+		"misc.blankkickmsg"
 	};
 
 	private static final String[][] keyUpdates = {};
@@ -64,6 +65,7 @@ public class Strings
 		defaults.put("changepw.success.other", "&aPassword changed.");
 
 		defaults.put("unregister.usage", "&cCorrect Usage: /unregister <player>");
+		defaults.put("unregister.target", "&cYou have been unregistered.");
 		defaults.put("unregister.success", "&a%1 has been unregistered.");
 
 		defaults.put("reload.success", "&e[xAuth] Configuration and Accounts reloaded");
@@ -74,12 +76,16 @@ public class Strings
 		defaults.put("toggle.success.pw", "&e[xAuth] Password changes are now %1.");
 		defaults.put("toggle.success.save", "&e[xAuth] Autosaving of account modifications is now %1.");
 
+		defaults.put("logout.err.session", "&cThis player does not have an active session.");
+		defaults.put("logout.success.ended", "&cYour session has been terminated. You must log in again.");
+		defaults.put("logout.success.other", "&a%1's session has been terminated.");
+
 		defaults.put("misc.illegal", "&7You must be logged in to do that!");
 		defaults.put("misc.reloaded", "&cServer reloaded! You must log in again.");
 		defaults.put("misc.enabled", "enabled");
 		defaults.put("misc.disabled", "disabled");
 		defaults.put("misc.filterkickmsg", "Your name contains one or more illegal characters.");
-		//defaults.put("misc.blankkickmsg", "Blank names are not allowed.");
+		defaults.put("misc.blankkickmsg", "Blank names are not allowed.");
 	}
 
 	private void updateKeys()

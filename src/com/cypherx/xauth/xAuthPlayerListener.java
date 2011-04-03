@@ -24,8 +24,8 @@ public class xAuthPlayerListener extends PlayerListener
     	if (xAuth.settings.getBool("security.filter.enabled") && !plugin.isNameLegal(player.getName()))
     		event.disallow(PlayerLoginEvent.Result.KICK_OTHER, xAuth.strings.getString("misc.filterkickmsg"));
 
-    	//if (xAuth.settings.getBool("security.filter.blankname") && player.getName().trim().equals(""))
-    		//event.disallow(PlayerLoginEvent.Result.KICK_OTHER, xAuth.strings.getString("misc.blankkickmsg"));
+    	if (xAuth.settings.getBool("security.filter.blankname") && player.getName().trim().equals(""))
+    		event.disallow(PlayerLoginEvent.Result.KICK_OTHER, xAuth.strings.getString("misc.blankkickmsg"));
     }
 
     public void onPlayerJoin(PlayerJoinEvent event)
@@ -34,12 +34,18 @@ public class xAuthPlayerListener extends PlayerListener
 
     	if (!plugin.isLoggedIn(player))
     	{
-    		plugin.saveInventory(player);
-
     		if (!plugin.isRegistered(player.getName()))
+    		{
+    			if (xAuth.settings.getBool("registration.forced"))
+    				plugin.saveInventory(player);
+
     			player.sendMessage(xAuth.strings.getString("register.login"));
+    		}
     		else
+    		{
+    			plugin.saveInventory(player);
     			player.sendMessage(xAuth.strings.getString("login.login"));
+    		}
     	}
     }
 

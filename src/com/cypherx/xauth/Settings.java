@@ -11,23 +11,26 @@ public class Settings
 	private static String[] keys = 
 	{
 		"registration.enabled",
+		"registration.forced",
 		"misc.allow-changepw",
 		"misc.autosave",
 		"session.timeout",
+		"session.verifyip",
 		"notify.limit",
-		"registration.pw-min-length",
 		"misc.allowed-cmds",
 		"login.strikes.enabled",
 		"login.strikes.amount",
 		"security.filter.enabled",
-		"security.filter.allowed"
-		//"security.filter.blankname"
+		"security.filter.allowed",
+		"security.filter.blankname",
+		"security.password.min-length"
 	};
 
 	private static final String[][] keyUpdates =
 	{
 		{"misc.allow-change-pw", "misc.allow-changepw"},
-		{"misc.save-on-change", "misc.autosave"}
+		{"misc.save-on-change", "misc.autosave"},
+		{"registration.pw-min-length", "security.password.min-length"}
 	};
 
 	private static Configuration config;
@@ -50,8 +53,9 @@ public class Settings
 	public void fillDefaults()
 	{
 		defaults.put("registration.enabled", true);
-		defaults.put("registration.pw-min-length", 3);
+		defaults.put("registration.forced", true);
 		defaults.put("session.timeout", 3600);
+		defaults.put("session.verifyip", true);
 		defaults.put("notify.limit", 5);
 		defaults.put("misc.allow-changepw", true);
 		defaults.put("misc.allowed-cmds", new String[]{"/register", "/login"});
@@ -60,7 +64,8 @@ public class Settings
 		defaults.put("login.strikes.amount", 5);
 		defaults.put("security.filter.enabled", true);
 		defaults.put("security.filter.allowed", "abcdefghijklmnopqrstuvwxyz0123456789_- ()[]{}");
-		//defaults.put("security.filter.blankname", true);
+		defaults.put("security.filter.blankname", true);
+		defaults.put("security.password.min-length", 3);
 	}
 
 	public void updateKeys()
@@ -118,7 +123,6 @@ public class Settings
 	@SuppressWarnings("unchecked")
 	public List<String> getStrList(String key)
 	{
-		//List<String> cmds = (List<String>)settings.get(key);
 		return (List<String>)settings.get(key);
 	}
 }
