@@ -12,14 +12,19 @@ public class Strings
 		"register.login", "register.usage",	"register.err.disabled", "register.err.registered",	"register.err.password",
 		"register.success1", "register.success2", "login.login", "login.usage",	"login.err.registered",	"login.err.logged",
 		"login.err.password", "login.err.kick", "login.success", "changepw.usage1", "changepw.usage2", "changepw.err.login", 
-		"changepw.err.disabled", "changepw.err.registered", "changepw.success.self",	"changepw.success.other",
-		"unregister.usage", "unregister.target", "unregister.success", "reload.success", "toggle.usage", "toggle.err.permission",
-		"toggle.success.reg", "toggle.success.pw", "toggle.success.save", "logout.err.session", "logout.success.ended",
-		"logout.success.other",	"misc.illegal", "misc.reloaded", "misc.enabled",	"misc.disabled", "misc.filterkickmsg",
-		"misc.blankkickmsg"
+		"changepw.err.disabled", "changepw.err.registered", "changepw.success.self", "changepw.success.other",
+		"unregister.usage", "unregister.target", "unregister.success", "reload.success", "toggle.usage", "toggle.success",
+		"logout.err.session", "logout.success.ended", "logout.success.other", "misc.illegal", "misc.reloaded",
+		"misc.enabled",	"misc.disabled", "misc.filterkickmsg", "misc.blankkickmsg"
 	};
 
 	private static final String[][] keyUpdates = {};
+
+	private static final String[] keyRemovals =
+	{
+		"toggle.err",
+		"toggle.success",
+	};
 
 	private static Configuration config;
 	private static final ConcurrentHashMap<String, String> defaults = new ConcurrentHashMap<String, String>();
@@ -30,9 +35,12 @@ public class Strings
 		config = new Configuration(file);
 		config.load();
 		fillDefaults();
-		
-		if (file.exists() && keyUpdates.length > 0)		
+
+		if (file.exists())
+		{
 			updateKeys();
+			removeKeys();
+		}
 
 		load();
 		config.save();
@@ -70,11 +78,8 @@ public class Strings
 
 		defaults.put("reload.success", "&e[xAuth] Configuration and Accounts reloaded");
 
-		defaults.put("toggle.usage", "&cCorrect Usage: /toggle <reg|changepw|autosave>");
-		defaults.put("toggle.err.permission", "&cYou aren't allow to toggle that!");
-		defaults.put("toggle.success.reg", "&e[xAuth] Registrations are now %1.");
-		defaults.put("toggle.success.pw", "&e[xAuth] Password changes are now %1.");
-		defaults.put("toggle.success.save", "&e[xAuth] Autosaving of account modifications is now %1.");
+		defaults.put("toggle.usage", "&cCorrect Usage: /toggle <reg|changepw|autosave|filter|blankname|verifyip|strike|forcereg>");
+		defaults.put("toggle.success", "&e[xAuth] Node %1.");
 
 		defaults.put("logout.err.session", "&cThis player does not have an active session.");
 		defaults.put("logout.success.ended", "&cYour session has been terminated. You must log in again.");
@@ -88,6 +93,15 @@ public class Strings
 		defaults.put("misc.blankkickmsg", "Blank names are not allowed.");
 	}
 
+	private void removeKeys()
+	{
+		for (String key : keyRemovals)
+		{
+			if (config.getProperty(key) != null)
+				config.removeProperty(key);
+		}
+	}
+
 	private void updateKeys()
 	{
 		String fromKey, toKey, holder;
@@ -99,7 +113,8 @@ public class Strings
 				toKey = update[1];
 				holder = config.getString(fromKey);
 				config.removeProperty(fromKey);
-				config.setProperty(toKey, holder);
+				if (!toKey.equals(""))
+					config.setProperty(toKey, holder);
 			}
 		}
 	}

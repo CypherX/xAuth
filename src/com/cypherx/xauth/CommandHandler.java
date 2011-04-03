@@ -70,7 +70,6 @@ public class CommandHandler
 							String addr = player.getAddress().getAddress().getHostAddress();
 							Server server = plugin.getServer();
 							server.dispatchCommand(((CraftServer)server).getServer().console, "ban-ip " + addr);
-							//server.dispatchCommand(((CraftServer)server).getServer().console, "kick " + player.getName());
 							player.kickPlayer(xAuth.strings.getString("login.err.kick"));
 							plugin.clearStrikes(player);
 							System.out.println("[" + pdfFile.getName() + "] " + addr + " banned by Strike system");
@@ -165,56 +164,42 @@ public class CommandHandler
     	}
 		else if (cmd.getName().equalsIgnoreCase("toggle"))
 		{
-			Boolean canToggleReg = plugin.canUseCommand(player, "xauth.admin.toggle.reg");
-			Boolean canTogglePw = plugin.canUseCommand(player, "xauth.admin.toggle.changepw");
-			Boolean canToggleSave = plugin.canUseCommand(player, "xauth.admin.toggle.autosave");
-
-			if (canToggleReg || canTogglePw || canToggleSave)
+			if (plugin.canUseCommand(player, "xauth.admin.toggle"))
 			{
-				if (args.length != 1)
-					player.sendMessage(xAuth.strings.getString("toggle.usage"));
-				else if (args[0].equalsIgnoreCase("reg"))
+				String node = null;
+
+				if (args.length < 1)
 				{
-					if (!canToggleReg)
-						player.sendMessage(xAuth.strings.getString("toggle.err.permission"));
-					else
-					{
-						Boolean b = xAuth.settings.getBool("registration.enabled");
-						xAuth.settings.updateValue("registration.enabled", (b ? false : true));
-						player.sendMessage(xAuth.strings.getString("toggle.success.reg",
-								(b ? xAuth.strings.getString("misc.disabled") : xAuth.strings.getString("misc.enabled"))));
-						System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has " + (b ? "disabled" : "enabled") + " registrations");
-					}
-						
+					player.sendMessage(xAuth.strings.getString("toggle.usage"));
+					return;
 				}
+
+				if (args[0].equalsIgnoreCase("reg"))
+					node = "registration.enabled";
 				else if (args[0].equalsIgnoreCase("changepw"))
-				{
-					if (!canTogglePw)
-						player.sendMessage(xAuth.strings.getString("toggle.err.permission"));
-					else
-					{
-						Boolean b = xAuth.settings.getBool("misc.allow-changepw");
-						xAuth.settings.updateValue("misc.allow-changepw", (b ? false : true));
-						player.sendMessage(xAuth.strings.getString("toggle.success.pw",
-								(b ? xAuth.strings.getString("misc.disabled") : xAuth.strings.getString("misc.enabled"))));
-						System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has " + (b ? "disabled" : "enabled") + " password changes");
-					}
-				}
+					node = "misc.allow-changepw";
 				else if (args[0].equalsIgnoreCase("autosave"))
-				{
-					if (!canToggleSave)
-						player.sendMessage(xAuth.strings.getString("toggle.err.permission"));
-					else
-					{
-						Boolean b = xAuth.settings.getBool("misc.autosave");
-						xAuth.settings.updateValue("misc.autosave", (b ? false : true));
-						player.sendMessage(xAuth.strings.getString("toggle.success.save",
-								(b ? xAuth.strings.getString("misc.disabled") : xAuth.strings.getString("misc.enabled"))));
-						System.out.println("[" + pdfFile.getName() + "] " + player.getName() + " has " + (b ? "disabled" : "enabled") + " autosave");
-					}
-				}
+					node = "misc.autosave";
+				else if (args[0].equalsIgnoreCase("filter"))
+					node = "security.filter.enabled";
+				else if (args[0].equalsIgnoreCase("blankname"))
+					node = "security.filter.blankname";
+				else if (args[0].equalsIgnoreCase("verifyip"))
+					node = "session.verifyip";
+				else if (args[0].equalsIgnoreCase("strike"))
+					node = "login.strikes.enabled";
+				else if (args[0].equalsIgnoreCase("forcereg"))
+					node = "registration.forced";
 				else
+				{
 					player.sendMessage(xAuth.strings.getString("toggle.usage"));
+					return;
+				}
+
+				Boolean b = xAuth.settings.getBool(node);
+				xAuth.settings.updateValue(node, (b ? false : true));
+				player.sendMessage(xAuth.strings.getString("toggle.success",
+						(b ? xAuth.strings.getString("misc.disabled") : xAuth.strings.getString("misc.enabled"))));
 			}
 		}
 		else if (cmd.getName().equalsIgnoreCase("logout"))
@@ -299,28 +284,39 @@ public class CommandHandler
 			plugin.reload();
 		else if (cmd.getName().equalsIgnoreCase("toggle"))
 		{
-			if (args.length != 1)
-				System.out.println("Correct Usage: /toggle <reg|changepw|autosave>");
-			else if (args[0].equalsIgnoreCase("reg"))
+			String node = null;
+
+			if (args.length < 1)
 			{
-				Boolean b = xAuth.settings.getBool("registration.enabled");
-				xAuth.settings.updateValue("registration.enabled", (b ? false : true));
-				System.out.println("[" + pdfFile.getName() + "] Registrations are now " + (b ? "disabled" : "enabled"));
+				System.out.println("[" + pdfFile.getName() + "] Correct Usage: /toggle <reg|changepw|autosave|filter|blankname|verifyip|strike|forcereg>");
+				return;
 			}
+
+			if (args[0].equalsIgnoreCase("reg"))
+				node = "registration.enabled";
 			else if (args[0].equalsIgnoreCase("changepw"))
-			{
-				Boolean b = xAuth.settings.getBool("misc.allow-changepw");
-				xAuth.settings.updateValue("misc.allow-changepw", (b ? false : true));
-				System.out.println("[" + pdfFile.getName() + "] Password changes are now " + (b ? "disabled" : "enabled"));
-			}
+				node = "misc.allow-changepw";
 			else if (args[0].equalsIgnoreCase("autosave"))
-			{
-				Boolean b = xAuth.settings.getBool("misc.autosave");
-				xAuth.settings.updateValue("misc.autosave", (b ? false : true));
-				System.out.println("[" + pdfFile.getName() + "] Autosaving of account modifications is now " + (b ? "disabled" : "enabled"));
-			}
+				node = "misc.autosave";
+			else if (args[0].equalsIgnoreCase("filter"))
+				node = "security.filter.enabled";
+			else if (args[0].equalsIgnoreCase("blankname"))
+				node = "security.filter.blankname";
+			else if (args[0].equalsIgnoreCase("verifyip"))
+				node = "session.verifyip";
+			else if (args[0].equalsIgnoreCase("strike"))
+				node = "login.strikes.enabled";
+			else if (args[0].equalsIgnoreCase("forcereg"))
+				node = "registration.forced";
 			else
-				System.out.println("Correct Usage: /toggle <reg|changepw|autosave>");
+			{
+				System.out.println("[" + pdfFile.getName() + "] Correct Usage: /toggle <reg|changepw|autosave|filter|blankname|verifyip|strike|forcereg>");
+				return;
+			}
+
+			Boolean b = xAuth.settings.getBool(node);
+			xAuth.settings.updateValue(node, (b ? false : true));
+			System.out.println("[" + pdfFile.getName() + "] Node " + (b ? "disabled" : "enabled"));
 		}
 		else if (cmd.getName().equalsIgnoreCase("logout"))
 		{

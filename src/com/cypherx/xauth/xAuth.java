@@ -206,7 +206,7 @@ public class xAuth extends JavaPlugin
 	//AUTH / REGISTER FUNCTIONS
 	public void addAuth(String pName, String pass)
 	{
-		String hash = md5(pass);
+		String hash = whirlpool(pass);
 		auths.put(pName.toLowerCase(), pName.toLowerCase() + ":" + hash);
 	
 		if (settings.getBool("misc.autosave"))
@@ -223,7 +223,7 @@ public class xAuth extends JavaPlugin
 	
 	public void changePass(String pName, String pass)
 	{
-		String hash = md5(pass);
+		String hash = whirlpool(pass);
 	
 		auths.remove(pName.toLowerCase());
 		auths.put(pName.toLowerCase(), pName.toLowerCase() + ":" + hash);
@@ -271,9 +271,23 @@ public class xAuth extends JavaPlugin
 	
 	public Boolean checkPass(Player player, String pass)
 	{
-		String hash = md5(pass);
-		if (auths.get(player.getName().toLowerCase()).equals(player.getName().toLowerCase() + ":" + hash))
+		String account = auths.get(player.getName().toLowerCase());
+		int md5Length = player.getName().length() + 33;
+		String hash;
+
+		if (account.length() == md5Length)
+			hash = md5(pass);
+		else
+			hash = whirlpool(pass);			
+		
+		if (account.equals(player.getName().toLowerCase() + ":" + hash))
+		{
+			//change pass to whirlpool if md5
+			if (hash.length() == 32)
+				changePass(player.getName(), pass);
+
 			return true;
+		}
 		else
 			return false;
 	}
@@ -281,11 +295,11 @@ public class xAuth extends JavaPlugin
 	public void logout(Player player)
 	{
 		String pName = player.getName();
-	
+
 		if (sessionExists(pName))
 		{
 			Session session = sessions.get(pName.toLowerCase());
-	
+
 			if (session.isExpired(new Date(session.getLoginTime() + (settings.getInt("session.timeout") * 1000))))
 				removeSession(pName);
 		}
@@ -420,7 +434,7 @@ public class xAuth extends JavaPlugin
 	
 		return false;
 	}
-	
+
 	public Boolean isLoggedIn(Player player)
 	{
 		if (sessionExists(player.getName()))
@@ -433,7 +447,7 @@ public class xAuth extends JavaPlugin
 
 		return false;
 	}
-	
+
 	public Boolean isSessionValid(Player player)
 	{
 		Session session = sessions.get(player.getName().toLowerCase());
@@ -445,7 +459,7 @@ public class xAuth extends JavaPlugin
 
 		return true;
 	}
-	
+
 	public void removeSession(String pName)
 	{
 		pName = pName.toLowerCase();
@@ -498,6 +512,16 @@ public class xAuth extends JavaPlugin
 	    }
 	
 		return null;
+	}
+
+	public String whirlpool(String str)
+	{
+		Whirlpool w = new Whirlpool();
+		byte[] digest = new byte[Whirlpool.DIGESTBYTES];
+		w.NESSIEinit();
+		w.NESSIEadd(str);
+		w.NESSIEfinalize(digest);
+		return Whirlpool.display(digest);
 	}
 	
 	public boolean canUseCommand(Player player, String node)

@@ -427,7 +427,7 @@ class Whirlpool {
         }
     }
 
-    private static String display(byte[] array) {
+    static String display(byte[] array) {
         char[] val = new char[2*array.length];
         String hex = "0123456789ABCDEF";
         for (int i = 0; i < array.length; i++) {
