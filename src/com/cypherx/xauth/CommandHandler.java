@@ -27,8 +27,8 @@ public class CommandHandler
 				player.sendMessage(xAuth.strings.getString("register.err.disabled"));
 			else if (plugin.isRegistered(player.getName()))
 				player.sendMessage(xAuth.strings.getString("register.err.registered"));
-			else if (args[0].length() < xAuth.settings.getInt("security.password.min-length"))
-				player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt("security.password.min-length")));
+			else if (!plugin.isValidPass(args[0]))
+				player.sendMessage(xAuth.strings.getString("password.invalid", xAuth.settings.getInt("password.min-length")));
 			else
 			{
 				plugin.addAuth(player.getName(), args[0]);
@@ -88,8 +88,8 @@ public class CommandHandler
 						player.sendMessage(xAuth.strings.getString("changepw.err.login"));
 					else if (!xAuth.settings.getBool("misc.allow-changepw"))
 						player.sendMessage(xAuth.strings.getString("changepw.err.disabled"));
-					else if (args[0].length() < xAuth.settings.getInt("security.password.min-length"))
-						player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt("security.password.min-length")));
+					else if (!plugin.isValidPass(args[0]))
+						player.sendMessage(xAuth.strings.getString("password.invalid", xAuth.settings.getInt("password.min-length")));
 					else
 					{
 						plugin.changePass(player.getName(), args[0]);
@@ -119,8 +119,8 @@ public class CommandHandler
 					player.sendMessage(xAuth.strings.getString("changepw.err.login"));
 				else if (!xAuth.settings.getBool("misc.allow-changepw"))
 					player.sendMessage(xAuth.strings.getString("changepw.err.disabled"));
-				else if (args[0].length() < xAuth.settings.getInt("security.password.min-length"))
-					player.sendMessage(xAuth.strings.getString("register.err.password", xAuth.settings.getInt("security.password.min-length")));
+				else if (!plugin.isValidPass(args[0]))
+					player.sendMessage(xAuth.strings.getString("password.invalid", xAuth.settings.getInt("password.min-length")));
 				else
 				{
 					plugin.changePass(player.getName(), args[0]);
@@ -144,7 +144,7 @@ public class CommandHandler
 
 					if (target != null)
 					{
-						if (xAuth.settings.getBool("registration.forced"))
+						if (xAuth.settings.getBool("registration.forced") && !xAuth.Permissions.has(target, "xauth.exclude"))
 							plugin.saveInventory(target);
 						target.sendMessage(xAuth.strings.getString("unregister.target"));
 					}
@@ -181,9 +181,9 @@ public class CommandHandler
 				else if (args[0].equalsIgnoreCase("autosave"))
 					node = "misc.autosave";
 				else if (args[0].equalsIgnoreCase("filter"))
-					node = "security.filter.enabled";
+					node = "filter.enabled";
 				else if (args[0].equalsIgnoreCase("blankname"))
-					node = "security.filter.blankname";
+					node = "filter.blankname";
 				else if (args[0].equalsIgnoreCase("verifyip"))
 					node = "session.verifyip";
 				else if (args[0].equalsIgnoreCase("strike"))
@@ -212,7 +212,7 @@ public class CommandHandler
 			{
 				if (plugin.canUseCommand(player, "xauth.admin.logout"))
 				{
-					String target = buildName(args);
+					String target = buildString(args);
 					if (!plugin.sessionExists(target))
 						player.sendMessage(xAuth.strings.getString("logout.err.session"));
 					else
@@ -272,7 +272,7 @@ public class CommandHandler
 
 				if (target != null)
 				{
-					if (xAuth.settings.getBool("registration.forced"))
+					if (xAuth.settings.getBool("registration.forced") && !xAuth.Permissions.has(target, "xauth.exclude"))
 						plugin.saveInventory(target);
 					target.sendMessage(xAuth.strings.getString("unregister.target"));
 				}
@@ -299,9 +299,9 @@ public class CommandHandler
 			else if (args[0].equalsIgnoreCase("autosave"))
 				node = "misc.autosave";
 			else if (args[0].equalsIgnoreCase("filter"))
-				node = "security.filter.enabled";
+				node = "filter.enabled";
 			else if (args[0].equalsIgnoreCase("blankname"))
-				node = "security.filter.blankname";
+				node = "filter.blankname";
 			else if (args[0].equalsIgnoreCase("verifyip"))
 				node = "session.verifyip";
 			else if (args[0].equalsIgnoreCase("strike"))
@@ -324,27 +324,27 @@ public class CommandHandler
 				System.out.println("Correct Usage: /logout <player>");
 			else
 			{
-				String target = buildName(args);
+				String target = buildString(args);
 				if (!plugin.sessionExists(target))
 					System.out.println("[" + pdfFile.getName() + "] This player does not have an active session.");
 				else
 				{
 					Player pTarget = plugin.getServer().getPlayer(target);
 					plugin.removeSession(target);
-					
+
 					if (pTarget != null)
 					{
 						plugin.saveInventory(pTarget);
 						pTarget.sendMessage(xAuth.strings.getString("logout.success.ended"));
 					}
-					
+
 					System.out.println("[" + pdfFile.getName() + "] " + target + "'s session has been terminated");
 				}
 			}
 		}
 	}
 
-	private String buildName(String[] args)
+	private String buildString(String[] args)
 	{
 		String s = "";
 

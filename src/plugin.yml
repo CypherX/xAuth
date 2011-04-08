@@ -1,6 +1,9 @@
 name: xAuth
 main: com.cypherx.xauth.xAuth
 version: 1.2
+description: Allows players to register and maintain an account while the server is in offline-mode.
+authors:
+    - CypherX
 
 commands:
     register:
@@ -11,9 +14,7 @@ commands:
         usage: /login <password>
     changepw:
         description: Change your or another players password
-        usage: |
-                /changepw <password>
-                /changepw <player> <password>
+        usage: /changepw [player] <password>
     unregister:
         description: Remove a players registration
         usage: /unregister <player>
@@ -22,12 +23,7 @@ commands:
         usage: /authreload
     toggle:
         description: Toggle various commands on/off
-        usage: |
-                /toggle reg
-                /toggle changepw
-                /toggle autosave
+        usage: /toggle <reg|changepw|autosave|filter|blankname|verifyip|strike|forcereg>
     logout:
         description: End a players session and force them to re-authenticate
-        usage: |
-            /logout
-            /logout <player>
+        usage: /logout [player]

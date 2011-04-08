@@ -21,10 +21,13 @@ public class xAuthPlayerListener extends PlayerListener
     {
     	Player player = event.getPlayer();
 
-    	if (xAuth.settings.getBool("security.filter.enabled") && !plugin.isNameLegal(player.getName()))
+    	if (player.isOnline())
+    		event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "A player with this name is already online.");
+
+    	if (xAuth.settings.getBool("filter.enabled") && !plugin.isNameLegal(player.getName()))
     		event.disallow(PlayerLoginEvent.Result.KICK_OTHER, xAuth.strings.getString("misc.filterkickmsg"));
 
-    	if (xAuth.settings.getBool("security.filter.blankname") && player.getName().trim().equals(""))
+    	if (xAuth.settings.getBool("filter.block-blankname") && player.getName().trim().equals(""))
     		event.disallow(PlayerLoginEvent.Result.KICK_OTHER, xAuth.strings.getString("misc.blankkickmsg"));
     }
 
@@ -36,10 +39,14 @@ public class xAuthPlayerListener extends PlayerListener
     	{
     		if (!plugin.isRegistered(player.getName()))
     		{
-    			if (xAuth.settings.getBool("registration.forced"))
-    				plugin.saveInventory(player);
+    			if (!xAuth.settings.getBool("registration.forced"))
+    				return;
 
-    			player.sendMessage(xAuth.strings.getString("register.login"));
+    			if (xAuth.Permissions.has(player, "xauth.exclude"))
+	    			return;
+
+    			plugin.saveInventory(player);
+				player.sendMessage(xAuth.strings.getString("register.login"));
     		}
     		else
     		{
@@ -59,7 +66,7 @@ public class xAuthPlayerListener extends PlayerListener
 	{
 		if (event.isCancelled())
 			return;
-		
+
 		Player player = event.getPlayer();
 		String[] msg = event.getMessage().split(" ");
 
@@ -73,9 +80,6 @@ public class xAuthPlayerListener extends PlayerListener
 	//Prevents player from being able to chat
 	public void onPlayerChat(PlayerChatEvent event)
 	{
-		//if (!xAuth.settings.getBool("limit.chat"))
-			//return;
-
 		if (event.isCancelled())
 			return;
 
@@ -93,21 +97,8 @@ public class xAuthPlayerListener extends PlayerListener
 		plugin.handleEvent(player, event);
 	}
 
-	//Prevents player from using an item such as food
-	/*public void onPlayerItem(PlayerItemEvent event)
-	{
-		if (event.isCancelled())
-			return;
-
-		Player player = event.getPlayer();
-		plugin.handleEvent(player, event);
-	}*/
-
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
-		//if (!xAuth.settings.getBool("limit.interact"))
-			//return;
-
 		if (event.isCancelled())
 			return;
 
@@ -118,9 +109,6 @@ public class xAuthPlayerListener extends PlayerListener
 	//Prevents player from moving
 	public void onPlayerMove(PlayerMoveEvent event)
 	{
-		//if (!xAuth.settings.getBool("limit.movement"))
-			//return;
-
 		if (event.isCancelled())
 			return;
 
@@ -144,9 +132,6 @@ public class xAuthPlayerListener extends PlayerListener
 	//Prevents player from picking up items
 	public void onPlayerPickupItem(PlayerPickupItemEvent event)
 	{
-		//if (!xAuth.settings.getBool("limit.pickup"))
-			//return;
-
 		if (event.isCancelled())
 			return;
 

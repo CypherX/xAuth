@@ -9,16 +9,19 @@ public class Strings
 {
 	private static String[] keys = 
 	{
-		"register.login", "register.usage",	"register.err.disabled", "register.err.registered",	"register.err.password",
-		"register.success1", "register.success2", "login.login", "login.usage",	"login.err.registered",	"login.err.logged",
+		"register.login", "register.usage",	"register.err.disabled", "register.err.registered",	"register.success1",
+		"register.success2", "login.login", "login.usage",	"login.err.registered",	"login.err.logged",
 		"login.err.password", "login.err.kick", "login.success", "changepw.usage1", "changepw.usage2", "changepw.err.login", 
 		"changepw.err.disabled", "changepw.err.registered", "changepw.success.self", "changepw.success.other",
 		"unregister.usage", "unregister.target", "unregister.success", "reload.success", "toggle.usage", "toggle.success",
-		"logout.err.session", "logout.success.ended", "logout.success.other", "misc.illegal", "misc.reloaded",
+		"logout.err.session", "logout.success.ended", "logout.success.other", "password.invalid", "misc.illegal", "misc.reloaded",
 		"misc.enabled",	"misc.disabled", "misc.filterkickmsg", "misc.blankkickmsg"
 	};
 
-	private static final String[][] keyUpdates = {};
+	private static final String[][] keyUpdates =
+	{
+		{"register.err.password", "password.invalid"}
+	};
 
 	private static final String[] keyRemovals =
 	{
@@ -52,7 +55,7 @@ public class Strings
 		defaults.put("register.usage", "&cCorrect Usage: /register <password>");
 		defaults.put("register.err.disabled", "&cRegistrations are currently disabled.");
 		defaults.put("register.err.registered", "&cYou are already registered.");
-		defaults.put("register.err.password", "&cYour password must contain %1 or more characters.");
+		//defaults.put("register.err.password", "&cYour password must contain %1 or more characters.");
 		defaults.put("register.success1", "&aYou have successfully registered!");
 		defaults.put("register.success2", "&aYour password is: &f%1");
 
@@ -85,21 +88,14 @@ public class Strings
 		defaults.put("logout.success.ended", "&cYour session has been terminated. You must log in again.");
 		defaults.put("logout.success.other", "&a%1's session has been terminated.");
 
+		defaults.put("password.invalid", "&cYour password must contain %1 or more characters.");
+
 		defaults.put("misc.illegal", "&7You must be logged in to do that!");
 		defaults.put("misc.reloaded", "&cServer reloaded! You must log in again.");
 		defaults.put("misc.enabled", "enabled");
 		defaults.put("misc.disabled", "disabled");
 		defaults.put("misc.filterkickmsg", "Your name contains one or more illegal characters.");
 		defaults.put("misc.blankkickmsg", "Blank names are not allowed.");
-	}
-
-	private void removeKeys()
-	{
-		for (String key : keyRemovals)
-		{
-			if (config.getProperty(key) != null)
-				config.removeProperty(key);
-		}
 	}
 
 	private void updateKeys()
@@ -116,6 +112,15 @@ public class Strings
 				if (!toKey.equals(""))
 					config.setProperty(toKey, holder);
 			}
+		}
+	}
+
+	private void removeKeys()
+	{
+		for (String key : keyRemovals)
+		{
+			if (config.getProperty(key) != null)
+				config.removeProperty(key);
 		}
 	}
 

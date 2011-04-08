@@ -1,5 +1,5 @@
 //xAuth 1.2
-//Built against Bukkit #493 and CraftBukkit #617
+//Built against Bukkit #652 and CraftBukkit #670
 
 package com.cypherx.xauth;
 
@@ -10,6 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.minecraft.server.PropertyManager;
 import org.bukkit.command.Command;
@@ -69,13 +71,6 @@ public class xAuth extends JavaPlugin
 		fullyEnabled = false;
 		pdfFile = this.getDescription();
 
-		/*Whirlpool w = new Whirlpool();
-		byte[] digest = new byte[Whirlpool.DIGESTBYTES];
-		w.NESSIEinit();
-		w.NESSIEadd("The quick brown fox jumps over the lazy dog");
-		w.NESSIEfinalize(digest);
-		System.out.println(Whirlpool.display(digest));*/
-
 		PropertyManager props = new PropertyManager(new File("server.properties"));
 		if (props.a("online-mode", true))
 		{
@@ -127,19 +122,15 @@ public class xAuth extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Highest, this);
-		//pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Lowest, this);
 
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
-		//pm.registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Highest, this);
-		//pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Highest, this);
 
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Highest, this);
-		//pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Highest, this);
 		pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener, Priority.Highest, this);
 
 		System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Enabled!");
@@ -261,6 +252,38 @@ public class xAuth extends JavaPlugin
 			System.out.println(e.getMessage());
 		}
 	}
+
+	public Boolean isValidPass(String pass)
+	{
+		if (!settings.getBool("password.complexity.enabled"))
+		{
+			if (pass.length() < settings.getInt("password.min-length"))
+				return false;
+
+			return true;
+		}
+
+		String pattern = "(";
+
+		if (settings.getBool("password.complexity.numbers"))
+			pattern += "(?=.*\\d)";
+
+		if (settings.getBool("password.complexity.lowercase"))
+			pattern += "(?=.*[a-z])";
+
+		if (settings.getBool("password.complexity.uppercase"))
+			pattern += "(?=.*[A-Z])";
+
+		if (settings.getBool("password.complexity.symbols"))
+			pattern += "(?=.*\\W)";
+
+		pattern += ".{" + settings.getInt("password.min-length") + ",})";
+
+		//String pattern = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{3,})";
+		Pattern p = Pattern.compile(pattern);
+		Matcher matcher = p.matcher(pass);
+		return matcher.matches();
+	}
 	
 	//LOGIN / LOGOUT FUNCTIONS
 	public void login(Player player)
@@ -339,7 +362,7 @@ public class xAuth extends JavaPlugin
 	//NOTIFY FUNCTIONS
 	public void handleEvent(Player player, Cancellable event)
 	{
-		if (!settings.getBool("registration.forced") && !isRegistered(player.getName()))
+		if ((!settings.getBool("registration.forced") || xAuth.Permissions.has(player, "xauth.exclude")) && !isRegistered(player.getName()))
 			return;
 
 		if (!sessionExists(player.getName()))
@@ -414,10 +437,10 @@ public class xAuth extends JavaPlugin
 			playerInv.setHelmet(armor.get(player)[3].getTypeId() == 0 ? null : armor.get(player)[3]);
 			armor.remove(player);
 		}
-	
+
+		//change to player.saveData()
 		CraftWorld cWorld = (CraftWorld)player.getWorld();
 		CraftPlayer cPlayer = (CraftPlayer)player;
-		//cWorld.getHandle().m().d().a(cPlayer.getHandle());
 		cWorld.getHandle().o().d().a(cPlayer.getHandle());
 	}
 	
@@ -547,7 +570,7 @@ public class xAuth extends JavaPlugin
 		if (illegalNames.contains(pName))
 			return false;
 
-		String allowed = settings.getStr("security.filter.allowed");
+		String allowed = settings.getStr("filter.allowed");
 
 		for(int i = 0; i < pName.length(); i++)
 			if (allowed.indexOf(pName.charAt(i)) == -1)

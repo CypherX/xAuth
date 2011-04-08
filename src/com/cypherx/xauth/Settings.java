@@ -1,6 +1,7 @@
 package com.cypherx.xauth;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,31 +21,48 @@ public class Settings
 		"misc.allowed-cmds",
 		"login.strikes.enabled",
 		"login.strikes.amount",
-		"security.filter.enabled",
-		"security.filter.allowed",
-		"security.filter.blankname",
-		"security.password.min-length"
+		"filter.enabled",
+		"filter.allowed",
+		"filter.block-blankname",
+		"password.min-length",
+		"password.complexity.enabled",
+		"password.complexity.lowercase",
+		"password.complexity.uppercase",
+		"password.complexity.numbers",
+		"password.complexity.symbols"
 	};
 
 	private static final String[][] keyUpdates =
 	{
 		{"misc.allow-change-pw", "misc.allow-changepw"},
 		{"misc.save-on-change", "misc.autosave"},
-		{"registration.pw-min-length", "security.password.min-length"}
+		{"registration.pw-min-length", "password.min-length"},
+		{"security.filter.enabled", "filter.enabled"},
+		{"security.filter.allowed", "filter.allowed"}
 	};
 
+	private static final String[] keyRemovals =
+	{
+		"security"
+	};
+
+	private final File file;
 	private static Configuration config;
 	private static final ConcurrentHashMap<String, Object> defaults = new ConcurrentHashMap<String, Object>();
 	private static final ConcurrentHashMap<String, Object> settings = new ConcurrentHashMap<String, Object>();
 
-	public Settings(File file)
+	public Settings(File f)
 	{
+		file = f;
 		config = new Configuration(file);
 		config.load();
 		fillDefaults();
 		
-		if (file.exists() && keyUpdates.length > 0)		
+		if (file.exists())
+		{
 			updateKeys();
+			removeKeys();
+		}
 
 		load();
 		config.save();
@@ -58,14 +76,19 @@ public class Settings
 		defaults.put("session.verifyip", true);
 		defaults.put("notify.limit", 5);
 		defaults.put("misc.allow-changepw", true);
-		defaults.put("misc.allowed-cmds", new String[]{"/register", "/login"});
+		defaults.put("misc.allowed-cmds", Arrays.asList(new String[]{"/register", "/login"}));
 		defaults.put("misc.autosave", true);
 		defaults.put("login.strikes.enabled", true);
 		defaults.put("login.strikes.amount", 5);
-		defaults.put("security.filter.enabled", true);
-		defaults.put("security.filter.allowed", "abcdefghijklmnopqrstuvwxyz0123456789_- ()[]{}");
-		defaults.put("security.filter.blankname", true);
-		defaults.put("security.password.min-length", 3);
+		defaults.put("filter.enabled", true);
+		defaults.put("filter.allowed", "abcdefghijklmnopqrstuvwxyz0123456789_- ()[]{}");
+		defaults.put("filter.block-blankname", true);
+		defaults.put("password.min-length", 3);
+		defaults.put("password.complexity.enabled", false);
+		defaults.put("password.complexity.lowercase", false);
+		defaults.put("password.complexity.uppercase", false);
+		defaults.put("password.complexity.numbers", false);
+		defaults.put("password.complexity.symbols", false);
 	}
 
 	public void updateKeys()
@@ -82,6 +105,15 @@ public class Settings
 				config.removeProperty(fromKey);
 				config.setProperty(toKey, holder);
 			}
+		}
+	}
+
+	private void removeKeys()
+	{
+		for (String key : keyRemovals)
+		{
+			if (config.getProperty(key) != null)
+				config.removeProperty(key);
 		}
 	}
 
@@ -107,6 +139,11 @@ public class Settings
 
 	public Boolean getBool(String key)
 	{
+		Object value = settings.get(key);
+
+		if (value instanceof String)
+			return Boolean.parseBoolean((String)value);
+		
 		return (Boolean)settings.get(key);
 	}
 
@@ -123,6 +160,26 @@ public class Settings
 	@SuppressWarnings("unchecked")
 	public List<String> getStrList(String key)
 	{
+		//COMMAND_PREPROCESS error debugging
+		if (!(settings.get(key) instanceof List))
+		{
+			System.out.println("[xAuth] COMMAND_PREPROCESS Error: Report this in the xAuth thread.");
+			System.out.println("[xAuth] Value:" + settings.get(key));
+			System.out.println("[xAuth] Attempting to autocorrect..");
+			xAuth.settings = new Settings(file);
+		}
+
+		/*Object value = settings.get(key);
+
+		if (value instanceof String[])
+			System.out.println("string array");
+		else if (value instanceof String)
+			System.out.println("string");
+		else if (value instanceof List)
+			System.out.println("list");
+
+		System.out.println(value);*/
+
 		return (List<String>)settings.get(key);
 	}
 }
