@@ -144,7 +144,7 @@ public class CommandHandler
 
 					if (target != null)
 					{
-						if (xAuth.settings.getBool("registration.forced") && !xAuth.Permissions.has(target, "xauth.exclude"))
+						if (plugin.mustRegister(target))
 							plugin.saveInventory(target);
 						target.sendMessage(xAuth.strings.getString("unregister.target"));
 					}
@@ -272,7 +272,7 @@ public class CommandHandler
 
 				if (target != null)
 				{
-					if (xAuth.settings.getBool("registration.forced") && !xAuth.Permissions.has(target, "xauth.exclude"))
+					if (plugin.mustRegister(target))
 						plugin.saveInventory(target);
 					target.sendMessage(xAuth.strings.getString("unregister.target"));
 				}

@@ -55,7 +55,6 @@ public class Strings
 		defaults.put("register.usage", "&cCorrect Usage: /register <password>");
 		defaults.put("register.err.disabled", "&cRegistrations are currently disabled.");
 		defaults.put("register.err.registered", "&cYou are already registered.");
-		//defaults.put("register.err.password", "&cYour password must contain %1 or more characters.");
 		defaults.put("register.success1", "&aYou have successfully registered!");
 		defaults.put("register.success2", "&aYour password is: &f%1");
 

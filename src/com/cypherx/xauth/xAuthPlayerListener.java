@@ -33,25 +33,30 @@ public class xAuthPlayerListener extends PlayerListener
 
     public void onPlayerJoin(PlayerJoinEvent event)
     {
-    	Player player = event.getPlayer();
+    	final Player player = event.getPlayer();
 
     	if (!plugin.isLoggedIn(player))
     	{
     		if (!plugin.isRegistered(player.getName()))
     		{
-    			if (!xAuth.settings.getBool("registration.forced"))
+    			if (!plugin.mustRegister(player))
     				return;
 
-    			if (xAuth.Permissions.has(player, "xauth.exclude"))
-	    			return;
-
     			plugin.saveInventory(player);
-				player.sendMessage(xAuth.strings.getString("register.login"));
+    			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+    	            public void run() {
+    	            	player.sendMessage(xAuth.strings.getString("register.login"));
+    	            }
+    	        }, 5);
     		}
     		else
     		{
     			plugin.saveInventory(player);
-    			player.sendMessage(xAuth.strings.getString("login.login"));
+    			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+    	            public void run() {
+    	            	player.sendMessage(xAuth.strings.getString("login.login"));
+    	            }
+    	        }, 5);
     		}
     	}
     }

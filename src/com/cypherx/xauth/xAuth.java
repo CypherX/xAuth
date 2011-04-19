@@ -1,5 +1,5 @@
-//xAuth 1.2
-//Built against Bukkit #652 and CraftBukkit #670
+//xAuth 1.2.2
+//Built against Bukkit #653, CraftBukkit #674, and Permissions v2.7
 
 package com.cypherx.xauth;
 
@@ -9,7 +9,6 @@ import java.security.MessageDigest;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,8 +16,6 @@ import net.minecraft.server.PropertyManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -43,7 +40,6 @@ public class xAuth extends JavaPlugin
 	private final xAuthPlayerListener playerListener = new xAuthPlayerListener(this);
 	private final xAuthBlockListener blockListener = new xAuthBlockListener(this);
 	private final xAuthEntityListener entityListener = new xAuthEntityListener(this);
-	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	private static PluginDescriptionFile pdfFile;
 
 	private static final String DIR = "plugins" + File.separator + "xAuth" + File.separator;
@@ -117,21 +113,21 @@ public class xAuth extends JavaPlugin
 		}
 
 		PluginManager pm = getServer().getPluginManager();
-		pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener, Priority.Lowest, this);
 		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Lowest, this);
-		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Event.Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Event.Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.Highest, this);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Event.Priority.Lowest, this);
+		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Event.Priority.Lowest, this);
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Lowest, this);
+		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Lowest, this);
+		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.Lowest, this);
+		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Lowest, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Lowest, this);
 
-		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Lowest, this);
+		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Lowest, this);
 
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Lowest, this);
+		pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener, Priority.Lowest, this);
 
 		System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " Enabled!");
 
@@ -164,6 +160,8 @@ public class xAuth extends JavaPlugin
 
 	public void onDisable()
 	{
+		getServer().getScheduler().cancelAllTasks();
+
 		//Restore players inventories so they are not lost
 		Player[] players = getServer().getOnlinePlayers();
 		if (players.length > 0)
@@ -362,7 +360,7 @@ public class xAuth extends JavaPlugin
 	//NOTIFY FUNCTIONS
 	public void handleEvent(Player player, Cancellable event)
 	{
-		if ((!settings.getBool("registration.forced") || xAuth.Permissions.has(player, "xauth.exclude")) && !isRegistered(player.getName()))
+		if (!isRegistered(player.getName()) && !mustRegister(player))
 			return;
 
 		if (!sessionExists(player.getName()))
@@ -438,10 +436,7 @@ public class xAuth extends JavaPlugin
 			armor.remove(player);
 		}
 
-		//change to player.saveData()
-		CraftWorld cWorld = (CraftWorld)player.getWorld();
-		CraftPlayer cPlayer = (CraftPlayer)player;
-		cWorld.getHandle().o().d().a(cPlayer.getHandle());
+		player.saveData();
 	}
 	
 	//SESSION FUNCTIONS
@@ -590,17 +585,16 @@ public class xAuth extends JavaPlugin
 		getAuths();
 		System.out.println("[" + pdfFile.getName() + "] Configuration & Accounts reloaded");
 	}
-	
-	public boolean isDebugging(final Player player)
+
+	public Boolean mustRegister(Player player)
 	{
-	    if (debugees.containsKey(player))
-	        return debugees.get(player);
-	    else
-	        return false;
-	}
-	
-	public void setDebugging(final Player player, final boolean value)
-	{
-	    debugees.put(player, value);
+		if (!settings.getBool("registration.forced"))
+			return false;
+
+		if (xAuth.Permissions != null)
+			if (xAuth.Permissions.has(player, "xauth.exclude"))
+				return false;
+
+		return true;
 	}
 }
