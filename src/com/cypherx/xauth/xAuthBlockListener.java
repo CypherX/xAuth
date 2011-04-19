@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.*;
 
 /**
- * Authenticate block listener
+ * Handle events for all Block related events
  * @author CypherX
  */
 public class xAuthBlockListener extends BlockListener

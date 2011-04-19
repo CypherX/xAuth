@@ -4,7 +4,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.entity.*;
 
 /**
- * Authenticate entity listener
+ * Handle events for all Entity related events
  * @author CypherX
  */
 public class xAuthEntityListener extends EntityListener
