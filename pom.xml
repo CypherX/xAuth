@@ -1,8 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>xAuth</groupId>
-  <artifactId>xAuth</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <groupId>com.cypherx</groupId>
+  <artifactId>xauth</artifactId>
+  <version>1.2.2</version>
+  <name>xAuth</name>
+  <url>http://www.bukkit.org</url>
   <dependencies>
   	<dependency>
   		<groupId>org.bukkit</groupId>
@@ -26,4 +28,32 @@
   		<scope>compile</scope>
   	</dependency>
   </dependencies>
+  <build>
+    <finalName>${project.name}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+	  <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.4.3</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+      </plugin>
+    </plugins>
+  </build>
 </project>
