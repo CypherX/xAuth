@@ -1,5 +1,5 @@
-//xAuth 1.2.2
-//Built against Bukkit #653, CraftBukkit #674, and Permissions v2.7
+//xAuth 1.2.3
+//Built against Bukkit #660, CraftBukkit #703, and Permissions v2.7
 
 package com.cypherx.xauth;
 
@@ -51,7 +51,7 @@ public class xAuth extends JavaPlugin
 	public static Strings strings;
 	public static PermissionHandler Permissions;
 
-	//autosave test code
+	//autosave stuff
 	private static Boolean fullyEnabled;
 
 	private ConcurrentHashMap<String, String> auths = new ConcurrentHashMap<String, String>();
@@ -68,7 +68,7 @@ public class xAuth extends JavaPlugin
 		pdfFile = this.getDescription();
 
 		PropertyManager props = new PropertyManager(new File("server.properties"));
-		if (props.a("online-mode", true))
+		if (props.getBoolean("online-mode", true))
 		{
 			System.out.println("[" + pdfFile.getName() + "] Stopping - Server is running in online-mode");
 			this.setEnabled(false);

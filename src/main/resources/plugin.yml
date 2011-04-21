@@ -1,6 +1,6 @@
 name: xAuth
 main: com.cypherx.xauth.xAuth
-version: 1.2.2
+version: 1.2.3
 description: Allows players to register and maintain an account while the server is in offline-mode.
 authors:
     - CypherX
