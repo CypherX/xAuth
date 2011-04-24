@@ -1,6 +1,6 @@
 package com.cypherx.xauth;
 
-import org.bukkit.Location;
+//import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.*;
 
@@ -117,21 +117,20 @@ public class xAuthPlayerListener extends PlayerListener
 		if (event.isCancelled())
 			return;
 
-		Location from = event.getFrom();
+		/*Location from = event.getFrom();
 		Location to = event.getTo();
 
 		if (from.getX() == to.getX() && from.getZ() == to.getZ())
 		{
 			if (from.getY() > to.getY())
 				return;
-		}
+		}*/
 
 		Player player = event.getPlayer();
 		plugin.handleEvent(player, event);
 
 		if (event.isCancelled())
 			player.teleport(event.getFrom());
-			//player.teleportTo(event.getFrom());
 	}
 
 	//Prevents player from picking up items
