@@ -1,6 +1,3 @@
-//xAuth 1.2.3
-//Built against Bukkit #660, CraftBukkit #703, and Permissions v2.7
-
 package com.cypherx.xauth;
 
 import java.io.*;
@@ -9,10 +6,13 @@ import java.security.MessageDigest;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.minecraft.server.PropertyManager;
+
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -60,6 +60,7 @@ public class xAuth extends JavaPlugin
 	private ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 	private ConcurrentHashMap<Player, Date> lastNotifyTimes = new ConcurrentHashMap<Player, Date>();
 	private ConcurrentHashMap<String, Integer> strikes = new ConcurrentHashMap<String, Integer>();
+	public HashMap<Player, Location> loginLocation = new HashMap<Player, Location>();
 	private ArrayList<String> illegalNames = new ArrayList<String>();
 
 	public void onEnable()
@@ -104,8 +105,10 @@ public class xAuth extends JavaPlugin
 		{
 			for (Player player : players)
 			{
-				if (isRegistered(player.getName()))
+				if (mustRegister(player))
 				{
+					loginLocation.put(player, player.getLocation());
+					player.teleport(player.getWorld().getSpawnLocation());
 					saveInventory(player);
 					player.sendMessage(strings.getString("misc.reloaded"));
 				}
@@ -118,10 +121,10 @@ public class xAuth extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Event.Priority.Lowest, this);
 		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Event.Priority.Lowest, this);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Lowest, this);
-		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Lowest, this);
+		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.Lowest, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Lowest, this);
-		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Lowest, this);
+		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Monitor, this);
 
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Lowest, this);
 		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Lowest, this);
@@ -142,7 +145,7 @@ public class xAuth extends JavaPlugin
 		try
 		{
 			BufferedReader authReader = new BufferedReader(new FileReader(DIR + AUTH_FILE));
-	
+
 			String line;
 			while ((line = authReader.readLine()) != null)
 			{
@@ -162,13 +165,17 @@ public class xAuth extends JavaPlugin
 	{
 		getServer().getScheduler().cancelAllTasks();
 
-		//Restore players inventories so they are not lost
+		//Restore players inventories and locations so they are not lost
 		Player[] players = getServer().getOnlinePlayers();
 		if (players.length > 0)
 		{
-			for (Player player : players)
-				if (!sessionExists(player.getName()))
+			for (Player player : players) {
+				if (!sessionExists(player.getName())) {
+					player.teleport(loginLocation.get(player));
+					loginLocation.remove(player);
 					restoreInventory(player);
+				}
+			}
 		}
 
 		if (fullyEnabled)
@@ -286,6 +293,8 @@ public class xAuth extends JavaPlugin
 	//LOGIN / LOGOUT FUNCTIONS
 	public void login(Player player)
 	{
+		player.teleport(loginLocation.get(player));
+		loginLocation.remove(player);
 		startSession(player);
 		restoreInventory(player);
 	}
@@ -324,8 +333,11 @@ public class xAuth extends JavaPlugin
 			if (session.isExpired(new Date(session.getLoginTime() + (settings.getInt("session.timeout") * 1000))))
 				removeSession(pName);
 		}
-		else
+		else {
+			player.teleport(loginLocation.get(player));
+			loginLocation.remove(player);
 			restoreInventory(player);
+		}
 	}
 
 	public void addStrike(Player player)
@@ -374,6 +386,9 @@ public class xAuth extends JavaPlugin
 	
 	public Boolean isCmdAllowed(String cmd)
 	{
+		if (cmd.equals("/register") || cmd.equals("/login") || cmd.equals("/l"))
+			return true;
+
 		if (settings.getStrList("misc.allowed-cmds").contains(cmd))
 			return true;
 
@@ -415,6 +430,10 @@ public class xAuth extends JavaPlugin
 		playerInv.setChestplate(null);
 		playerInv.setLeggings(null);
 		playerInv.setBoots(null);
+
+		//Backpack fix
+		player.saveData();
+		//end Backpack fix
 	}
 	
 	public void restoreInventory(Player player)
@@ -423,7 +442,21 @@ public class xAuth extends JavaPlugin
 	
 		if (inventory.containsKey(player))
 		{
-			playerInv.setContents(inventory.get(player));
+			ItemStack[] inv = inventory.get(player);
+
+			//Backpack fix
+			if (playerInv.getSize() > inv.length)
+			{
+				ItemStack[] newInv = new ItemStack[playerInv.getSize()];
+
+				for(int i = 0; i < inv.length; i++)
+					newInv[i] = inv[i];
+
+				inv = newInv;
+			}
+			//end Backpack fix
+
+			playerInv.setContents(inv);
 			inventory.remove(player);
 		}
 	
@@ -492,6 +525,8 @@ public class xAuth extends JavaPlugin
 
 		if (player != null)
 		{
+			loginLocation.put(player, player.getLocation());
+			player.teleport(player.getWorld().getSpawnLocation());
 			saveInventory(player);
 			player.sendMessage(strings.getString("logout.success.ended"));
 		}

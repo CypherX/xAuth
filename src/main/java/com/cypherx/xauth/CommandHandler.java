@@ -1,10 +1,9 @@
 package com.cypherx.xauth;
 
-import org.bukkit.Server;
 import org.bukkit.command.Command;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.craftbukkit.CraftServer;
 
 public class CommandHandler
 {
@@ -67,12 +66,20 @@ public class CommandHandler
 
 						if (plugin.getStrikes(player) >= xAuth.settings.getInt("login.strikes.amount"))
 						{
-							String addr = player.getAddress().getAddress().getHostAddress();
-							Server server = plugin.getServer();
-							server.dispatchCommand(((CraftServer)server).getServer().console, "ban-ip " + addr);
+							String action;
+
+							if (xAuth.settings.getStr("login.strikes.action").equals("banip"))
+							{
+								String addr = player.getAddress().getAddress().getHostAddress();
+								plugin.getServer().dispatchCommand(new ConsoleCommandSender(plugin.getServer()), "ban-ip " + addr);
+								action = addr + " banned";
+							}
+							else
+								action = player.getName() + " kicked";
+
 							player.kickPlayer(xAuth.strings.getString("login.err.kick"));
 							plugin.clearStrikes(player);
-							System.out.println("[" + pdfFile.getName() + "] " + addr + " banned by Strike system");
+							System.out.println("[" + pdfFile.getName() + "] " + action + " by strike system");
 						}
 					}
 				}
@@ -144,8 +151,11 @@ public class CommandHandler
 
 					if (target != null)
 					{
-						if (plugin.mustRegister(target))
+						if (plugin.mustRegister(target)) {
+							plugin.loginLocation.put(target, target.getLocation());
+							target.teleport(target.getWorld().getSpawnLocation());
 							plugin.saveInventory(target);
+						}
 						target.sendMessage(xAuth.strings.getString("unregister.target"));
 					}
 
@@ -222,6 +232,8 @@ public class CommandHandler
 						
 						if (pTarget != null)
 						{
+							plugin.loginLocation.put(pTarget, pTarget.getLocation());
+							pTarget.teleport(pTarget.getWorld().getSpawnLocation());
 							plugin.saveInventory(pTarget);
 							pTarget.sendMessage(xAuth.strings.getString("logout.success.ended"));
 						}
@@ -272,8 +284,11 @@ public class CommandHandler
 
 				if (target != null)
 				{
-					if (plugin.mustRegister(target))
+					if (plugin.mustRegister(target)) {
+						plugin.loginLocation.put(target, target.getLocation());
+						target.teleport(target.getWorld().getSpawnLocation());
 						plugin.saveInventory(target);
+					}
 					target.sendMessage(xAuth.strings.getString("unregister.target"));
 				}
 
@@ -334,6 +349,8 @@ public class CommandHandler
 
 					if (pTarget != null)
 					{
+						plugin.loginLocation.put(pTarget, pTarget.getLocation());
+						pTarget.teleport(pTarget.getWorld().getSpawnLocation());
 						plugin.saveInventory(pTarget);
 						pTarget.sendMessage(xAuth.strings.getString("logout.success.ended"));
 					}

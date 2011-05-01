@@ -1,15 +1,15 @@
 name: xAuth
 main: com.cypherx.xauth.xAuth
-version: 1.2.3
+version: 1.2.4
 description: Allows players to register and maintain an account while the server is in offline-mode.
-authors:
-    - CypherX
+author: CypherX
 
 commands:
     register:
         description: Register your player name
         usage: /register <password>
     login:
+        aliases: [l]
         description: Authenticate yourself
         usage: /login <password>
     changepw:

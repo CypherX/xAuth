@@ -21,6 +21,7 @@ public class Settings
 		"misc.allowed-cmds",
 		"login.strikes.enabled",
 		"login.strikes.amount",
+		"login.strikes.action",
 		"filter.enabled",
 		"filter.allowed",
 		"filter.block-blankname",
@@ -80,6 +81,7 @@ public class Settings
 		defaults.put("misc.autosave", true);
 		defaults.put("login.strikes.enabled", true);
 		defaults.put("login.strikes.amount", 5);
+		defaults.put("login.strikes.action", "kick");
 		defaults.put("filter.enabled", true);
 		defaults.put("filter.allowed", "abcdefghijklmnopqrstuvwxyz0123456789_- ()[]{}");
 		defaults.put("filter.block-blankname", true);
@@ -111,10 +113,8 @@ public class Settings
 	private void removeKeys()
 	{
 		for (String key : keyRemovals)
-		{
 			if (config.getProperty(key) != null)
 				config.removeProperty(key);
-		}
 	}
 
 	public void load()
@@ -164,21 +164,10 @@ public class Settings
 		if (!(settings.get(key) instanceof List))
 		{
 			System.out.println("[xAuth] COMMAND_PREPROCESS Error: Report this in the xAuth thread.");
-			System.out.println("[xAuth] Value:" + settings.get(key));
+			System.out.println("[xAuth] Value: " + settings.get(key));
 			System.out.println("[xAuth] Attempting to autocorrect..");
 			xAuth.settings = new Settings(file);
 		}
-
-		/*Object value = settings.get(key);
-
-		if (value instanceof String[])
-			System.out.println("string array");
-		else if (value instanceof String)
-			System.out.println("string");
-		else if (value instanceof List)
-			System.out.println("list");
-
-		System.out.println(value);*/
 
 		return (List<String>)settings.get(key);
 	}
