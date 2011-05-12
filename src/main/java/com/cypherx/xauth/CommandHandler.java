@@ -152,8 +152,7 @@ public class CommandHandler
 					if (target != null)
 					{
 						if (plugin.mustRegister(target)) {
-							plugin.loginLocation.put(target, target.getLocation());
-							target.teleport(target.getWorld().getSpawnLocation());
+							plugin.saveLocation(target);
 							plugin.saveInventory(target);
 						}
 						target.sendMessage(xAuth.strings.getString("unregister.target"));
@@ -232,8 +231,7 @@ public class CommandHandler
 						
 						if (pTarget != null)
 						{
-							plugin.loginLocation.put(pTarget, pTarget.getLocation());
-							pTarget.teleport(pTarget.getWorld().getSpawnLocation());
+							plugin.saveLocation(pTarget);
 							plugin.saveInventory(pTarget);
 							pTarget.sendMessage(xAuth.strings.getString("logout.success.ended"));
 						}
@@ -285,8 +283,7 @@ public class CommandHandler
 				if (target != null)
 				{
 					if (plugin.mustRegister(target)) {
-						plugin.loginLocation.put(target, target.getLocation());
-						target.teleport(target.getWorld().getSpawnLocation());
+						plugin.saveLocation(target);
 						plugin.saveInventory(target);
 					}
 					target.sendMessage(xAuth.strings.getString("unregister.target"));
@@ -349,8 +346,7 @@ public class CommandHandler
 
 					if (pTarget != null)
 					{
-						plugin.loginLocation.put(pTarget, pTarget.getLocation());
-						pTarget.teleport(pTarget.getWorld().getSpawnLocation());
+						plugin.saveLocation(pTarget);
 						plugin.saveInventory(pTarget);
 						pTarget.sendMessage(xAuth.strings.getString("logout.success.ended"));
 					}

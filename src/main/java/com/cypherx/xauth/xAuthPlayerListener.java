@@ -1,6 +1,7 @@
 package com.cypherx.xauth;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.*;
 
@@ -37,14 +38,12 @@ public class xAuthPlayerListener extends PlayerListener
 
     	if (!plugin.isLoggedIn(player))
     	{
-    		plugin.loginLocation.put(player, player.getLocation());
-    		player.teleport(player.getWorld().getSpawnLocation());
-
     		if (!plugin.isRegistered(player.getName()))
     		{
     			if (!plugin.mustRegister(player))
     				return;
 
+    			plugin.saveLocation(player);
     			plugin.saveInventory(player);
     			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
     	            public void run() {
@@ -54,6 +53,7 @@ public class xAuthPlayerListener extends PlayerListener
     		}
     		else
     		{
+    			plugin.saveLocation(player);
     			plugin.saveInventory(player);
     			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
     	            public void run() {
@@ -120,21 +120,29 @@ public class xAuthPlayerListener extends PlayerListener
 		if (event.isCancelled())
 			return;
 
-		/*Location from = event.getFrom();
-		Location to = event.getTo();
-
-		if (from.getX() == to.getX() && from.getZ() == to.getZ())
-		{
-			if (from.getY() > to.getY())
-				return;
-		}*/
-
 		Player player = event.getPlayer();
 		plugin.handleEvent(player, event);
 
-		Location loc = player.getWorld().getSpawnLocation();
+		if (event.isCancelled()) {
+			Location loc;
 
-		if (event.isCancelled() && player.teleport(loc)) {
+			//protect location by teleporting user to spawn
+			if (xAuth.settings.getBool("misc.protect-location")) {
+				World w = player.getWorld();
+				loc = w.getSpawnLocation();
+
+				//underground, go up 1 block until air is reached
+				while (w.getBlockTypeIdAt(loc) != 0)
+					loc = new Location(w, loc.getX(), loc.getY() + 1, loc.getZ());
+
+				//in the air, go down 1 block until the ground is reached
+				while (w.getBlockTypeIdAt((int) loc.getX(), (int) loc.getY() - 1, (int) loc.getZ()) == 0)
+					loc = new Location(w, loc.getX(), loc.getY() - 1, loc.getZ());
+			}
+			else
+				loc = event.getFrom();
+
+			player.teleport(loc);
 			event.setTo(loc);
 			event.setFrom(loc);
 		}

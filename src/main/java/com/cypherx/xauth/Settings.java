@@ -19,6 +19,7 @@ public class Settings
 		"session.verifyip",
 		"notify.limit",
 		"misc.allowed-cmds",
+		"misc.protect-location",
 		"login.strikes.enabled",
 		"login.strikes.amount",
 		"login.strikes.action",
@@ -79,6 +80,7 @@ public class Settings
 		defaults.put("misc.allow-changepw", true);
 		defaults.put("misc.allowed-cmds", Arrays.asList(new String[]{"/register", "/login"}));
 		defaults.put("misc.autosave", true);
+		defaults.put("misc.protect-location", true);
 		defaults.put("login.strikes.enabled", true);
 		defaults.put("login.strikes.amount", 5);
 		defaults.put("login.strikes.action", "kick");

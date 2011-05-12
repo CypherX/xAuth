@@ -25,7 +25,7 @@ public class xAuthEntityListener extends EntityListener
 		Entity entity = event.getEntity();
 
 		//Player taking damage
-		if (entity instanceof Player)
+		if (entity instanceof Player && ((Player)entity).isOnline())
 			plugin.handleEvent((Player)entity, event);
 		//Player dealing damage to other entity
 		else if (event instanceof EntityDamageByEntityEvent)

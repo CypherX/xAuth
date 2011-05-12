@@ -6,7 +6,6 @@ import java.security.MessageDigest;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,7 +59,7 @@ public class xAuth extends JavaPlugin
 	private ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 	private ConcurrentHashMap<Player, Date> lastNotifyTimes = new ConcurrentHashMap<Player, Date>();
 	private ConcurrentHashMap<String, Integer> strikes = new ConcurrentHashMap<String, Integer>();
-	public HashMap<Player, Location> loginLocation = new HashMap<Player, Location>();
+	private ConcurrentHashMap<Player, Location> locations = new ConcurrentHashMap<Player, Location>();
 	private ArrayList<String> illegalNames = new ArrayList<String>();
 
 	public void onEnable()
@@ -105,10 +104,9 @@ public class xAuth extends JavaPlugin
 		{
 			for (Player player : players)
 			{
-				if (mustRegister(player))
+				if (mustRegister(player) || isRegistered(player.getName()))
 				{
-					loginLocation.put(player, player.getLocation());
-					player.teleport(player.getWorld().getSpawnLocation());
+					saveLocation(player);
 					saveInventory(player);
 					player.sendMessage(strings.getString("misc.reloaded"));
 				}
@@ -171,8 +169,7 @@ public class xAuth extends JavaPlugin
 		{
 			for (Player player : players) {
 				if (!sessionExists(player.getName())) {
-					player.teleport(loginLocation.get(player));
-					loginLocation.remove(player);
+					restoreLocation(player);
 					restoreInventory(player);
 				}
 			}
@@ -293,9 +290,8 @@ public class xAuth extends JavaPlugin
 	//LOGIN / LOGOUT FUNCTIONS
 	public void login(Player player)
 	{
-		player.teleport(loginLocation.get(player));
-		loginLocation.remove(player);
 		startSession(player);
+		restoreLocation(player);
 		restoreInventory(player);
 	}
 	
@@ -334,8 +330,7 @@ public class xAuth extends JavaPlugin
 				removeSession(pName);
 		}
 		else {
-			player.teleport(loginLocation.get(player));
-			loginLocation.remove(player);
+			restoreLocation(player);
 			restoreInventory(player);
 		}
 	}
@@ -399,11 +394,11 @@ public class xAuth extends JavaPlugin
 	{
 		if (lastNotifyTimes.get(player) == null)
 			return true;
-	
+
 		Date nextNotifyTime = new Date(lastNotifyTimes.get(player).getTime() + (settings.getInt("notify.limit") * 1000));
 		if (nextNotifyTime.compareTo(new Date()) < 0)
 			return true;
-	
+
 		return false;
 	}
 	
@@ -418,7 +413,26 @@ public class xAuth extends JavaPlugin
 		lastNotifyTimes.remove(player);
 		lastNotifyTimes.put(player, date);
 	}
-	
+
+	public void saveLocation(Player player) {
+		if (!settings.getBool("misc.protect-location"))
+			return;
+
+		locations.put(player, player.getLocation());
+		player.teleport(player.getWorld().getSpawnLocation());
+	}
+
+	public void restoreLocation(Player player) {
+		if (!settings.getBool("misc.protect-location"))
+			return;
+
+		Location loc = locations.get(player);
+
+		if (loc != null) {
+			player.teleport(loc);
+			locations.remove(player);
+		}
+	}
 	//INVENTORY FUNCTIONS
 	public void saveInventory(Player player)
 	{
@@ -525,8 +539,7 @@ public class xAuth extends JavaPlugin
 
 		if (player != null)
 		{
-			loginLocation.put(player, player.getLocation());
-			player.teleport(player.getWorld().getSpawnLocation());
+			saveLocation(player);
 			saveInventory(player);
 			player.sendMessage(strings.getString("logout.success.ended"));
 		}
