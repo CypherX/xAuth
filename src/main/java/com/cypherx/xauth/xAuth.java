@@ -200,6 +200,7 @@ public class xAuth extends JavaPlugin
 	public void addAuth(String pName, String pass)
 	{
 		String hash = whirlpool(pass);
+
 		auths.put(pName.toLowerCase(), pName.toLowerCase() + ":" + hash);
 	
 		if (settings.getBool("misc.autosave"))
@@ -415,7 +416,7 @@ public class xAuth extends JavaPlugin
 	}
 
 	public void saveLocation(Player player) {
-		if (!settings.getBool("misc.protect-location"))
+		if (!settings.getBool("misc.protect-location") || player.getHealth() <= 0)
 			return;
 
 		locations.put(player, player.getLocation());
