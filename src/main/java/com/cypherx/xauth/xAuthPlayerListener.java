@@ -55,7 +55,7 @@ public class xAuthPlayerListener extends PlayerListener
     		{
     			plugin.saveLocation(player);
     			plugin.saveInventory(player);
-    			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+    			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
     	            public void run() {
     	            	player.sendMessage(xAuth.strings.getString("login.login"));
     	            }
