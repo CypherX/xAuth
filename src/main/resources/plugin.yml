@@ -22,6 +22,7 @@ commands:
         description: Reload the account, configuration, and string files
         usage: /authreload
     toggle:
+        aliases: [xtoggle]
         description: Toggle various commands on/off
         usage: /toggle <reg|changepw|autosave|filter|blankname|verifyip|strike|forcereg>
     logout:
