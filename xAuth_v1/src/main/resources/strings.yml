@@ -1,0 +1,51 @@
+register:
+    err:
+        registered: '&cYou are already registered.'
+        disabled: '&cRegistrations are currently disabled.'
+    usage: '&cCorrect Usage: /register <password>'
+    login: '&cYou are not registered. Please register using /register <password>.'
+    success2: '&aYour password is: &f%1'
+    success1: '&aYou have successfully registered!'
+logout:
+    err:
+        session: '&cThis player does not have an active session.'
+    success:
+        other: '&a%1''s session has been terminated.'
+        ended: '&cYour session has been terminated. You must log in again.'
+toggle:
+    usage: '&cCorrect Usage: /toggle <reg|changepw|autosave|filter|blankname|verifyip|strike|forcereg>'
+    success: '&e[xAuth] Node %1.'
+unregister:
+    target: '&cYou have been unregistered.'
+    usage: '&cCorrect Usage: /unregister <player>'
+    success: '&a%1 has been unregistered.'
+login:
+    err:
+        kick: Too many incorrect passwords!
+        registered: '&cYou are not registered.'
+        logged: '&cYou are already logged in.'
+        password: '&cIncorrect password!'
+    usage: '&cCorrect Usage: /login <password>'
+    login: '&cPlease log in using /login <password>.'
+    success: '&aYou are now logged in.'
+password:
+    invalid: '&cYour password must contain %1 or more characters.'
+reload:
+    success: '&e[xAuth] Configuration and Accounts reloaded'
+changepw:
+    err:
+        registered: '&cThis player is not registered!'
+        login: '&cYou must login before changing your password!'
+        disabled: '&cPassword changes are currently disabled.'
+    usage1: '&cCorrect Usage: /changepw <newpassword>'
+    success:
+        other: '&aPassword changed.'
+        self: '&aYour password has been changed to: &f%1'
+    usage2: '&cCorrect Usage: /changepw [player] <newpassword>'
+misc:
+    enabled: enabled
+    reloaded: '&cServer reloaded! You must log in again.'
+    filterkickmsg: Your name contains one or more illegal characters.
+    illegal: '&7You must be logged in to do that!'
+    blankkickmsg: Blank names are not allowed.
+    disabled: disabled
