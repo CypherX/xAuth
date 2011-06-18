@@ -1,9 +1,8 @@
 name: xAuth
 main: com.cypherx.xauth.xAuth
-version: 2.0 [Dev]
+version: 2.0b1
 description: Offline-Mode Security Suite
 author: CypherX
-database: false
 commands:
     register:
         description: Create an account linked to your player name
@@ -28,5 +27,5 @@ commands:
                /<command> logout <player>
                /<command> unregister <player>
                /<command> location set|remove
-               /<command> config <setting> <value>
+               /<command> config <setting> [value]
                /<command> reload

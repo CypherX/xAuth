@@ -19,7 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-//import org.bukkit.scheduler.BukkitTask;
 
 public class xAuth extends JavaPlugin {
 	public static PluginDescriptionFile desc;
@@ -38,17 +37,6 @@ public class xAuth extends JavaPlugin {
 
 		if (dataManager != null)
 			dataManager.close();
-
-		// not sure if necessary
-		/*Boolean activeTasks = true;
-		while (activeTasks) {
-			xAuthLog.info("Waiting for scheduled tasks to finish..");
-			for (BukkitTask task : getServer().getScheduler().getPendingTasks())
-				if (task.getOwner() == this)
-					continue;
-
-			activeTasks = false;
-		}*/
 
 		xAuthSettings.saveChanges();
 		xAuthLog.info("v" + desc.getVersion() + " Disabled!");
