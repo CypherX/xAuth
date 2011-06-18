@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class Account {
-    private int id = 0;
+	private int id = 0;
 	private String playerName;
 	private String password;
 	private String email;
