@@ -1,0 +1,32 @@
+name: xAuth
+main: com.cypherx.xauth.xAuth
+version: 2.0 [Dev]
+description: Offline-Mode Security Suite
+author: CypherX
+database: false
+commands:
+    register:
+        description: Create an account linked to your player name
+        usage: /<command> <password> [email]
+    login:
+        aliases: [l]
+        description: Authenticate yourself as the account owner
+        usage: /<command> <password>
+    changepw:
+        aliases: [changepassword, changepass, cpw]
+        description: Change your password
+        usage: /<command> <old password> <new password>
+    logout:
+        description: Terminate your session early
+        usage: /<command>
+    xauth:
+        aliases: [x]
+        description: All of the xAuth Admin commands
+        usage: |
+               /<command> register <player> <password> [email]
+               /<command> changepw <player> <new password>
+               /<command> logout <player>
+               /<command> unregister <player>
+               /<command> location set|remove
+               /<command> config <setting> <value>
+               /<command> reload

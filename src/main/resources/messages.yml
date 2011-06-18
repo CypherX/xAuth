@@ -1,0 +1,87 @@
+join:
+    register: '[joinRegister]'
+    login: '[joinLogin]'
+    error:
+        banned: '[joinErrBanned]'
+        online: '[joinErrOnline]'
+        name: '[joinErrName]'
+
+register:
+    usage: '[regUsage]'
+    success: '[regSuccess]'
+    error:
+        disabled: '[regErrDisabled]'
+        registered: '[regErrRegistered]'
+        multiple: '[regErrMultiple]'
+        password: '[regErrPassword]'
+        email: '[regErrEmail]'
+
+login:
+    usage: '[loginUsage]'
+    success: '[loginSuccess]'
+    error:
+        registered: '[loginErrRegistered]'
+        logged: '[loginErrLogged]'
+        password: '[loginErrPassword]'
+        activate: '[loginErrActivate]'
+
+logout:
+    success: '[logoutSuccess]'
+    error:
+        logged: '[logoutErrLogged]'
+
+changepw:
+    usage: '[cpwUsage]'
+    success: '[cpwSuccess]'
+    error:
+        disabled: '[cpwErrDisabled]'
+        logged: '[cpwErrLogged]'
+        incorrect: '[cpwErrIncorrect]'
+        invalid: '[cpwErrInvalid]'
+
+admin:
+    unknown: '[admnUnknown]'
+    permission: '[admnPermission]'
+    register:
+        usage: '[admnRegUsage]'
+        registered: '[admnRegRegistered]'
+        success: '[admnRegSuccess]'
+    changepw:
+        usage: '[admnCpwUsage]'
+        registered: '[admnCpwRegistered]'
+        success: '[admnCpwSuccess]'
+    logout:
+        usage: '[admnLogoutUsage]'
+        logged: '[admnLogoutLogged]'
+        success: '[admnLogoutSuccess]'
+    unregister:
+        usage: '[admnUnregUsage]'
+        registered: '[admnUnregRegistered]'
+        success:
+            target: '[admnUnregSuccessTgt]'
+            player: '[admnUnregSuccessPlyr]'
+    location:
+        usage: '[admnLocUsage]'
+        set:
+            success: '[admnLocSetSuccess]'
+        remove:
+            no: '[admnLocRmvNo]'
+            success: '[admnLocRmvSuccess]'
+    config:
+        usage: '[admnConfUsage]'
+        no: '[admnConfNo]'
+        desc: '[admnConfDesc]'
+        invalid: '[admnConfInvalid]'
+        success: '[admnConfSuccess]'
+    reload:
+        sucess: '[admnReloadSuccess]'      
+
+misc:
+    illegal: '[miscIllegal]'
+    reloaded: '[miscReloaded]'
+    kick:
+        timeout: '[miscKickTimeout]'
+        strike: '[miscKickStrike]'
+
+# INTERNAL USE ONLY! DO NOT TOUCH!
+version: [version]

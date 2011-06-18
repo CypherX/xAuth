@@ -1,0 +1,96 @@
+#
+# Configuration file for xAuth
+#
+
+main:
+    # How should xAuth store data (Accounts, sessions, etc.)?
+    # Possible values: default (H2), mysql
+    datasource: [datasource]
+    # If set to true, xAuth will disable itself if the server is in online-mode
+    auto-disable: [autoDisable]
+    # When set to true, if a player connects with the same name as someone who is
+    # already online, the player connecting will be kicked instead of the online player
+    reverse-enforce-single-session: true
+
+mysql:
+    # Location of the MySQL server. Can be either a host name or IP address
+    host: [mysqlHost]
+    # Port used by MySQL. Default is 3306
+    port: [mysqlPort]
+    # User name used to connect to the MySQL server
+    username: [mysqlUser]
+    # Password used to connect to the MySQL server
+    password: [mysqlPass]
+    # Name of the database that will be used by xAuth
+    database: [mysqlDb]
+    # Names of the tables xAuth will use to store data
+    tables:
+        account: [tblAccount]
+        session: [tblSession]
+        strike: [tblStrike]
+        location: [tblLocation]
+
+registration:
+    # Enable/disable new registrations
+    enabled: [regEnabled]
+    # If set to true, everyone must register
+    forced: [regForced]
+    # Setting this to true requires a player to enter an email address when they register
+    require-email: [requireEmail]
+    # If set to true, a valid email address is required
+    validate-email: [validateEmail]
+    # Setting this to false will impose a limit of one account per IP address
+    allow-multiple: [allowMultiple]
+    # Used with web registrations that require account activation
+    activation: [activation]
+
+login:
+    strikes:
+        # Amount of times a player can enter an incorrect password before action is taken
+        # Set as 0 to disable
+        amount: [maxStrikes]
+        # What action to take when the strike threshold is reached
+        # Possible values: kick, banip
+        action: [strikeAction]
+        # Length, in seconds, of a ban given by the strike system
+        # Set as 0 for a permanent ban
+        length: [banLength]
+
+password:
+    # Minimum length a password may be
+    min-length: [pwMinLength]
+    # Enable/disable password changes
+    allow-change: [pwAllowChange]
+    # Require at least one of the character types below that are set to true
+    complexity:
+        lowercase: [pwCompLower]
+        uppercase: [pwCompUpper]
+        number: [pwCompNumber]
+        symbol: [pwCompSymbol]
+
+guest:
+    # Amount of time, in seconds, that a player has to log in before they are kicked
+    # Set as 0 to disable
+    timeout: [guestTimeout]
+    # Amount of time, in seconds, between "You must be logged in.." messages
+    notify-cooldown: [notifyCooldown]
+
+session:
+    # Amount of time, in seconds, that a session will remain valid
+    length: [sessionLength]
+    # Verify a player's IP address when resuming a session
+    verifyip: [verifyIp]
+    # Length of time, in seconds, that a player will have godmode upon logging in
+    # set as 0 to disable
+    godmode-length: [godmodeLength]
+
+filter:
+    # Minimum length a players name can be
+    min-length: [filterMinLength]
+    # Characters that may be present in a players name. Use an asterisk (*) to allow all
+    allowed: '[filterAllowed]'
+    # If set to false, players with blank names can connect
+    blankname: [filterBlank]
+
+# INTERNAL USE ONLY! DO NOT TOUCH!
+version: [version]
