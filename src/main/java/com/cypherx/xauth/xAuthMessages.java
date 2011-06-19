@@ -236,12 +236,14 @@ public class xAuthMessages {
 
 		// target
 		if (target != null) {
-			message = message.replace("{TARGET}", player.getName());
-			message = message.replace("{TARGETIP}", Util.getHostFromPlayer(player));
+			message = message.replace("{TARGET}", target.getName());
+			message = message.replace("{TARGETIP}", Util.getHostFromPlayer(target));
 		}
 
 		// settings
 		message = message.replace("{PWMINLENGTH}", Integer.toString(xAuthSettings.pwMinLength));
+		message = message.replace("{NAMEMINLENGTH}", Integer.toString(xAuthSettings.filterMinLength));
+		message = message.replace("{MAXSTRIKES}", Integer.toString(xAuthSettings.maxStrikes));
 
 		// misc
 		message = message.replace("{NEWLINE}", "\n");

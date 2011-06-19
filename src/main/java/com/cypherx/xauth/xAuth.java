@@ -242,7 +242,7 @@ public class xAuth extends JavaPlugin {
 		int saltPos = (checkPass.length() >= realPass.length() ? realPass.length() : checkPass.length());
 
 		// extract salt
-		String salt = realPass.substring(saltPos, saltPos + 8);
+		String salt = realPass.substring(saltPos, saltPos + 12);
 
 		// encrypt salt + checkPass
 		Whirlpool w = new Whirlpool();

@@ -152,7 +152,7 @@ public class Util {
 		w.NESSIEinit();
 		w.NESSIEadd(UUID.randomUUID().toString());
 		w.NESSIEfinalize(digest);
-		String salt = Whirlpool.display(digest).substring(0, 8);
+		String salt = Whirlpool.display(digest).substring(0, 12);
 
 		w.NESSIEinit();
 		w.NESSIEadd(salt + pass);
