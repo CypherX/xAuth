@@ -218,6 +218,7 @@ public class xAuth extends JavaPlugin {
 		dataManager.insertSession(session);
 
 		removeGuest(xPlayer);
+		xPlayer.setStrikes(0);
 	}
 
 	public void changePassword(Account account, String newPass) {
@@ -271,6 +272,8 @@ public class xAuth extends JavaPlugin {
 		player.kickPlayer(xAuthMessages.get("miscKickStrike", player, null));
 		if (xAuthSettings.strikeAction.equals("kick"))
 			xAuthLog.info(player.getName() + " kicked by strike system");
+
+		xPlayer.setStrikes(0);
 	}
 
 	public boolean isBanned(String host) {
