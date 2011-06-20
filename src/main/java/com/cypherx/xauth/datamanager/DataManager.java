@@ -38,7 +38,7 @@ public class DataManager {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = DriverManager.getConnection("jdbc:mysql://" + xAuthSettings.mysqlHost + ":" + xAuthSettings.mysqlPort + "/" +
-					xAuthSettings.mysqlDb, xAuthSettings.mysqlUser, xAuthSettings.mysqlPass);
+					xAuthSettings.mysqlDb + "?zeroDateTimeBehavior=convertToNull", xAuthSettings.mysqlUser, xAuthSettings.mysqlPass);
 			stmt = connection.createStatement();
 			xAuthLog.info("Connection to MySQL server established!");
 		} catch (ClassNotFoundException e) {
@@ -188,6 +188,25 @@ public class DataManager {
 		}
 
 		return xPlayer;
+	}
+
+	public int getActive(String playerName) {
+		try {
+			prepStmt = connection.prepareStatement(
+				"SELECT `active`" +
+				" FROM `" + xAuthSettings.tblAccount + "`" +
+				" WHERE playername = ?"
+			);
+			prepStmt.setString(1, playerName);
+			rs = prepStmt.executeQuery();
+
+			if (rs.next())
+				return rs.getInt("active");
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not check active status of player: " + playerName, e);
+		}
+
+		return 0;
 	}
 
 	public void saveAccount(Account account) {

@@ -47,7 +47,8 @@ public class LoginCommand implements CommandExecutor {
 
 				xAuthMessages.send("loginErrPassword", player);
 				return true;
-			} else if (xAuthSettings.activation && account.getActive() == 0) {
+			//} else if (xAuthSettings.activation && account.getActive() == 0) {
+			} else if (xAuthSettings.activation && plugin.getDataManager().getActive(player.getName()) == 0) {
 				xAuthMessages.send("loginErrActivate", player);
 				return true;
 			}

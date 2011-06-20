@@ -46,7 +46,7 @@ public class xAuthEntityListener extends EntityListener {
 			Entity damager = edbeEvent.getDamager();
 
 			if (damager instanceof Player) {
-				xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(((Player)entity).getName());
+				xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(((Player)damager).getName());
 
 				//if (!xAuthSettings.rstrDmgGiven && !xPlayer.isRegistered())
 					//return;
