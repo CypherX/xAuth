@@ -195,7 +195,7 @@ public class DataManager {
 			prepStmt = connection.prepareStatement(
 				"SELECT `active`" +
 				" FROM `" + xAuthSettings.tblAccount + "`" +
-				" WHERE playername = ?"
+				" WHERE `playername` = ?"
 			);
 			prepStmt.setString(1, playerName);
 			rs = prepStmt.executeQuery();
