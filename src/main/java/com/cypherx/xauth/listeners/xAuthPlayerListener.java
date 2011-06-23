@@ -133,7 +133,7 @@ public class xAuthPlayerListener extends PlayerListener {
 				if (xPlayer.canNotify())
 					xPlayer.sendIllegalActionNotice();
 
-				event.setMessage("");
+				event.setMessage("/");
 				event.setCancelled(true);
 			}
 		}
