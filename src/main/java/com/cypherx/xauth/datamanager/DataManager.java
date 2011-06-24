@@ -154,7 +154,7 @@ public class DataManager {
 			);
 
 			stmt.execute(
-				"CREATE TABLE IF NOT EXISTS `inventory` (" +
+				"CREATE TABLE IF NOT EXISTS `" + xAuthSettings.tblInventory + "` (" +
 					"`playername` VARCHAR(255) NOT NULL," +
 					"`itemid` TEXT NOT NULL," +
 					"`amount` TEXT NOT NULL," +
