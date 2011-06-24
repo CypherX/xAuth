@@ -31,7 +31,7 @@ public class xAuthEntityListener extends EntityListener {
 
 		Entity entity = event.getEntity();
 		if (entity instanceof Player && ((Player)entity).isOnline()) { // player taking damage
-			xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(((Player)entity).getName());
+			xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(((Player)entity).getName());
 
 			//if (!xAuthSettings.rstrDmgTaken && !xPlayer.isRegistered())
 				//return;
@@ -46,7 +46,7 @@ public class xAuthEntityListener extends EntityListener {
 			Entity damager = edbeEvent.getDamager();
 
 			if (damager instanceof Player) {
-				xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(((Player)damager).getName());
+				xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(((Player)damager).getName());
 
 				//if (!xAuthSettings.rstrDmgGiven && !xPlayer.isRegistered())
 					//return;
@@ -67,7 +67,7 @@ public class xAuthEntityListener extends EntityListener {
 
 		Entity target = event.getTarget();
 		if (target instanceof Player) {
-			xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(((Player)target).getName());
+			xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(((Player)target).getName());
 
 			//if (!xAuthSettings.rstrMobTarget && !xPlayer.isRegistered())
 				//return;

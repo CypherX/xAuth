@@ -1,6 +1,5 @@
 package com.cypherx.xauth.listeners;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -55,7 +54,7 @@ public class xAuthPlayerListener extends PlayerListener {
 
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(player.getName());
+		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerJoin(player.getName());
 		boolean isRegistered = xPlayer.isRegistered();
 
 		if (!xPlayer.isAuthenticated() && (isRegistered || (!isRegistered && xPlayer.mustRegister()))) {
@@ -89,7 +88,7 @@ public class xAuthPlayerListener extends PlayerListener {
 
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(player.getName());
+		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(player.getName());
 
 		if (xPlayer.isGuest())
 			plugin.removeGuest(xPlayer);
@@ -104,7 +103,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(event.getPlayer().getName());
+		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(event.getPlayer().getName());
 
 		//if (!xAuthSettings.rstrChat && !xPlayer.isRegistered())
 			//return;
@@ -121,21 +120,22 @@ public class xAuthPlayerListener extends PlayerListener {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(event.getPlayer().getName());
+		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(event.getPlayer().getName());
 
 		//if (!xAuthSettings.rstrCommands && !xPlayer.isRegistered())
 			//return;
 
 		if (xPlayer.isGuest()) {
-			String command = event.getMessage().split(" ")[0];
+			String command = event.getMessage().split(" ")[0].replaceFirst("/", "");
 
-			if (!command.equals("/register") && !command.equals("/login") && !command.equals("/l")) {
-				if (xPlayer.canNotify())
-					xPlayer.sendIllegalActionNotice();
+			if (xAuthSettings.allowedCmds.contains(command))
+				return;
 
-				event.setMessage("/");
-				event.setCancelled(true);
-			}
+			if (xPlayer.canNotify())
+				xPlayer.sendIllegalActionNotice();
+
+			event.setMessage("/");
+			event.setCancelled(true);
 		}
 	}
 
@@ -143,7 +143,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(event.getPlayer().getName());
+		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(event.getPlayer().getName());
 
 		//if (!xAuthSettings.rstrInteract && !xPlayer.isRegistered())
 			//return;
@@ -154,7 +154,6 @@ public class xAuthPlayerListener extends PlayerListener {
 
 			if (action == Action.LEFT_CLICK_BLOCK) {
 				if (type == Material.NOTE_BLOCK
-						//|| type == Material.TNT
 						|| type == Material.WOODEN_DOOR
 						|| type == Material.LEVER
 						|| type == Material.IRON_DOOR
@@ -189,10 +188,6 @@ public class xAuthPlayerListener extends PlayerListener {
 					event.setCancelled(true);
 			}
 		}
-
-		/*xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(event.getPlayer().getName());
-		if (xPlayer.isGuest())
-			event.setCancelled(true);*/
 	}
 
 	public void onPlayerMove(PlayerMoveEvent event) {
@@ -200,21 +195,22 @@ public class xAuthPlayerListener extends PlayerListener {
 			return;
 
 		Player player = event.getPlayer();
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(player.getName());
+		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(player.getName());
 
 		//if (!xAuthSettings.rstrMovement && !xPlayer.isRegistered())
 			//return;
 
 		if (xPlayer.isGuest()) {
-			Location loc = plugin.getLocationToTeleport(player.getWorld());
-			player.teleport(loc);
-			event.setFrom(loc);
-			event.setTo(loc);
+			//Location loc = plugin.getLocationToTeleport(player.getWorld());
+			//player.teleport(loc);
+
+			//event.setFrom(loc);
+			event.setTo(plugin.getLocationToTeleport(player.getWorld()));
 
 			if (xPlayer.canNotify())
 				xPlayer.sendIllegalActionNotice();
 
-			event.setCancelled(true);
+			//event.setCancelled(true);
 		}
 	}
 
@@ -222,7 +218,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(event.getPlayer().getName());
+		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(event.getPlayer().getName());
 
 		//if (!xAuthSettings.rstrPickup && !xPlayer.isRegistered())
 			//return;

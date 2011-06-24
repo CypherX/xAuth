@@ -106,7 +106,7 @@ public class xAuthMessages {
 
 		regUsage = getString("register.usage", regUsage);
 		regSuccess = getString("register.success", regSuccess);
-		regErrDisabled = getString("register.error.disable", regErrDisabled);
+		regErrDisabled = getString("register.error.disabled", regErrDisabled);
 		regErrRegistered = getString("register.error.registered", regErrRegistered);
 		regErrMultiple = getString("register.error.multiple", regErrMultiple);
 		regErrPassword = getString("register.error.password", regErrPassword);

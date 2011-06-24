@@ -1,6 +1,8 @@
 package com.cypherx.xauth;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.util.config.Configuration;
 
@@ -24,6 +26,7 @@ public class xAuthSettings {
 	public static String tblSession = "sessions";
 	public static String tblStrike = "strike_bans";
 	public static String tblLocation = "tele_locations";
+	public static String tblInventory = "inventory";
 	/*public static String colAccId = "id";
 	public static String colAccPlayerName = "playername";
 	public static String colAccPassword = "password";
@@ -58,6 +61,7 @@ public class xAuthSettings {
 	// guest
 	public static int guestTimeout = 300;
 	public static int notifyCooldown = 5;
+	public static List<String> allowedCmds = Arrays.asList(new String[]{"register", "login", "l"});
 
 	// session
 	public static int sessionLength = 3600;
@@ -84,7 +88,7 @@ public class xAuthSettings {
 	/*
 	 * REMEMBER TO CHANGE VERSION AFTER MODIFYING DEFAULT SETTINGS
 	 */
-	public static int version = 1;
+	public static int version = 2;
 
 	public static void setup(File dataFolder) {
 		file = new File(dataFolder, "config.yml");
@@ -114,6 +118,7 @@ public class xAuthSettings {
 		tblSession = getString("mysql.tables.session", tblSession);
 		tblStrike = getString("mysql.tables.strike", tblStrike);
 		tblLocation = getString("mysql.tables.location", tblLocation);
+		tblInventory = getString("mysql.tables.inventory", tblInventory);
 		/*colAccId = getString("mysql.columns.account.id", colAccId);
 		colAccPlayerName = getString("mysql.columns.account.playername", colAccPlayerName);
 		colAccPassword = getString("mysql.columns.account.password", colAccPassword);
@@ -144,6 +149,7 @@ public class xAuthSettings {
 
 		guestTimeout = getInt("guest.timeout", guestTimeout);
 		notifyCooldown = getInt("guest.notify-cooldown", notifyCooldown);
+		allowedCmds = getStrList("guest.allowed-commands", allowedCmds);
 
 		sessionLength = getInt("session.length", sessionLength);
 		verifyIp = getBool("session.verifyip", verifyIp);
@@ -175,6 +181,10 @@ public class xAuthSettings {
 
 	private static boolean getBool(String key, boolean def) {
 		return config.getBoolean(key, def);
+	}
+
+	private static List<String> getStrList(String key, List<String> def) {
+		return config.getStringList(key, def);
 	}
 
 	private static void update() {

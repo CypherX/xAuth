@@ -9,10 +9,14 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+
 import com.cypherx.xauth.Account;
 import com.cypherx.xauth.Session;
 import com.cypherx.xauth.StrikeBan;
 import com.cypherx.xauth.TeleLocation;
+import com.cypherx.xauth.Util;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer;
@@ -142,22 +146,160 @@ public class DataManager {
 			);
 
 			stmt.execute(
-					"CREATE TABLE IF NOT EXISTS `" + xAuthSettings.tblStrike + "` (" +
-						"`host` CHAR(15) NOT NULL," +
-						"`bantime` DATETIME NOT NULL," +
-						"PRIMARY KEY(`host`)" +
-					")"
-				);
+				"CREATE TABLE IF NOT EXISTS `" + xAuthSettings.tblStrike + "` (" +
+					"`host` CHAR(15) NOT NULL," +
+					"`bantime` DATETIME NOT NULL," +
+					"PRIMARY KEY(`host`)" +
+				")"
+			);
+
+			stmt.execute(
+				"CREATE TABLE IF NOT EXISTS `inventory` (" +
+					"`playername` VARCHAR(255) NOT NULL," +
+					"`itemid` TEXT NOT NULL," +
+					"`amount` TEXT NOT NULL," +
+					"`durability` TEXT NOT NULL," +
+					"PRIMARY KEY (`playername`)" +
+				")"
+			);
 		} catch (SQLException e) {
 			xAuthLog.severe("Could not check/create database tables!", e);
 		}
 	}
 
-	public xAuthPlayer getPlayerByName(String playerName) {
+	public void insertInventory(xAuthPlayer xPlayer) {
+		try {
+			prepStmt = connection.prepareStatement(
+				"SELECT *" +
+				" FROM `" + xAuthSettings.tblInventory + "`" +
+				" WHERE `playername` = ?"
+			);
+			prepStmt.setString(1, xPlayer.getPlayerName());
+			rs = prepStmt.executeQuery();
+
+			if (rs.next())
+				return;
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not check inventory for player: " + xPlayer.getPlayerName(), e);
+		}
+
+		PlayerInventory inv = xPlayer.getPlayer().getInventory();
+		StringBuilder sbItems = new StringBuilder();
+		StringBuilder sbAmount = new StringBuilder();
+		StringBuilder sbDurability = new StringBuilder();
+
+		for (ItemStack item : inv.getContents()) {
+			int itemid = 0;
+			int amount = 0;
+			short durability = 0;
+
+			if (item != null) {
+				itemid = item.getTypeId();
+				amount = item.getAmount();
+				durability = item.getDurability();
+			}
+
+			sbItems.append(itemid + ",");
+			sbAmount.append(amount + ",");
+			sbDurability.append(durability + ",");
+		}
+
+		for (ItemStack item : inv.getArmorContents()) {
+			int itemid = 0;
+			int amount = 0;
+			short durability = 0;
+
+			if (item != null) {
+				itemid = item.getTypeId();
+				amount = item.getAmount();
+				durability = item.getDurability();
+			}
+
+			sbItems.append(itemid + ",");
+			sbAmount.append(amount + ",");
+			sbDurability.append(durability + ",");
+		}
+
+		sbItems.deleteCharAt(sbItems.lastIndexOf(","));
+		sbAmount.deleteCharAt(sbAmount.lastIndexOf(","));
+		sbDurability.deleteCharAt(sbDurability.lastIndexOf(","));
+
+		try {
+			prepStmt = connection.prepareStatement(
+				"INSERT INTO `" + xAuthSettings.tblInventory + "`" +
+				" VALUES" +
+					"(?, ?, ?, ?)"
+			);
+			prepStmt.setString(1, xPlayer.getPlayerName());
+			prepStmt.setString(2, sbItems.toString());
+			prepStmt.setString(3, sbAmount.toString());
+			prepStmt.setString(4, sbDurability.toString());
+			prepStmt.executeUpdate();
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not insert inventory for player: " + xPlayer.getPlayerName(), e);
+		}
+	}
+
+	public ItemStack[] getInventory(xAuthPlayer xPlayer) {
+		try {
+			prepStmt = connection.prepareStatement(
+				"SELECT *" +
+				" FROM `" + xAuthSettings.tblInventory + "`" +
+				" WHERE `playername` = ?"
+			);
+			prepStmt.setString(1, xPlayer.getPlayerName());
+			rs = prepStmt.executeQuery();
+
+			if (rs.next()) {
+				int[] itemid = Util.stringToInt(rs.getString("itemid").split(","));
+				int[] amount = Util.stringToInt(rs.getString("amount").split(","));
+				int[] durability = Util.stringToInt(rs.getString("durability").split(","));
+				ItemStack[] inv = new ItemStack[itemid.length];
+
+				for (int i = 0; i < inv.length; i++)
+					inv[i] = new ItemStack(itemid[i], amount[i], (short)durability[i]);
+
+				return inv;
+			}
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not load inventory for player: " + xPlayer.getPlayerName(), e);
+		}
+
+		return null;
+	}
+
+	public void deleteInventory(xAuthPlayer xPlayer) {
+		try {
+			prepStmt = connection.prepareStatement(
+				"DELETE FROM `" + xAuthSettings.tblInventory + "`" +
+				" WHERE `playername` = ?"
+			);
+			prepStmt.setString(1, xPlayer.getPlayerName());
+			prepStmt.executeUpdate();
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not delete inventory for player: " + xPlayer.getPlayerName(), e);
+		}
+	}
+
+	public xAuthPlayer getPlayer(String playerName) {
 		String lowPlayerName = playerName.toLowerCase();
 
 		if (playerCache.containsKey(lowPlayerName))
 			return playerCache.get(lowPlayerName);
+
+		xAuthPlayer xPlayer = getPlayerFromDb(playerName);
+		if (xPlayer == null)
+			xPlayer = new xAuthPlayer(playerName);
+
+		playerCache.put(lowPlayerName, xPlayer);
+		return xPlayer;
+	}
+
+	public xAuthPlayer getPlayerJoin(String playerName) {
+		String lowPlayerName = playerName.toLowerCase();
+
+		if (playerCache.containsKey(lowPlayerName))
+			return reloadPlayer(playerCache.get(lowPlayerName));
 
 		xAuthPlayer xPlayer = getPlayerFromDb(playerName);
 		if (xPlayer == null)
@@ -185,6 +327,29 @@ public class DataManager {
 				xPlayer = new xAuthPlayer(playerName, buildAccount(rs), buildSession(rs));
 		} catch (SQLException e) {
 			xAuthLog.severe("Could not load player: " + playerName, e);
+		}
+
+		return xPlayer;
+	}
+
+	public xAuthPlayer reloadPlayer(xAuthPlayer xPlayer) {
+		try {
+			prepStmt = connection.prepareStatement(
+				"SELECT a.*, s.*" +
+				" FROM `" + xAuthSettings.tblAccount + "` a" +
+				" LEFT JOIN `" + xAuthSettings.tblSession + "` s" +
+					" ON a.id = s.accountid" +
+				" WHERE `playername` = ?"
+			);
+			prepStmt.setString(1, xPlayer.getPlayerName());
+			rs = prepStmt.executeQuery();
+
+			if (rs.next()) {
+				xPlayer.setAccount(buildAccount(rs));
+				xPlayer.setSession(buildSession(rs));
+			}
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not reload player: " + xPlayer.getPlayerName(), e);
 		}
 
 		return xPlayer;

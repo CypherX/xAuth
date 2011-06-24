@@ -23,7 +23,7 @@ public class RegisterCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
-			xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(player.getName());
+			xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(player.getName());
 
 			if (!xAuthSettings.regEnabled) {
 				xAuthMessages.send("regErrDisabled", player);

@@ -29,7 +29,7 @@ public class xAuth extends JavaPlugin {
 		Player[] players = getServer().getOnlinePlayers();
 		if (players.length > 0) {
 			for (Player player : players) {
-				xAuthPlayer xPlayer = dataManager.getPlayerByName(player.getName());
+				xAuthPlayer xPlayer = dataManager.getPlayer(player.getName());
 				if (xPlayer.isGuest())
 					removeGuest(xPlayer);
 			}
@@ -52,7 +52,8 @@ public class xAuth extends JavaPlugin {
 		xAuthSettings.setup(dataFolder);
 		xAuthMessages.setup(dataFolder);
 
-		if (xAuthSettings.autoDisable && Util.getOnlineMode()) {
+		// Util.getOnlineMode() -> getServer().getOnlineMode()
+		if (xAuthSettings.autoDisable && getServer().getOnlineMode()) {
 			xAuthLog.warning("Disabling - Server is running in online-mode");
 			getServer().getPluginManager().disablePlugin(this);
 			return;
@@ -125,7 +126,7 @@ public class xAuth extends JavaPlugin {
 
 	private void handleReload(Player[] players) {
 		for (Player player : players) {
-			xAuthPlayer xPlayer = dataManager.getPlayerByName(player.getName());
+			xAuthPlayer xPlayer = dataManager.getPlayerJoin(player.getName());
 			boolean isRegistered = xPlayer.isRegistered();
 
 			if (!xPlayer.isAuthenticated() && (isRegistered || (!isRegistered && xPlayer.mustRegister()))) {
@@ -167,8 +168,9 @@ public class xAuth extends JavaPlugin {
 		Player player = xPlayer.getPlayer();
 		PlayerInventory playerInv = player.getInventory();
 
-		xPlayer.setInventory(playerInv.getContents());
-		xPlayer.setArmor(playerInv.getArmorContents());
+		dataManager.insertInventory(xPlayer);
+		//xPlayer.setInventory(playerInv.getContents());
+		//xPlayer.setArmor(playerInv.getArmorContents());
 		playerInv.clear();
 		playerInv.setHelmet(null);
 		playerInv.setChestplate(null);
@@ -179,15 +181,41 @@ public class xAuth extends JavaPlugin {
 		if (player.getHealth() > 0)
 			xPlayer.setLocation(player.getLocation());
 
-		Location loc = getLocationToTeleport(player.getWorld());
-		player.teleport(loc);
+		player.teleport(getLocationToTeleport(player.getWorld()));
 	}
 
 	public void restore(xAuthPlayer xPlayer) {
 		Player player = xPlayer.getPlayer();
 		PlayerInventory playerInv = player.getInventory();
 
-		ItemStack[] inv = xPlayer.getInventory();
+		ItemStack[] inv = dataManager.getInventory(xPlayer);
+		ItemStack[] items = new ItemStack[inv.length - 4];
+		ItemStack[] armor = new ItemStack[4];
+
+		for (int i = 0; i < inv.length - 4; i++)
+			items[i] = inv[i];
+
+		//Backpack fix
+		if (playerInv.getSize() > items.length) {
+			ItemStack[] newItems = new ItemStack[playerInv.getSize()];
+
+			for(int i = 0; i < items.length; i++)
+				newItems[i] = items[i];
+
+			items = newItems;
+		}
+		//end Backpack fix
+
+		armor[0] = inv[inv.length - 4];
+		armor[1] = inv[inv.length - 3];
+		armor[2] = inv[inv.length - 2];
+		armor[3] = inv[inv.length - 1];
+
+		playerInv.setContents(items);
+		playerInv.setArmorContents(armor);
+		dataManager.deleteInventory(xPlayer);
+
+		/*ItemStack[] inv = xPlayer.getInventory();
 		//Backpack fix
 		if (playerInv.getSize() > inv.length) {
 			ItemStack[] newInv = new ItemStack[playerInv.getSize()];
@@ -200,7 +228,7 @@ public class xAuth extends JavaPlugin {
 		//end Backpack fix
 
 		playerInv.setContents(inv);
-		playerInv.setArmorContents(xPlayer.getArmor());
+		playerInv.setArmorContents(xPlayer.getArmor());*/
 
 		if (xPlayer.getLocation() != null)
 			xPlayer.getPlayer().teleport(xPlayer.getLocation());

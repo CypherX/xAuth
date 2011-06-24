@@ -22,7 +22,7 @@ public class LoginCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
-			xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(player.getName());
+			xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(player.getName());
 
 			if (args.length < 1) {
 				xAuthMessages.send("loginUsage", player);

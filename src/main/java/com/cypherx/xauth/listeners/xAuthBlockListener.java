@@ -26,7 +26,7 @@ public class xAuthBlockListener extends BlockListener {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(event.getPlayer().getName());
+		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(event.getPlayer().getName());
 
 		//if (!xAuthSettings.rstrBreak && !xPlayer.isRegistered())
 			//return;
@@ -43,7 +43,7 @@ public class xAuthBlockListener extends BlockListener {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerByName(event.getPlayer().getName());
+		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(event.getPlayer().getName());
 
 		//if (!xAuthSettings.rstrPlace && !xPlayer.isRegistered())
 			//return;

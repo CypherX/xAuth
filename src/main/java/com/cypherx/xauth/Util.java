@@ -3,7 +3,7 @@ package com.cypherx.xauth;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
+//import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,7 +80,7 @@ public class Util {
 		return sb.toString();
 	}
 
-	public static boolean getOnlineMode() {
+	/*public static boolean getOnlineMode() {
 		BufferedReader br = null;
 		String value = null;
 		String line;
@@ -99,7 +99,7 @@ public class Util {
 		}
 
 		return Boolean.parseBoolean(value);
-	}
+	}*/
 
 	public static boolean isValidName(Player player) {
 		String playerName = player.getName().toLowerCase();
@@ -198,5 +198,14 @@ public class Util {
 
 	public static Timestamp getNow() {
 		return new Timestamp(System.currentTimeMillis());
+	}
+
+	public static int[] stringToInt(String[] strArray) {
+		int[] intArray = new int[strArray.length];
+
+		for (int i = 0; i < strArray.length; i++)
+			intArray[i] = Integer.parseInt(strArray[i]);
+
+		return intArray;
 	}
 }

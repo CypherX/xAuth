@@ -29,6 +29,7 @@ mysql:
         session: [tblSession]
         strike: [tblStrike]
         location: [tblLocation]
+        inventory: [tblInventory]
 
 registration:
     # Enable/disable new registrations
@@ -74,6 +75,8 @@ guest:
     timeout: [guestTimeout]
     # Amount of time, in seconds, between "You must be logged in.." messages
     notify-cooldown: [notifyCooldown]
+    # Commands that players who are not registered or logged in may execute
+    allowed-commands: [allowedCmds]
 
 session:
     # Amount of time, in seconds, that a session will remain valid

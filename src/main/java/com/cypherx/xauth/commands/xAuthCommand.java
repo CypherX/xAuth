@@ -72,7 +72,7 @@ public class xAuthCommand implements CommandExecutor {
 			String targetName = args[1];
 			String password = args[2];
 			String email = (args.length > 3 ? args[3] : null);
-			xAuthPlayer xPlayer = dataManager.getPlayerByName(targetName);
+			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
 
 			if (xPlayer.isRegistered()) {
 				xAuthMessages.send("admnRegRegistered", player, xPlayer.getPlayer());
@@ -94,7 +94,7 @@ public class xAuthCommand implements CommandExecutor {
 			String targetName = args[1];
 			String password = args[2];
 			String email = (args.length > 3 ? args[3] : null);
-			xAuthPlayer xPlayer = dataManager.getPlayerByName(targetName);
+			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
 
 			if (xPlayer.isRegistered()) {
 				xAuthLog.info(targetName + " is already registered!");
@@ -124,7 +124,7 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayerByName(targetName);
+			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
 
 			if (!xPlayer.isRegistered()) {
 				xAuthMessages.send("admnCpwRegistered", player, xPlayer.getPlayer());
@@ -144,7 +144,7 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayerByName(targetName);
+			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
 
 			if (!xPlayer.isRegistered()) {
 				xAuthLog.info("This player is not registered!");
@@ -174,7 +174,7 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayerByName(targetName);
+			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
 
 			if (!xPlayer.hasSession()) {
 				xAuthMessages.send("admnLogoutLogged", player, xPlayer.getPlayer());
@@ -194,7 +194,7 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayerByName(targetName);
+			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
 
 			if (!xPlayer.hasSession()) {
 				xAuthLog.info(targetName + " is not logged in!");
@@ -224,7 +224,7 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayerByName(targetName);
+			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
 
 			if (!xPlayer.isRegistered()) {
 				xAuthMessages.send("admnUnregRegistered", player, xPlayer.getPlayer());
@@ -248,7 +248,7 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayerByName(targetName);
+			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
 
 			if (!xPlayer.isRegistered()) {
 				xAuthLog.info(targetName + " is not registered!");

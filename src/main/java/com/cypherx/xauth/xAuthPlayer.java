@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+//import org.bukkit.inventory.ItemStack;
 
 public class xAuthPlayer {
 	private String playerName;
@@ -13,8 +13,8 @@ public class xAuthPlayer {
 	private Session session;
 	private boolean guest = false;
 	private Location location;
-	private ItemStack[] inventory;
-	private ItemStack[] armor;
+	//private ItemStack[] inventory;
+	//private ItemStack[] armor;
 	private Timestamp lastNotifyTime;
 	private int strikes = 0;
 	private int timeoutTaskId;
@@ -127,7 +127,7 @@ public class xAuthPlayer {
 		return location;
 	}
 
-	public void setInventory(ItemStack[] inventory) {
+	/*public void setInventory(ItemStack[] inventory) {
 		this.inventory = inventory;
 	}
 
@@ -141,7 +141,7 @@ public class xAuthPlayer {
 
 	public ItemStack[] getArmor() {
 		return armor;
-	}
+	}*/
 
 	public void setLastNotifyTime(Timestamp lastNotifyTime) {
 		this.lastNotifyTime = lastNotifyTime;
