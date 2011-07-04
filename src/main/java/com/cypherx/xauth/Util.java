@@ -3,7 +3,6 @@ package com.cypherx.xauth;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-//import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,10 +18,6 @@ import java.util.regex.Pattern;
 import org.bukkit.entity.Player;
 
 import com.avaje.ebean.validation.factory.EmailValidatorFactory;
-
-/*
- * Miscellaneous methods
- */
 
 public class Util {
 	public static void writeConfig(File file, Class<?> c) {
@@ -79,27 +74,6 @@ public class Util {
 
 		return sb.toString();
 	}
-
-	/*public static boolean getOnlineMode() {
-		BufferedReader br = null;
-		String value = null;
-		String line;
-
-		try {
-			br = new BufferedReader(new FileReader("server.properties"));
-			while ((line = br.readLine()).indexOf("online-mode") == -1);
-			value = line.split("=")[1];
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-			} catch (IOException e) {}
-		}
-
-		return Boolean.parseBoolean(value);
-	}*/
 
 	public static boolean isValidName(Player player) {
 		String playerName = player.getName().toLowerCase();

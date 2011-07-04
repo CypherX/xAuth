@@ -52,7 +52,6 @@ public class xAuth extends JavaPlugin {
 		xAuthSettings.setup(dataFolder);
 		xAuthMessages.setup(dataFolder);
 
-		// Util.getOnlineMode() -> getServer().getOnlineMode()
 		if (xAuthSettings.autoDisable && getServer().getOnlineMode()) {
 			xAuthLog.warning("Disabling - Server is running in online-mode");
 			getServer().getPluginManager().disablePlugin(this);
@@ -159,6 +158,9 @@ public class xAuth extends JavaPlugin {
 	}
 
 	public void removeGuest(xAuthPlayer xPlayer) {
+		if (!xPlayer.isGuest())
+			return;
+
 		getServer().getScheduler().cancelTask(xPlayer.getTimeoutTaskId());
 		restore(xPlayer);
 		xPlayer.setGuest(false);
@@ -169,8 +171,6 @@ public class xAuth extends JavaPlugin {
 		PlayerInventory playerInv = player.getInventory();
 
 		dataManager.insertInventory(xPlayer);
-		//xPlayer.setInventory(playerInv.getContents());
-		//xPlayer.setArmor(playerInv.getArmorContents());
 		playerInv.clear();
 		playerInv.setHelmet(null);
 		playerInv.setChestplate(null);
@@ -181,7 +181,8 @@ public class xAuth extends JavaPlugin {
 		if (player.getHealth() > 0)
 			xPlayer.setLocation(player.getLocation());
 
-		player.teleport(getLocationToTeleport(player.getWorld()));
+		if (xAuthSettings.protectLoc)
+			player.teleport(getLocationToTeleport(player.getWorld()));
 	}
 
 	public void restore(xAuthPlayer xPlayer) {
@@ -214,21 +215,6 @@ public class xAuth extends JavaPlugin {
 		playerInv.setContents(items);
 		playerInv.setArmorContents(armor);
 		dataManager.deleteInventory(xPlayer);
-
-		/*ItemStack[] inv = xPlayer.getInventory();
-		//Backpack fix
-		if (playerInv.getSize() > inv.length) {
-			ItemStack[] newInv = new ItemStack[playerInv.getSize()];
-
-			for(int i = 0; i < inv.length; i++)
-				newInv[i] = inv[i];
-
-			inv = newInv;
-		}
-		//end Backpack fix
-
-		playerInv.setContents(inv);
-		playerInv.setArmorContents(xPlayer.getArmor());*/
 
 		if (xPlayer.getLocation() != null)
 			xPlayer.getPlayer().teleport(xPlayer.getLocation());
@@ -324,8 +310,6 @@ public class xAuth extends JavaPlugin {
 	public void reload() {
 		xAuthSettings.setup(dataFolder);
 		xAuthMessages.setup(dataFolder);
-		//dataManager.close();
-		//dataManager = new DataManager();
 	}
 
 	public DataManager getDataManager() {

@@ -235,7 +235,8 @@ public class xAuthCommand implements CommandExecutor {
 
 			Player target = xPlayer.getPlayer();
 			if (target != null) {
-				plugin.createGuest(xPlayer);
+				if (xPlayer.mustRegister())
+					plugin.createGuest(xPlayer);
 				xAuthMessages.send("admnUnregSuccessTgt", target);
 			}
 
@@ -259,7 +260,8 @@ public class xAuthCommand implements CommandExecutor {
 			
 			Player target = xPlayer.getPlayer();
 			if (target != null) {
-				plugin.createGuest(xPlayer);
+				if (xPlayer.mustRegister())
+					plugin.createGuest(xPlayer);
 				target.sendMessage("You have been unregistered and logged out!");
 			}
 

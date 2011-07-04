@@ -62,6 +62,7 @@ public class xAuthSettings {
 	public static int guestTimeout = 300;
 	public static int notifyCooldown = 5;
 	public static List<String> allowedCmds = Arrays.asList(new String[]{"register", "login", "l"});
+	public static boolean protectLoc = true;
 
 	// session
 	public static int sessionLength = 3600;
@@ -88,7 +89,7 @@ public class xAuthSettings {
 	/*
 	 * REMEMBER TO CHANGE VERSION AFTER MODIFYING DEFAULT SETTINGS
 	 */
-	public static int version = 2;
+	public static int version = 3;
 
 	public static void setup(File dataFolder) {
 		file = new File(dataFolder, "config.yml");
@@ -150,6 +151,7 @@ public class xAuthSettings {
 		guestTimeout = getInt("guest.timeout", guestTimeout);
 		notifyCooldown = getInt("guest.notify-cooldown", notifyCooldown);
 		allowedCmds = getStrList("guest.allowed-commands", allowedCmds);
+		protectLoc = getBool("guest.protect-location", protectLoc);
 
 		sessionLength = getInt("session.length", sessionLength);
 		verifyIp = getBool("session.verifyip", verifyIp);

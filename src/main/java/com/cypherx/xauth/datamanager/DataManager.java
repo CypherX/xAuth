@@ -32,6 +32,10 @@ public class DataManager {
 	private ConcurrentHashMap<String, TeleLocation> teleLocations = new ConcurrentHashMap<String, TeleLocation>();
 
 	public DataManager() {
+		connect();
+	}
+
+	private void connect() {
 		if (xAuthSettings.datasource.equals("mysql"))
 			connectMySQL();
 		else
@@ -83,6 +87,9 @@ public class DataManager {
 				"WHERE NOW() > DATEADD('SECOND', " + xAuthSettings.sessionLength + ", `logintime`)";
 		}
 
+		if (!isConnected())
+			connect();
+
 		// delete expired sessions
 		try {
 			stmt.executeUpdate(sql);
@@ -91,22 +98,10 @@ public class DataManager {
 		}
 	}
 
-	public void printStats() {
-		try {
-			rs = stmt.executeQuery(
-				"SELECT" +
-					" (SELECT COUNT(*) FROM `" + xAuthSettings.tblAccount + "`) AS accounts," +
-					" (SELECT COUNT(*) FROM `" + xAuthSettings.tblSession + "`) AS sessions"
-			);
-
-			if (rs.next())
-				xAuthLog.info("Accounts: " + rs.getInt("accounts") + ", Sessions: " + rs.getInt("sessions"));
-		} catch (SQLException e) {
-			xAuthLog.severe("Could not fetch xAuth statistics!", e);
-		}
-	}
-
 	public void createTables() {
+		if (!isConnected())
+			connect();
+
 		try {
 			stmt.execute(
 				"CREATE TABLE IF NOT EXISTS `" + xAuthSettings.tblAccount + "` (" +
@@ -167,7 +162,28 @@ public class DataManager {
 		}
 	}
 
+	public void printStats() {
+		if (!isConnected())
+			connect();
+
+		try {
+			rs = stmt.executeQuery(
+				"SELECT" +
+					" (SELECT COUNT(*) FROM `" + xAuthSettings.tblAccount + "`) AS accounts," +
+					" (SELECT COUNT(*) FROM `" + xAuthSettings.tblSession + "`) AS sessions"
+			);
+
+			if (rs.next())
+				xAuthLog.info("Accounts: " + rs.getInt("accounts") + ", Sessions: " + rs.getInt("sessions"));
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not fetch xAuth statistics!", e);
+		}
+	}
+
 	public void insertInventory(xAuthPlayer xPlayer) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"SELECT *" +
@@ -241,6 +257,9 @@ public class DataManager {
 	}
 
 	public ItemStack[] getInventory(xAuthPlayer xPlayer) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"SELECT *" +
@@ -269,6 +288,9 @@ public class DataManager {
 	}
 
 	public void deleteInventory(xAuthPlayer xPlayer) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"DELETE FROM `" + xAuthSettings.tblInventory + "`" +
@@ -310,6 +332,9 @@ public class DataManager {
 	}
 
 	public xAuthPlayer getPlayerFromDb(String playerName) {
+		if (!isConnected())
+			connect();
+
 		xAuthPlayer xPlayer = null;
 
 		try {
@@ -333,6 +358,9 @@ public class DataManager {
 	}
 
 	public xAuthPlayer reloadPlayer(xAuthPlayer xPlayer) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"SELECT a.*, s.*" +
@@ -356,6 +384,9 @@ public class DataManager {
 	}
 
 	public int getActive(String playerName) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"SELECT `active`" +
@@ -382,6 +413,9 @@ public class DataManager {
 	}
 
 	protected void insertAccount(Account account) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"INSERT INTO `" + xAuthSettings.tblAccount + "`" +
@@ -408,6 +442,9 @@ public class DataManager {
 	}
 
 	public void insertAccounts(List<Account> accounts) {
+		if (!isConnected())
+			connect();
+
 		StringBuilder sb = new StringBuilder();
 		Account account;
 		sb.append("INSERT INTO `" + xAuthSettings.tblAccount + "` (`playername`, `password`) VALUES");
@@ -431,6 +468,9 @@ public class DataManager {
 	}
 
 	protected void updateAccount(Account account) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"UPDATE `" + xAuthSettings.tblAccount + "`" +
@@ -461,6 +501,9 @@ public class DataManager {
 	}
 
 	public void deleteAccount(xAuthPlayer xPlayer) {
+		if (!isConnected())
+			connect();
+
 		Account account = xPlayer.getAccount();
 
 		try {
@@ -479,6 +522,9 @@ public class DataManager {
 	}
 
 	public void insertSession(Session session) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"INSERT INTO `" + xAuthSettings.tblSession + "`" +
@@ -495,6 +541,9 @@ public class DataManager {
 	}
 
 	public void deleteSession(xAuthPlayer xPlayer) {
+		if (!isConnected())
+			connect();
+
 		Session session = xPlayer.getSession();
 
 		try {
@@ -512,7 +561,8 @@ public class DataManager {
 	}
 
 	public void loadTeleLocations() {
-		//List<TeleLocation> teleLocations = new ArrayList<TeleLocation>();
+		if (!isConnected())
+			connect();
 
 		try {
 			rs = stmt.executeQuery(
@@ -529,16 +579,16 @@ public class DataManager {
 				teleLocation.setYaw(rs.getFloat("yaw"));
 				teleLocation.setPitch(rs.getFloat("pitch"));
 				teleLocations.put(teleLocation.getWorldName(), teleLocation);
-				//teleLocations.add(teleLocation);
 			}
 		} catch (SQLException e) {
 			xAuthLog.severe("Could not load TeleLocations from database!", e);
 		}
-
-		//return teleLocations;
 	}
 
 	public void insertTeleLocation(TeleLocation teleLocation) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"INSERT INTO `" + xAuthSettings.tblLocation + "`" +
@@ -559,6 +609,9 @@ public class DataManager {
 	}
 
 	public void updateTeleLocation(TeleLocation teleLocation) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"UPDATE `" + xAuthSettings.tblLocation + "`" +
@@ -583,6 +636,9 @@ public class DataManager {
 	}
 
 	public void deleteTeleLocation(TeleLocation teleLocation) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"DELETE FROM `" + xAuthSettings.tblLocation + "`" +
@@ -597,6 +653,9 @@ public class DataManager {
 	}
 
 	public StrikeBan loadStrikeBan(String host) {
+		if (!isConnected())
+			connect();
+
 		StrikeBan ban = null;
 
 		try {
@@ -622,6 +681,9 @@ public class DataManager {
 	}
 
 	public void insertStrikeBan(StrikeBan ban) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"INSERT INTO `" + xAuthSettings.tblStrike + "`" +
@@ -639,6 +701,9 @@ public class DataManager {
 	}
 
 	public void deleteStrikeBan(StrikeBan ban) {
+		if (!isConnected())
+			connect();
+
 		try {
 			stmt = connection.prepareStatement(
 				"DELETE FROM `" + xAuthSettings.tblStrike + "`" +
@@ -653,6 +718,9 @@ public class DataManager {
 	}
 
 	public boolean isHostUsed(String host) {
+		if (!isConnected())
+			connect();
+
 		try {
 			prepStmt = connection.prepareStatement(
 				"SELECT `id`" +

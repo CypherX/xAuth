@@ -13,8 +13,6 @@ public class xAuthPlayer {
 	private Session session;
 	private boolean guest = false;
 	private Location location;
-	//private ItemStack[] inventory;
-	//private ItemStack[] armor;
 	private Timestamp lastNotifyTime;
 	private int strikes = 0;
 	private int timeoutTaskId;

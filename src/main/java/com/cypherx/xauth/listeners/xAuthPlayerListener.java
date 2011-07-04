@@ -201,16 +201,13 @@ public class xAuthPlayerListener extends PlayerListener {
 			//return;
 
 		if (xPlayer.isGuest()) {
-			//Location loc = plugin.getLocationToTeleport(player.getWorld());
-			//player.teleport(loc);
-
-			//event.setFrom(loc);
-			event.setTo(plugin.getLocationToTeleport(player.getWorld()));
+			if (xAuthSettings.protectLoc)
+				event.setTo(plugin.getLocationToTeleport(player.getWorld()));
+			else
+				event.setTo(xPlayer.getLocation());
 
 			if (xPlayer.canNotify())
 				xPlayer.sendIllegalActionNotice();
-
-			//event.setCancelled(true);
 		}
 	}
 

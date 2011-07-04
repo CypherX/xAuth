@@ -10,7 +10,7 @@ main:
     auto-disable: [autoDisable]
     # When set to true, if a player connects with the same name as someone who is
     # already online, the player connecting will be kicked instead of the online player
-    reverse-enforce-single-session: true
+    reverse-enforce-single-session: [reverseESS]
 
 mysql:
     # Location of the MySQL server. Can be either a host name or IP address
@@ -77,6 +77,8 @@ guest:
     notify-cooldown: [notifyCooldown]
     # Commands that players who are not registered or logged in may execute
     allowed-commands: [allowedCmds]
+    # Turn on/off location protection
+    protect-location: [protectLoc]
 
 session:
     # Amount of time, in seconds, that a session will remain valid
