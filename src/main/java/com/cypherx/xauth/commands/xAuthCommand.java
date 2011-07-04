@@ -47,12 +47,23 @@ public class xAuthCommand implements CommandExecutor {
 			return configCommand(sender, args);
 		else if (subCommand.equals("reload"))
 			return reloadCommand(sender);
+		else if (subCommand.equals("version"))
+			return versionCommand(sender);
 		else {
 			if (sender instanceof Player)
 				xAuthMessages.send("admnUnknown", (Player)sender);
 			else if (sender instanceof ConsoleCommandSender)
 				xAuthLog.info("Unknown subcommand, try \"xauth\" for more information");
 		}
+
+		return true;
+	}
+
+	private boolean versionCommand(CommandSender sender) {
+		if (sender instanceof Player)
+			((Player)sender).sendMessage("[" + xAuth.desc.getName() + "] This server is running version " + xAuth.desc.getVersion());
+		else if (sender instanceof ConsoleCommandSender)
+			xAuthLog.info("This server is running version " + xAuth.desc.getVersion());
 
 		return true;
 	}

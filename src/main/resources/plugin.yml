@@ -29,3 +29,4 @@ commands:
                /<command> location set|remove
                /<command> config <setting> [value]
                /<command> reload
+               /<command> version
