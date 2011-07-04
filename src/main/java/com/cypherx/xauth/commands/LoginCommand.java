@@ -27,7 +27,7 @@ public class LoginCommand implements CommandExecutor {
 			if (args.length < 1) {
 				xAuthMessages.send("loginUsage", player);
 				return true;
-			} else if (!xPlayer.isRegistered()) {
+			} else if (!xAuthSettings.authURLEnabled && !xPlayer.isRegistered()) {
 				xAuthMessages.send("loginErrRegistered", player);
 				return true;
 			} else if (xPlayer.hasSession()) {
@@ -36,6 +36,10 @@ public class LoginCommand implements CommandExecutor {
 			}
 
 			Account account = xPlayer.getAccount();
+			if(xAuthSettings.authURLEnabled && account == null){
+				account = new Account(player.getName(), "authURL", null);
+				xPlayer.setAccount(account);
+			}
 			String password = args[0];
 
 			if (!plugin.checkPassword(account, password)) {

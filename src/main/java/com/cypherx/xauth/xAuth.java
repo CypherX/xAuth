@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -19,6 +20,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class xAuth extends JavaPlugin {
 	public static PluginDescriptionFile desc;
@@ -241,6 +251,19 @@ public class xAuth extends JavaPlugin {
 	}
 
 	public boolean checkPassword(Account account, String checkPass) {
+		if(xAuthSettings.authURLEnabled){
+			StringBuilder sb = new StringBuilder();
+
+			boolean result = checkAuthURLPass(account.getPlayerName(), checkPass, sb);
+			// if true, tell whole server a player logged in
+			// else, send the returned string (error message) to the user
+			if(result)
+				Bukkit.getServer().broadcastMessage("Player '" + account.getPlayerName() + "' logged in with forum name '"+sb.toString()+"'");
+			else
+				account.getPlayer().sendMessage(sb.toString());
+			return result;
+		}
+
 		String realPass = account.getPassword();
 
 		// check for old encryption (md5 or whirlpool)
@@ -267,6 +290,39 @@ public class xAuth extends JavaPlugin {
 		w.NESSIEfinalize(digest);
 		String hash = Whirlpool.display(digest);
 		return (hash.substring(0, saltPos) + salt + hash.substring(saltPos)).equals(realPass);
+	}
+
+	public boolean checkAuthURLPass(String user, String pass, StringBuilder response) {
+		try {
+			user = URLEncoder.encode(user, "UTF-8");
+			pass = URLEncoder.encode(pass, "UTF-8");
+
+			HttpURLConnection.setFollowRedirects(false);
+			HttpURLConnection uc = (HttpURLConnection) new URL(xAuthSettings.authURL).openConnection();
+
+			uc.setRequestMethod("POST");
+			uc.setDoInput(true);
+			uc.setDoOutput(true);
+			uc.setUseCaches(false);
+			uc.setAllowUserInteraction(false);
+			uc.setInstanceFollowRedirects(false);
+			uc.setRequestProperty("User-Agent", "Mozilla/5.0 xAuth/" + desc.getVersion());
+			uc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+			DataOutputStream out = new DataOutputStream(uc.getOutputStream());
+			out.writeBytes("user=" + user + "&pass=" + pass);
+			out.flush();
+			out.close();
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream()));
+			String line = in.readLine();
+			boolean success = line != null && line.equals("YES");
+			response.append(in.readLine());
+			in.close();
+			return success;
+		} catch (Exception e) {
+			response.append(e.getMessage());
+			return false;
+		}
 	}
 
 	public Location getLocationToTeleport(World world) {

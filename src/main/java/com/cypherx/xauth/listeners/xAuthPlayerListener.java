@@ -61,7 +61,7 @@ public class xAuthPlayerListener extends PlayerListener {
 			final String fieldName;
 			plugin.createGuest(xPlayer);
 
-			if (isRegistered)
+			if (isRegistered || xAuthSettings.authURLEnabled)
 				fieldName = "joinLogin";
 			else
 				fieldName = "joinRegister";

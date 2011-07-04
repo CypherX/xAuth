@@ -16,6 +16,10 @@ public class xAuthSettings {
 	public static boolean autoDisable = true;
 	public static boolean reverseESS = true;
 
+	// authURL
+	public static boolean authURLEnabled = false;
+	public static String authURL = "http://127.0.0.1/auth.php?field=minecra";
+
 	// mysql
 	public static String mysqlHost = "localhost";
 	public static int mysqlPort = 3306;
@@ -110,6 +114,9 @@ public class xAuthSettings {
 		autoDisable = getBool("main.auto-disable", autoDisable);
 		reverseESS = getBool("main.reverse-enforce-single-session", reverseESS);
 
+		authURLEnabled = getBool("authurl.enabled", authURLEnabled);
+		authURL = getString("authurl.url", authURL);
+
 		mysqlHost = getString("mysql.host", mysqlHost);
 		mysqlPort = getInt("mysql.port", mysqlPort);
 		mysqlUser = getString("mysql.username", mysqlUser);
@@ -171,6 +178,14 @@ public class xAuthSettings {
 		rstrDmgTaken = getBool("restrict.damage-taken", rstrDmgTaken);
 		rstrDmgGiven = getBool("restrict.damage-given", rstrDmgGiven);
 		rstrMobTarget = getBool("restrict.mob-target", rstrMobTarget);*/
+
+		// authURL doesn't allow for registration, or password management, so automatically disable it
+		if (authURLEnabled) {
+			regEnabled = false;
+			regForced = true;
+			pwAllowChange = false;
+			activation = false;
+		}
 	}
 
 	private static String getString(String key, String def) {

@@ -12,6 +12,14 @@ main:
     # already online, the player connecting will be kicked instead of the online player
     reverse-enforce-single-session: [reverseESS]
 
+authurl:
+    # Send user/pass data to authURL for authentication instead of the database
+    # This option disables registration and password changes
+    enabled: [authURLEnabled]
+    # The URL to send user/pass data to, look at the example auth.php for an
+    # example that works with SMF forums.
+    url: [authURL]
+
 mysql:
     # Location of the MySQL server. Can be either a host name or IP address
     host: [mysqlHost]
