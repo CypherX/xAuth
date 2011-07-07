@@ -54,6 +54,11 @@ public class xAuthPlayerListener extends PlayerListener {
 
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
+
+		//Easyban fix?
+		if (player == null)
+			return;
+
 		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerJoin(player.getName());
 		boolean isRegistered = xPlayer.isRegistered();
 
