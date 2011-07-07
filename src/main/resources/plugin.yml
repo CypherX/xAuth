@@ -1,6 +1,6 @@
 name: xAuth
 main: com.cypherx.xauth.xAuth
-version: 2.0b3
+version: 2.0b3.5
 description: Offline-Mode Security Suite
 author: CypherX
 commands:
