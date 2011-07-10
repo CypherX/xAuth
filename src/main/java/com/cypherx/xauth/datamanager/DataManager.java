@@ -705,7 +705,7 @@ public class DataManager {
 			connect();
 
 		try {
-			stmt = connection.prepareStatement(
+			prepStmt = connection.prepareStatement(
 				"DELETE FROM `" + xAuthSettings.tblStrike + "`" +
 				" WHERE `host` = ?"
 			);
