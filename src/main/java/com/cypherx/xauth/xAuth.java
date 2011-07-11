@@ -61,7 +61,11 @@ public class xAuth extends JavaPlugin {
 		xAuthPermissions.setup(this);
 		xAuthHelp.setup(this);
 
-		dataManager = new DataManager();
+		if (xAuthSettings.datasource.equals("mysql"))
+			dataManager = new MySQL();
+		else
+			dataManager = new H2();
+
 		if (!dataManager.isConnected()) {
 			xAuthLog.severe("Disabling - No connection to database");
 			getServer().getPluginManager().disablePlugin(this);

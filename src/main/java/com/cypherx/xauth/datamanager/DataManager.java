@@ -1,7 +1,7 @@
 package com.cypherx.xauth.datamanager;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
+//import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,14 +17,14 @@ import com.cypherx.xauth.Session;
 import com.cypherx.xauth.StrikeBan;
 import com.cypherx.xauth.TeleLocation;
 import com.cypherx.xauth.Util;
-import com.cypherx.xauth.xAuth;
+//import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
 
-public class DataManager {
-	private Connection connection = null;
-	private Statement stmt = null;
+public abstract class DataManager {
+	protected Connection connection = null;
+	protected Statement stmt = null;
 	private PreparedStatement prepStmt = null;
 	private ResultSet rs = null;
 
@@ -33,9 +33,18 @@ public class DataManager {
 
 	public DataManager() {
 		connect();
+
+		if (isConnected()) {
+			try {
+				stmt = connection.createStatement();
+			} catch (SQLException e) {}
+		}
 	}
 
-	private void connect() {
+	public abstract void connect();
+	public abstract void deleteExpiredSessions();
+
+	/*private void connect() {
 		if (xAuthSettings.datasource.equals("mysql"))
 			connectMySQL();
 		else
@@ -71,13 +80,14 @@ public class DataManager {
 		} catch (SQLException e) {
 			xAuthLog.severe("Could not connect to H2 database!", e);
 		}
-	}
+	}*/
 
 	public void runStartupTasks() {
 		createTables();
 		loadTeleLocations();
+		deleteExpiredSessions();
 
-		String sql;
+		/*String sql;
 
 		if (xAuthSettings.datasource.equals("mysql")) {
 			sql = "DELETE FROM `" + xAuthSettings.tblSession + "`" +
@@ -95,7 +105,7 @@ public class DataManager {
 			stmt.executeUpdate(sql);
 		} catch (SQLException e) {
 			xAuthLog.severe("Could not delete expired settings!", e);
-		}
+		}*/
 	}
 
 	public void createTables() {
