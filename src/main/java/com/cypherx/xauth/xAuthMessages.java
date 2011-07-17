@@ -10,7 +10,7 @@ public class xAuthMessages {
 	private static Configuration config;
 
 	// join
-	public static String joinRegister = "{RED}You are not registered.{NEWLINE}{RED}Please register using /register <password>.";
+	public static String joinRegister = "{RED}ВЫ не зарегестрированы.{NEWLINE}{RED}Please register using /register <password>.";
 	public static String joinLogin = "{RED}Please log in using /login <password>.";
 	public static String joinErrBanned = "You have are banned for exceeding the incorrect password threshold.";
 	public static String joinErrOnline = "You are already online!";
