@@ -53,7 +53,7 @@ public class xAuthMessages {
 	public static String admnRegSuccess = "{BRIGHTGREEN}Account successfully created for: {WHITE}{TARGET}";
 	public static String admnCpwUsage = "{RED}Correct Usage: /xauth changepw <player> <new password>";
 	public static String admnCpwRegistered = "{RED}This player is not registered!";
-	public static String admnCpwSuccess = "{TARGET}''s {BRIGHTGREEN}password has been changed!";
+	public static String admnCpwSuccess = "{TARGET}'s {BRIGHTGREEN}password has been changed!";
 	public static String admnLogoutUsage = "{RED}Correct Usage: /xauth logout <player>";
 	public static String admnLogoutLogged = "{TARGET} {RED}is not logged in!";
 	public static String admnLogoutSuccess = "{TARGET} {BRIGHTGREEN}has been logged out!";
@@ -61,10 +61,15 @@ public class xAuthMessages {
 	public static String admnUnregRegistered = "{RED}This player is not registered!";
 	public static String admnUnregSuccessTgt = "{RED}You have been unregistered and logged out!";
 	public static String admnUnregSuccessPlyr = "{TARGET} {BRIGHTGREEN}has been unregistered!";
-	public static String admnLocUsage = "{RED}Correct Usage: /xauth location set|remove";
+	public static String admnLocUsage = "{RED}Correct Usage: /xauth location set|remove [global]";
+	public static String admnLocSetErrGlobal = "{YELLOW}{PLUGIN} {RED}Global teleport location is set to this world.{NEWLINE}{YELLOW}{PLUGIN} {RED}Please remove it first.";
 	public static String admnLocSetSuccess = "{YELLOW}{PLUGIN} {BRIGHTGREEN}Teleport location for this world set to your location!";
+	public static String admnLocSetGlobalSuccess = "{YELLOW}{PLUGIN} {BRIGHTGREEN}Global teleport location set to your location!";
 	public static String admnLocRmvNo = "{YELLOW}{PLUGIN} {BRIGHTGREEN}This world does not have a teleport location!";
+	public static String admnLocRmvErrGlobal = "{YELLOW}{PLUGIN} {RED}Global teleport location is set to this world.{NEWLINE}{YELLOW}{PLUGIN} {RED}Please use /xauth location remove global";
+	public static String admnLocRmvGlobalNo = "{YELLOW}{PLUGIN} {BRIGHTGREEN}A global teleport location is not set!";
 	public static String admnLocRmvSuccess = "{YELLOW}{PLUGIN} {BRIGHTGREEN}Teleport location for this world has been removed!";
+	public static String admnLocRmvGlobalSuccess = "{YELLOW}{PLUGIN} {BRIGHTGREEN}Global teleport location has been removed!";
 	public static String admnConfUsage = "{RED}Correct Usage: /xauth config <setting> [new value]";
 	public static String admnConfNo = "{YELLOW}{PLUGIN} {RED}No such setting!";
 	public static String admnConfDesc = "Setting: {SETTING}{NEWLINE}Type: {TYPE}{NEWLINE}Value: {VALUE}";
@@ -81,7 +86,7 @@ public class xAuthMessages {
 	/*
 	 * REMEMBER TO CHANGE VERSION AFTER MODIFYING DEFAULT STRINGS
 	 */
-	public static int version = 1;	
+	public static int version = 2;	
 
 	public static void setup(File dataFolder) {
 		file = new File(dataFolder, "messages.yml");
@@ -145,9 +150,14 @@ public class xAuthMessages {
 		admnUnregSuccessTgt = getString("admin.unregister.success.target", admnUnregSuccessTgt);
 		admnUnregSuccessPlyr = getString("admin.unregister.success.player", admnUnregSuccessPlyr);
 		admnLocUsage = getString("admin.location.usage", admnLocUsage);
+		admnLocSetErrGlobal = getString("admin.location.set.isglobal", admnLocSetErrGlobal);
 		admnLocSetSuccess = getString("admin.location.set.success", admnLocSetSuccess);
+		admnLocSetGlobalSuccess = getString("admin.location.set.global.success", admnLocSetGlobalSuccess);
 		admnLocRmvNo = getString("admin.location.remove.no", admnLocRmvNo);
+		admnLocRmvErrGlobal = getString("admin.location.remove.isglobal", admnLocRmvErrGlobal);
 		admnLocRmvSuccess = getString("admin.location.remove.success", admnLocRmvSuccess);
+		admnLocRmvGlobalNo = getString("admin.location.remove.global.no", admnLocRmvGlobalNo);
+		admnLocRmvGlobalSuccess = getString("admin.location.remove.global.success", admnLocRmvGlobalSuccess);
 		admnConfUsage = getString("admin.config.usage", admnConfUsage);
 		admnConfNo = getString("admin.config.no", admnConfNo);
 		admnConfDesc = getString("admin.config.desc", admnConfDesc);
@@ -172,7 +182,7 @@ public class xAuthMessages {
 	private static void update() {
 		if (version > getInt("version", version)) {
 			xAuthLog.info("Updating file: messages.yml");
-			Util.writeConfig(file, xAuthSettings.class);
+			Util.writeConfig(file, xAuthMessages.class);
 		}
 	}
 

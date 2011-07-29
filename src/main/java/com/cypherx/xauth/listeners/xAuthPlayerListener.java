@@ -15,6 +15,7 @@ import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
+import com.cypherx.xauth.database.DbUtil;
 
 public class xAuthPlayerListener extends PlayerListener {
 	private final xAuth plugin;
@@ -59,7 +60,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		if (player == null)
 			return;
 
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayerJoin(player.getName());
+		xAuthPlayer xPlayer = plugin.getPlayerJoin(player.getName());
 		boolean isRegistered = xPlayer.isRegistered();
 
 		if (!xPlayer.isAuthenticated() && (isRegistered || (!isRegistered && xPlayer.mustRegister()))) {
@@ -93,14 +94,14 @@ public class xAuthPlayerListener extends PlayerListener {
 
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(player.getName());
+		xAuthPlayer xPlayer = plugin.getPlayer(player.getName());
 
 		if (xPlayer.isGuest())
 			plugin.removeGuest(xPlayer);
 		else if (xPlayer.hasSession()) {
 			Session session = xPlayer.getSession();
 			if (session.isExpired())
-				plugin.getDataManager().deleteSession(xPlayer);
+				DbUtil.deleteSession(xPlayer);
 		}
 	}
 
@@ -108,7 +109,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(event.getPlayer().getName());
+		xAuthPlayer xPlayer = plugin.getPlayer(event.getPlayer().getName());
 
 		//if (!xAuthSettings.rstrChat && !xPlayer.isRegistered())
 			//return;
@@ -125,7 +126,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(event.getPlayer().getName());
+		xAuthPlayer xPlayer = plugin.getPlayer(event.getPlayer().getName());
 
 		//if (!xAuthSettings.rstrCommands && !xPlayer.isRegistered())
 			//return;
@@ -148,7 +149,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(event.getPlayer().getName());
+		xAuthPlayer xPlayer = plugin.getPlayer(event.getPlayer().getName());
 
 		//if (!xAuthSettings.rstrInteract && !xPlayer.isRegistered())
 			//return;
@@ -200,7 +201,7 @@ public class xAuthPlayerListener extends PlayerListener {
 			return;
 
 		Player player = event.getPlayer();
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(player.getName());
+		xAuthPlayer xPlayer = plugin.getPlayer(player.getName());
 
 		//if (!xAuthSettings.rstrMovement && !xPlayer.isRegistered())
 			//return;
@@ -220,7 +221,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(event.getPlayer().getName());
+		xAuthPlayer xPlayer = plugin.getPlayer(event.getPlayer().getName());
 
 		//if (!xAuthSettings.rstrPickup && !xPlayer.isRegistered())
 			//return;

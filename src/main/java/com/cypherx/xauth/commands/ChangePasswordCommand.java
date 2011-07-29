@@ -23,7 +23,7 @@ public class ChangePasswordCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
-			xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(player.getName());
+			xAuthPlayer xPlayer = plugin.getPlayer(player.getName());
 
 			if (!xAuthSettings.pwAllowChange) {
 				xAuthMessages.send("cpwErrDisabled", player);

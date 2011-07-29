@@ -17,7 +17,7 @@ public class xAuthPermissions {
 				permissionHandler = ((Permissions) permissionsPlugin).getHandler();
 				xAuthLog.info("'Permission' support enabled");
 			} else
-				xAuthLog.warning("Permission system not detected, defaulting to OP");
+				xAuthLog.info("Permission system not detected, defaulting to OP");
 		}
 	}
 

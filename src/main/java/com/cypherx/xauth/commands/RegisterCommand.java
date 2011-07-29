@@ -7,6 +7,7 @@ import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
+import com.cypherx.xauth.database.DbUtil;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,7 +24,7 @@ public class RegisterCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
-			xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(player.getName());
+			xAuthPlayer xPlayer = plugin.getPlayer(player.getName());
 
 			if (!xAuthSettings.regEnabled) {
 				xAuthMessages.send("regErrDisabled", player);
@@ -34,7 +35,7 @@ public class RegisterCommand implements CommandExecutor {
 			} else if (xPlayer.isRegistered()) {
 				xAuthMessages.send("regErrRegistered", player);
 				return true;
-			} else if (!xAuthSettings.allowMultiple && plugin.getDataManager().isHostUsed(Util.getHostFromPlayer(player))) {
+			} else if (!xAuthSettings.allowMultiple && DbUtil.isHostUsed(Util.getHostFromPlayer(player))) {
 				xAuthMessages.send("regErrMultiple", player);
 				return true;
 			}

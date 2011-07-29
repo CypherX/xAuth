@@ -59,6 +59,15 @@
 					<include>messages.yml</include>
 				</includes>
 			</resource>
+			<resource>
+				<targetPath>sql</targetPath>
+				<filtering>false</filtering>
+				<directory>sql</directory>
+				<includes>
+					<include>h2/*.sql</include>
+					<include>mysql/*.sql</include>
+				</includes>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>

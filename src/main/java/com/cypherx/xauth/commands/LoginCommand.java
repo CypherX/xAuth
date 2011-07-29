@@ -11,6 +11,7 @@ import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
+import com.cypherx.xauth.database.DbUtil;
 
 public class LoginCommand implements CommandExecutor {
 	private final xAuth plugin;
@@ -22,7 +23,7 @@ public class LoginCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
-			xAuthPlayer xPlayer = plugin.getDataManager().getPlayer(player.getName());
+			xAuthPlayer xPlayer = plugin.getPlayer(player.getName());
 
 			if (args.length < 1) {
 				xAuthMessages.send("loginUsage", player);
@@ -49,7 +50,7 @@ public class LoginCommand implements CommandExecutor {
 				return true;
 			}
 
-			int active = plugin.getDataManager().getActive(player.getName());
+			int active = DbUtil.getActive(player.getName());
 			account.setActive(active);
 
 			if (xAuthSettings.activation && active == 0) {

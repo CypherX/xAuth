@@ -17,15 +17,13 @@ import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPermissions;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
-import com.cypherx.xauth.datamanager.DataManager;
+import com.cypherx.xauth.database.DbUtil;
 
 public class xAuthCommand implements CommandExecutor {
 	private final xAuth plugin;
-	private DataManager dataManager;
 
 	public xAuthCommand(xAuth plugin) {
 	    this.plugin = plugin;
-	    this.dataManager = plugin.getDataManager();
 	}
 
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -83,7 +81,7 @@ public class xAuthCommand implements CommandExecutor {
 			String targetName = args[1];
 			String password = args[2];
 			String email = (args.length > 3 ? args[3] : null);
-			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
+			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (xPlayer.isRegistered()) {
 				xAuthMessages.send("admnRegRegistered", player, xPlayer.getPlayer());
@@ -92,7 +90,7 @@ public class xAuthCommand implements CommandExecutor {
 
 			Account account = new Account(targetName, Util.encrypt(password), email);
 			xPlayer.setAccount(account);
-			dataManager.saveAccount(account);
+			DbUtil.saveAccount(account);
 
 			xAuthMessages.send("admnRegSuccess", player, xPlayer.getPlayer());
 			xAuthLog.info(player.getName() + " has registered an account for " + targetName);
@@ -105,7 +103,7 @@ public class xAuthCommand implements CommandExecutor {
 			String targetName = args[1];
 			String password = args[2];
 			String email = (args.length > 3 ? args[3] : null);
-			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
+			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (xPlayer.isRegistered()) {
 				xAuthLog.info(targetName + " is already registered!");
@@ -114,7 +112,7 @@ public class xAuthCommand implements CommandExecutor {
 
 			Account account = new Account(targetName, Util.encrypt(password), email);
 			xPlayer.setAccount(account);
-			dataManager.saveAccount(account);
+			DbUtil.saveAccount(account);
 
 			xAuthLog.info("Account successfully created for: " + targetName);
 		}
@@ -135,7 +133,7 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
+			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (!xPlayer.isRegistered()) {
 				xAuthMessages.send("admnCpwRegistered", player, xPlayer.getPlayer());
@@ -155,7 +153,7 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
+			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (!xPlayer.isRegistered()) {
 				xAuthLog.info("This player is not registered!");
@@ -185,7 +183,7 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
+			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (!xPlayer.hasSession()) {
 				xAuthMessages.send("admnLogoutLogged", player, xPlayer.getPlayer());
@@ -205,7 +203,7 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
+			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (!xPlayer.hasSession()) {
 				xAuthLog.info(targetName + " is not logged in!");
@@ -235,14 +233,14 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
+			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (!xPlayer.isRegistered()) {
 				xAuthMessages.send("admnUnregRegistered", player, xPlayer.getPlayer());
 				return true;
 			}
 
-			dataManager.deleteAccount(xPlayer);
+			DbUtil.deleteAccount(xPlayer);
 
 			Player target = xPlayer.getPlayer();
 			if (target != null) {
@@ -260,14 +258,14 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String targetName = args[1];
-			xAuthPlayer xPlayer = dataManager.getPlayer(targetName);
+			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (!xPlayer.isRegistered()) {
 				xAuthLog.info(targetName + " is not registered!");
 				return true;
 			}
 
-			dataManager.deleteAccount(xPlayer);
+			DbUtil.deleteAccount(xPlayer);
 			
 			Player target = xPlayer.getPlayer();
 			if (target != null) {
@@ -295,19 +293,43 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			String action = args[1];
+			Boolean global = (args.length > 2 && args[2].equals("global") ? true : false);
 
 			if (action.equals("set")) {
-				dataManager.setTeleLocation(new TeleLocation(player.getLocation()));
-				xAuthMessages.send("admnLocSetSuccess", player);
-			} else {
-				TeleLocation tLoc = dataManager.getTeleLocation(player.getWorld().getName());
-				if (tLoc == null) {
-					xAuthMessages.send("admnLocRmvNo", player);
+				if (!global && player.getWorld().getUID().equals(plugin.getGlobalUID())) {
+					xAuthMessages.send("admnLocSetErrGlobal", player);
 					return true;
 				}
 
-				dataManager.removeTeleLocation(tLoc);
-				xAuthMessages.send("admnLocRmvSuccess", player);
+				plugin.setTeleLocation(new TeleLocation(player.getLocation(), global));
+
+				if (global)
+					xAuthMessages.send("admnLocSetGlobalSuccess", player);
+				else
+					xAuthMessages.send("admnLocSetSuccess", player);
+			} else {
+				if (global) {
+					TeleLocation tLoc = plugin.getTeleLocation(plugin.getGlobalUID());
+					if (tLoc == null) {
+						xAuthMessages.send("admnLocRmvGlobalNo", player);
+						return true;
+					}
+
+					plugin.removeTeleLocation(tLoc);
+					xAuthMessages.send("admnLocRmvGlobalSuccess", player);
+				} else {
+					TeleLocation tLoc = plugin.getTeleLocation(player.getWorld().getUID());
+					if (tLoc == null) {
+						xAuthMessages.send("admnLocRmvNo", player);
+						return true;
+					} else if (tLoc.getUID().equals(plugin.getGlobalUID())) {
+						xAuthMessages.send("admnLocRmvErrGlobal", player);
+						return true;
+					}
+
+					plugin.removeTeleLocation(tLoc);
+					xAuthMessages.send("admnLocRmvSuccess", player);
+				}
 			}
 		}
 

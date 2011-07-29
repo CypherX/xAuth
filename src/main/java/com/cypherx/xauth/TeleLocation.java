@@ -1,34 +1,39 @@
 package com.cypherx.xauth;
 
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 public class TeleLocation {
-	private String worldName;
+	private UUID uid;
 	private double x;
 	private double y;
 	private double z;
 	private float yaw;
 	private float pitch;
+	private int global;
 
 	public TeleLocation() {}
 
-	public TeleLocation(Location location) {
-		worldName = location.getWorld().getName();
+	public TeleLocation(Location location, boolean global) {
+		World world = location.getWorld();
+		uid = world.getUID();
 		x = location.getX();
 		y = location.getY();
 		z = location.getZ();
 		yaw = location.getYaw();
 		pitch = location.getPitch();
+		this.global = (global ? 1 : 0);
 	}
 
-	public void setWorldName(String worldName) {
-		this.worldName = worldName;
+	public void setUID(UUID uid) {
+		this.uid = uid;
 	}
 
-	public String getWorldName() {
-		return worldName;
+	public UUID getUID() {
+		return uid;
 	}
 
 	public void setX(double x) {
@@ -71,8 +76,15 @@ public class TeleLocation {
 		return pitch;
 	}
 
+	public void setGlobal(int global) {
+		this.global = global;
+	}
+
+	public int getGlobal() {
+		return global;
+	}
+
 	public void setLocation(Location location) {
-		this.worldName = location.getWorld().getName();
 		this.x = location.getX();
 		this.y = location.getY();
 		this.z = location.getZ();
@@ -81,7 +93,7 @@ public class TeleLocation {
 	}
 
 	public Location getLocation() {
-		World world = Bukkit.getServer().getWorld(worldName);
+		World world = Bukkit.getServer().getWorld(uid);
 		return new Location(world, x, y, z, yaw, pitch);
 	}
 }
