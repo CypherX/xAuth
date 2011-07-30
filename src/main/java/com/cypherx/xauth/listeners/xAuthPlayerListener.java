@@ -16,6 +16,7 @@ import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
 import com.cypherx.xauth.database.DbUtil;
+import com.cypherx.xauth.plugins.xBukkitContrib;
 
 public class xAuthPlayerListener extends PlayerListener {
 	private final xAuth plugin;
@@ -55,8 +56,6 @@ public class xAuthPlayerListener extends PlayerListener {
 
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
-
-		//Easyban fix?
 		if (player == null)
 			return;
 
@@ -131,7 +130,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		//if (!xAuthSettings.rstrCommands && !xPlayer.isRegistered())
 			//return;
 
-		if (xPlayer.isGuest()) {
+		if (xPlayer.isGuest() && !xBukkitContrib.isVersionCommand(event.getMessage())) {
 			String command = event.getMessage().split(" ")[0].replaceFirst("/", "");
 
 			if (xAuthSettings.allowedCmds.contains(command))

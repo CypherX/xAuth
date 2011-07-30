@@ -3,6 +3,9 @@ package com.cypherx.xauth;
 import com.cypherx.xauth.commands.*;
 import com.cypherx.xauth.database.*;
 import com.cypherx.xauth.listeners.*;
+import com.cypherx.xauth.plugins.xBukkitContrib;
+import com.cypherx.xauth.plugins.xHelp;
+import com.cypherx.xauth.plugins.xPermissions;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+
 
 public class xAuth extends JavaPlugin {
 	public static PluginDescriptionFile desc;
@@ -46,6 +50,12 @@ public class xAuth extends JavaPlugin {
 		xAuthLog.info("v" + desc.getVersion() + " Disabled!");
 	}
 
+	private void initializePlugins() {
+		xBukkitContrib.setup(this);
+		xHelp.setup(this);
+		xPermissions.setup(this);
+	}
+
 	public void onEnable() {
 		desc = getDescription();
 		dataFolder = getDataFolder();
@@ -62,8 +72,7 @@ public class xAuth extends JavaPlugin {
 			return;
 		}
 
-		xAuthPermissions.setup(this);
-		xAuthHelp.setup(this);
+		initializePlugins();
 
 		Database.connect();
 		if (!Database.isConnected()) {
