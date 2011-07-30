@@ -8,7 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-
 import com.cypherx.xauth.Account;
 import com.cypherx.xauth.TeleLocation;
 import com.cypherx.xauth.Util;
