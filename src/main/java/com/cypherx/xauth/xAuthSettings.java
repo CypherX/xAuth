@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.bukkit.util.config.Configuration;
 
+import com.cypherx.xauth.database.Database;
+
 public class xAuthSettings {
 	private static File file;
 	private static Configuration config;
@@ -31,15 +33,6 @@ public class xAuthSettings {
 	public static String tblStrike = "strike_bans";
 	public static String tblLocation = "tele_locations";
 	public static String tblInventory = "inventory";
-	/*public static String colAccId = "id";
-	public static String colAccPlayerName = "playername";
-	public static String colAccPassword = "password";
-	public static String colAccEmail = "email";
-	public static String colAccRegDate = "registerdate";
-	public static String colAccRegIp = "registerip";
-	public static String colAccLastLoginDate = "lastlogindate";
-	public static String colAccLastLoginIp = "lastloginip";
-	public static String colAccActive = "active";*/
 
 	// registration
 	public static boolean regEnabled = true;
@@ -127,15 +120,6 @@ public class xAuthSettings {
 		tblStrike = getString("mysql.tables.strike", tblStrike);
 		tblLocation = getString("mysql.tables.location", tblLocation);
 		tblInventory = getString("mysql.tables.inventory", tblInventory);
-		/*colAccId = getString("mysql.columns.account.id", colAccId);
-		colAccPlayerName = getString("mysql.columns.account.playername", colAccPlayerName);
-		colAccPassword = getString("mysql.columns.account.password", colAccPassword);
-		colAccEmail = getString("mysql.columns.account.email", colAccEmail);
-		colAccRegDate = getString("mysql.columns.account.registerdate", colAccRegDate);
-		colAccRegIp = getString("mysql.columns.account.registerip", colAccRegIp);
-		colAccLastLoginDate = getString("mysql.columns.account.lastlogindate", colAccLastLoginDate);
-		colAccLastLoginIp = getString("mysql.columns.account.lastloginip", colAccLastLoginIp);
-		colAccActive = getString("mysql.columns.account.active", colAccActive);*/
 
 		regEnabled = getBool("registration.enabled", regEnabled);
 		regForced = getBool("registration.forced", regForced);
@@ -186,6 +170,9 @@ public class xAuthSettings {
 			pwAllowChange = false;
 			activation = false;
 		}
+
+		if (datasource.equals("mysql"))
+			Database.setDBMS(Database.DBMS.MYSQL);
 	}
 
 	private static String getString(String key, String def) {

@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -22,7 +24,7 @@ import com.avaje.ebean.validation.factory.EmailValidatorFactory;
 public class Util {
 	public static void writeConfig(File file, Class<?> c) {
 		String fileName = file.getName();
-		String content = getResourceAsString(fileName);
+		String content = getResourceAsString("/res/" + fileName);
 
 		for (Field field : c.getFields()) {
 			try {
@@ -45,8 +47,8 @@ public class Util {
 		}
 	}
 
-	private static String getResourceAsString(String resource) {
-		InputStream input = xAuth.class.getResourceAsStream("/res/" + resource);
+	public static String getResourceAsString(String resource) {
+		InputStream input = xAuth.class.getResourceAsStream(resource);
 		StringBuilder sb = new StringBuilder();
 
 		if (input != null) {
@@ -181,5 +183,53 @@ public class Util {
 			intArray[i] = Integer.parseInt(strArray[i]);
 
 		return intArray;
+	}
+
+	public static Account buildAccount(ResultSet rs) {
+		Account account = null;
+		try {
+			account = new Account();
+			account.setId(rs.getInt("id"));
+			account.setPlayerName(rs.getString("playername"));
+			account.setPassword(rs.getString("password"));
+			account.setEmail(rs.getString("email"));
+			account.setRegisterDate(rs.getTimestamp("registerdate"));
+			account.setRegisterHost(rs.getString("registerip"));
+			account.setLastLoginDate(rs.getTimestamp("lastlogindate"));
+			account.setLastLoginHost(rs.getString("lastloginip"));
+			account.setActive(rs.getInt("active"));
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not build Account from ResultSet!", e);
+		}
+
+		return account;
+	}
+
+	public static Session buildSession(ResultSet rs) {
+		Session session = null;
+		try {
+			session = new Session();
+			session.setAccountId(rs.getInt("accountid"));
+
+			if (rs.wasNull()) // no session data in database
+				return null;
+
+			session.setHost(rs.getString("host"));
+			session.setLoginTime(rs.getTimestamp("logintime"));
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not build Session from ResultSet!", e);
+		}
+
+		return session;
+	}
+
+	public static boolean isUUID(String str) {
+		try {
+			UUID.fromString(str);
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+
+		return true;
 	}
 }

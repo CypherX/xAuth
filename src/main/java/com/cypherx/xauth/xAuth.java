@@ -1,16 +1,23 @@
 package com.cypherx.xauth;
 
 import com.cypherx.xauth.commands.*;
-import com.cypherx.xauth.datamanager.*;
+import com.cypherx.xauth.database.*;
 import com.cypherx.xauth.listeners.*;
+import com.cypherx.xauth.plugins.xBukkitContrib;
+import com.cypherx.xauth.plugins.xHelp;
+import com.cypherx.xauth.plugins.xPermissions;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -33,23 +40,29 @@ import java.util.List;
 public class xAuth extends JavaPlugin {
 	public static PluginDescriptionFile desc;
 	public static File dataFolder;
-	private DataManager dataManager;
+	private ConcurrentHashMap<String, xAuthPlayer> playerCache = new ConcurrentHashMap<String, xAuthPlayer>();
+	private ConcurrentHashMap<UUID, TeleLocation> teleLocations = new ConcurrentHashMap<UUID, TeleLocation>();
+	private UUID globalUID = null;
 
 	public void onDisable() {
 		Player[] players = getServer().getOnlinePlayers();
 		if (players.length > 0) {
 			for (Player player : players) {
-				xAuthPlayer xPlayer = dataManager.getPlayer(player.getName());
+				xAuthPlayer xPlayer = getPlayer(player.getName());
 				if (xPlayer.isGuest())
 					removeGuest(xPlayer);
 			}
 		}
 
-		if (dataManager != null)
-			dataManager.close();
-
+		Database.close();
 		xAuthSettings.saveChanges();
 		xAuthLog.info("v" + desc.getVersion() + " Disabled!");
+	}
+
+	private void initializePlugins() {
+		xBukkitContrib.setup(this);
+		xHelp.setup(this);
+		xPermissions.setup(this);
 	}
 
 	public void onEnable() {
@@ -68,22 +81,29 @@ public class xAuth extends JavaPlugin {
 			return;
 		}
 
-		xAuthPermissions.setup(this);
-		xAuthHelp.setup(this);
+		initializePlugins();
 
-		dataManager = new DataManager();
-		if (!dataManager.isConnected()) {
+		Database.connect();
+		if (!Database.isConnected()) {
 			xAuthLog.severe("Disabling - No connection to database");
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
-		dataManager.runStartupTasks();
+
+		DbUpdate dbUpdate = new DbUpdate();
+		if (!dbUpdate.checkVersion()) {
+			xAuthLog.info("Updating database..");
+			dbUpdate.update();
+		}
+
+		DbUtil.deleteExpiredSessions();
+		loadTeleLocations();
 
 		File oldAuthFile = new File(dataFolder, "auths.txt");
 		if (oldAuthFile.exists())
 			importAccounts(oldAuthFile);
 
-		dataManager.printStats();
+		Database.printStats();
 
 		Player[] players = getServer().getOnlinePlayers();
 		if (players.length > 0) // /reload was used
@@ -125,7 +145,7 @@ public class xAuth extends JavaPlugin {
 			} catch (IOException e) {}
 		}
 
-		dataManager.insertAccounts(accounts);
+		DbUtil.insertAccounts(accounts);
 
 		if (oldAuthFile.renameTo(new File(dataFolder, "auths.txt.old")))
 			xAuthLog.info("Import complete! auths.txt renamed to auths.txt.old");
@@ -133,9 +153,37 @@ public class xAuth extends JavaPlugin {
 			xAuthLog.info("Import complete! Verify that all accounts were imported then remove/rename auths.txt");
 	}
 
+	public xAuthPlayer getPlayer(String playerName) {
+		String lowPlayerName = playerName.toLowerCase();
+
+		if (playerCache.containsKey(lowPlayerName))
+			return playerCache.get(lowPlayerName);
+
+		xAuthPlayer xPlayer = DbUtil.getPlayerFromDb(playerName);
+		if (xPlayer == null)
+			xPlayer = new xAuthPlayer(playerName);
+
+		playerCache.put(lowPlayerName, xPlayer);
+		return xPlayer;
+	}
+
+	public xAuthPlayer getPlayerJoin(String playerName) {
+		String lowPlayerName = playerName.toLowerCase();
+
+		if (playerCache.containsKey(lowPlayerName))
+			return DbUtil.reloadPlayer(playerCache.get(lowPlayerName));
+
+		xAuthPlayer xPlayer = DbUtil.getPlayerFromDb(playerName);
+		if (xPlayer == null)
+			xPlayer = new xAuthPlayer(playerName);
+
+		playerCache.put(lowPlayerName, xPlayer);
+		return xPlayer;
+	}
+
 	private void handleReload(Player[] players) {
 		for (Player player : players) {
-			xAuthPlayer xPlayer = dataManager.getPlayerJoin(player.getName());
+			xAuthPlayer xPlayer = getPlayerJoin(player.getName());
 			boolean isRegistered = xPlayer.isRegistered();
 
 			if (!xPlayer.isAuthenticated() && (isRegistered || (!isRegistered && xPlayer.mustRegister()))) {
@@ -150,7 +198,7 @@ public class xAuth extends JavaPlugin {
 
 		// remove old session (if any)
 		if (xPlayer.hasSession())
-			dataManager.deleteSession(xPlayer);
+			DbUtil.deleteSession(xPlayer);
 
 		if (xAuthSettings.guestTimeout > 0 && xPlayer.isRegistered()) {
 			int taskId = getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
@@ -180,7 +228,7 @@ public class xAuth extends JavaPlugin {
 		Player player = xPlayer.getPlayer();
 		PlayerInventory playerInv = player.getInventory();
 
-		dataManager.insertInventory(xPlayer);
+		DbUtil.insertInventory(xPlayer);
 		playerInv.clear();
 		playerInv.setHelmet(null);
 		playerInv.setChestplate(null);
@@ -199,7 +247,7 @@ public class xAuth extends JavaPlugin {
 		Player player = xPlayer.getPlayer();
 		PlayerInventory playerInv = player.getInventory();
 
-		ItemStack[] inv = dataManager.getInventory(xPlayer);
+		ItemStack[] inv = DbUtil.getInventory(xPlayer);
 		ItemStack[] items = new ItemStack[inv.length - 4];
 		ItemStack[] armor = new ItemStack[4];
 
@@ -224,7 +272,7 @@ public class xAuth extends JavaPlugin {
 
 		playerInv.setContents(items);
 		playerInv.setArmorContents(armor);
-		dataManager.deleteInventory(xPlayer);
+		DbUtil.deleteInventory(xPlayer);
 
 		if (xPlayer.getLocation() != null)
 			xPlayer.getPlayer().teleport(xPlayer.getLocation());
@@ -235,11 +283,11 @@ public class xAuth extends JavaPlugin {
 		Account account = xPlayer.getAccount();
 		account.setLastLoginDate(Util.getNow());
 		account.setLastLoginHost(Util.getHostFromPlayer(xPlayer.getPlayer()));
-		dataManager.saveAccount(account);
+		DbUtil.saveAccount(account);
 
 		Session session = new Session(account.getId(), account.getLastLoginHost());
 		xPlayer.setSession(session);
-		dataManager.insertSession(session);
+		DbUtil.insertSession(session);
 
 		removeGuest(xPlayer);
 		xPlayer.setStrikes(0);
@@ -247,7 +295,7 @@ public class xAuth extends JavaPlugin {
 
 	public void changePassword(Account account, String newPass) {
 		account.setPassword(Util.encrypt(newPass));
-		dataManager.saveAccount(account);
+		DbUtil.saveAccount(account);
 	}
 
 	public boolean checkPassword(Account account, String checkPass) {
@@ -325,8 +373,77 @@ public class xAuth extends JavaPlugin {
 		}
 	}
 
+	private void loadTeleLocations() {
+		String sql = "SELECT * FROM `" + xAuthSettings.tblLocation + "`";
+		ResultSet rs = Database.queryRead(sql);
+
+		try {
+			while (rs.next()) {
+				TeleLocation teleLocation = new TeleLocation();
+				String uid = rs.getString("uid");
+				boolean update = false;
+
+				// Database version 0001 -> 0002 fix
+				if (Util.isUUID(uid))
+					teleLocation.setUID(UUID.fromString(uid));
+				else {
+					teleLocation.setUID(getServer().getWorld(uid).getUID());
+					update = true;
+				}
+
+				teleLocation.setX(rs.getDouble("x"));
+				teleLocation.setY(rs.getDouble("y"));
+				teleLocation.setZ(rs.getDouble("z"));
+				teleLocation.setYaw(rs.getFloat("yaw"));
+				teleLocation.setPitch(rs.getFloat("pitch"));
+				teleLocation.setGlobal(rs.getInt("global"));
+				teleLocations.put(teleLocation.getUID(), teleLocation);
+
+				if (teleLocation.getGlobal() == 1)
+					globalUID = teleLocation.getUID();
+
+				if (update) {
+					sql = "UPDATE `" + xAuthSettings.tblLocation + "` SET `uid` = ? WHERE `uid` = ?";
+					Database.queryWrite(sql, teleLocation.getUID().toString(), uid);
+				}
+			}
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not load TeleLocations from database!", e);
+		} finally {
+			try {
+				rs.close();
+			} catch (SQLException e) {}
+		}
+	}
+
+	public TeleLocation getTeleLocation(UUID uid) {
+		if (uid == null)
+			return null;
+
+		return teleLocations.get(uid);
+	}
+
+	public void setTeleLocation(TeleLocation teleLocation) {
+		TeleLocation tOld = teleLocations.put(teleLocation.getUID(), teleLocation);
+		if (teleLocation.getGlobal() == 1)
+			globalUID = teleLocation.getUID();
+
+		if (tOld == null)
+			DbUtil.insertTeleLocation(teleLocation);
+		else
+			DbUtil.updateTeleLocation(teleLocation);
+	}
+
+	public void removeTeleLocation(TeleLocation teleLocation) {
+		teleLocations.remove(teleLocation.getUID());
+		if (teleLocation.getGlobal() == 1)
+			globalUID = null;
+
+		DbUtil.deleteTeleLocation(teleLocation);
+	}
+
 	public Location getLocationToTeleport(World world) {
-		TeleLocation teleLocation = dataManager.getTeleLocation(world.getName());
+		TeleLocation teleLocation = getTeleLocation((globalUID == null ? world.getUID() : globalUID));
 		return (teleLocation == null ? world.getSpawnLocation() : teleLocation.getLocation());
 	}
 
@@ -335,7 +452,7 @@ public class xAuth extends JavaPlugin {
 
 		if (xAuthSettings.strikeAction.equals("banip")) {
 			StrikeBan ban = new StrikeBan(Util.getHostFromPlayer(player));
-			getDataManager().insertStrikeBan(ban);
+			DbUtil.insertStrikeBan(ban);
 			xAuthLog.info(ban.getHost() + " banned by strike system");
 		}
 
@@ -347,7 +464,7 @@ public class xAuth extends JavaPlugin {
 	}
 
 	public boolean isBanned(String host) {
-		final StrikeBan ban = dataManager.loadStrikeBan(host);
+		final StrikeBan ban = DbUtil.loadStrikeBan(host);
 		if (ban == null)
 			return false;
 
@@ -358,7 +475,7 @@ public class xAuth extends JavaPlugin {
 		if (unbanTime.compareTo(Util.getNow()) > 0) // still banned
 			return true;
 		else // no longer banned, remove from database
-			dataManager.deleteStrikeBan(ban);
+			DbUtil.deleteStrikeBan(ban);
 
 		return false;
 	}
@@ -368,7 +485,7 @@ public class xAuth extends JavaPlugin {
 		xAuthMessages.setup(dataFolder);
 	}
 
-	public DataManager getDataManager() {
-		return dataManager;
+	public UUID getGlobalUID() {
+		return globalUID;
 	}
 }

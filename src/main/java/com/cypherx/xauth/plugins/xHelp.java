@@ -1,9 +1,12 @@
-package com.cypherx.xauth;
+package com.cypherx.xauth.plugins;
 
 import me.taylorkelly.help.Help;
 import org.bukkit.plugin.Plugin;
 
-public class xAuthHelp {
+import com.cypherx.xauth.xAuth;
+import com.cypherx.xauth.xAuthLog;
+
+public class xHelp {
 	public static void setup(xAuth plugin) {
 		Plugin test = plugin.getServer().getPluginManager().getPlugin("Help");
 		if (test != null) {
@@ -22,7 +25,7 @@ public class xAuthHelp {
 			helpPlugin.registerCommand("xauth config [setting] (new value)", "View info about or change a setting", plugin, permissions[5]);
 			helpPlugin.registerCommand("xauth reload", "Reload the xAuth configuration and accounts", plugin, permissions[6]);
 			xAuthLog.info("'Help' support enabled");
-		} else
-			xAuthLog.warning("'Help' isn't detected. No /help support");
+		}/* else
+			xAuthLog.info("'Help' isn't detected. No /help support");*/
 	}
 }

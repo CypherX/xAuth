@@ -1,6 +1,6 @@
 name: xAuth
 main: com.cypherx.xauth.xAuth
-version: 2.0b3.5
+version: 2.0b4
 description: Offline-Mode Security Suite
 author: CypherX
 commands:
@@ -26,7 +26,7 @@ commands:
                /<command> changepw <player> <new password>
                /<command> logout <player>
                /<command> unregister <player>
-               /<command> location set|remove
+               /<command> location set|remove [global]
                /<command> config <setting> [value]
                /<command> reload
                /<command> version

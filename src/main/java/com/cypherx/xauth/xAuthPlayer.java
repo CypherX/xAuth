@@ -5,7 +5,10 @@ import java.sql.Timestamp;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+
+import com.cypherx.xauth.plugins.xPermissions;
 //import org.bukkit.inventory.ItemStack;
+
 
 public class xAuthPlayer {
 	private String playerName;
@@ -51,7 +54,7 @@ public class xAuthPlayer {
 		if (xAuthSettings.regForced)
 			return true;
 
-		return xAuthPermissions.has(getPlayer(), "xauth.register");
+		return xPermissions.has(getPlayer(), "xauth.register");
 	}
 
 	public boolean canNotify() {

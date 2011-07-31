@@ -1,12 +1,14 @@
-package com.cypherx.xauth;
+package com.cypherx.xauth.plugins;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.cypherx.xauth.xAuth;
+import com.cypherx.xauth.xAuthLog;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
-public class xAuthPermissions {
+public class xPermissions {
 	private static PermissionHandler permissionHandler;
 
 	public static void setup(xAuth plugin) {
@@ -17,7 +19,7 @@ public class xAuthPermissions {
 				permissionHandler = ((Permissions) permissionsPlugin).getHandler();
 				xAuthLog.info("'Permission' support enabled");
 			} else
-				xAuthLog.warning("Permission system not detected, defaulting to OP");
+				xAuthLog.info("Permission system not detected, defaulting to OP");
 		}
 	}
 
