@@ -3,14 +3,17 @@ package com.cypherx.xauth;
 import com.cypherx.xauth.commands.*;
 import com.cypherx.xauth.database.*;
 import com.cypherx.xauth.listeners.*;
-import com.cypherx.xauth.plugins.xBukkitContrib;
-import com.cypherx.xauth.plugins.xHelp;
-import com.cypherx.xauth.plugins.xPermissions;
+import com.cypherx.xauth.plugins.*;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -27,15 +30,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 public class xAuth extends JavaPlugin {
 	public static PluginDescriptionFile desc;
@@ -305,8 +299,8 @@ public class xAuth extends JavaPlugin {
 			boolean result = checkAuthURLPass(account.getPlayerName(), checkPass, sb);
 			// if true, tell whole server a player logged in
 			// else, send the returned string (error message) to the user
-			if(result)
-				Bukkit.getServer().broadcastMessage("Player '" + account.getPlayerName() + "' logged in with forum name '"+sb.toString()+"'");
+			if (result)
+				Bukkit.getServer().broadcastMessage("Player '" + account.getPlayerName() + "' logged in with forum name '" + sb.toString() + "'");
 			else
 				account.getPlayer().sendMessage(sb.toString());
 			return result;
