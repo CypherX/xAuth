@@ -92,7 +92,7 @@ public class Util {
 		if (!dir.exists())
 			dir.mkdir();
 
-		File file = new File(dir + File.separator + "h2.jar");
+		File file = new File(dir, "h2.jar");
 		BufferedInputStream input = null;
 		FileOutputStream output = null;
 

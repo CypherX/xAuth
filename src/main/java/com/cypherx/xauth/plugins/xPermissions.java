@@ -9,24 +9,35 @@ import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class xPermissions {
+	private static PermType permType;
 	private static PermissionHandler permissionHandler;
 
 	public static void setup(xAuth plugin) {
 		Plugin permissionsPlugin = plugin.getServer().getPluginManager().getPlugin("Permissions");
 
-		if (permissionHandler == null) {
-			if (permissionsPlugin != null) {
-				permissionHandler = ((Permissions) permissionsPlugin).getHandler();
-				xAuthLog.info("'Permission' support enabled");
-			} else
-				xAuthLog.info("Permission system not detected, defaulting to OP");
+		if (permissionsPlugin != null) {
+			permType = PermType.PERMISSIONS;
+			permissionHandler = ((Permissions) permissionsPlugin).getHandler();
+			xAuthLog.info("'Permissions' v" + permissionsPlugin.getDescription().getVersion() + " support enabled!");
+		} else {
+			permType = PermType.SUPERPERMS;
+			xAuthLog.info("'Permissions' not detected, using Bukkit Superperms");
 		}
 	}
 
 	public static boolean has(Player player, String permission) {
-		if (permissionHandler == null)
-			return player.isOp();
+		switch (permType) {
+			case PERMISSIONS:
+				return permissionHandler.has(player, permission);
+			case SUPERPERMS:
+				return player.hasPermission(permission);
+			default:
+				return player.isOp();
+		}
+	}
 
-		return permissionHandler.has(player, permission);
+	private enum PermType {
+		PERMISSIONS,
+		SUPERPERMS
 	}
 }

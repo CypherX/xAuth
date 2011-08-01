@@ -30,3 +30,37 @@ commands:
                /<command> config <setting> [value]
                /<command> reload
                /<command> version
+permissions:
+    xauth.register:
+        description: Used when forced registration is disabled to specify which groups/players must register
+    xauth.admin.*:
+        description: Gives access to all xAuth admin commands
+        children:
+            xauth.admin.register: true
+            xauth.admin.changepw: true
+            xauth.admin.logout: true
+            xauth.admin.unregister: true
+            xauth.admin.location: true
+            xauth.admin.config: true
+            xauth.admin.reload: true
+    xauth.admin.register:
+        description: Allows you to register other players
+        default: op
+    xauth.admin.changepw:
+        description: Allows changing of other players passwords
+        default: op
+    xauth.admin.logout:
+        description: Allows you to end a players session
+        default: op
+    xauth.admin.unregister:
+        description: Remove a players registration
+        default: op
+    xauth.admin.location:
+        description: Set/remove the current world or global teleport location
+        default: op
+    xauth.admin.config:
+        description: View information about or change a xAuth setting
+        default: op
+    xauth.admin.reload:
+        description: Allows reloading of the xAuth configuration
+        default: op
