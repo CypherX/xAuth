@@ -88,8 +88,8 @@ public class xAuthMessages {
 	 */
 	public static int version = 2;	
 
-	public static void setup(File dataFolder) {
-		file = new File(dataFolder, "messages.yml");
+	public static void setup() {
+		file = new File(xAuth.dataFolder, "messages.yml");
 
 		if (!file.exists()) {
 			xAuthLog.info("Creating file: messages.yml");

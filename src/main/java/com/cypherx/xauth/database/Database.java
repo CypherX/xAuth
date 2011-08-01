@@ -35,9 +35,9 @@ public class Database {
 			connection = DriverManager.getConnection(getConnString(), username, password);
 			xAuthLog.info("Connection to database established!");
 		} catch (ClassNotFoundException e) {
-			xAuthLog.severe("Missing database library! [datasource = " + xAuthSettings.datasource + "]");
+			xAuthLog.severe("Missing database library! [DBMS = " + dbms.toString() + "]");
 		} catch (SQLException e) {
-			xAuthLog.severe("Could not connect to database! [datasource = " + xAuthSettings.datasource + "]", e);
+			xAuthLog.severe("Could not connect to database! [DBMS = " + dbms.toString() + "]", e);
 		}
 	}
 

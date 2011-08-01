@@ -2,6 +2,7 @@ package com.cypherx.xauth;
 
 import com.cypherx.xauth.commands.*;
 import com.cypherx.xauth.database.*;
+import com.cypherx.xauth.database.Database.DBMS;
 import com.cypherx.xauth.listeners.*;
 import com.cypherx.xauth.plugins.*;
 
@@ -66,8 +67,8 @@ public class xAuth extends JavaPlugin {
 		if (!dataFolder.exists())
 			dataFolder.mkdirs();
 
-		xAuthSettings.setup(dataFolder);
-		xAuthMessages.setup(dataFolder);
+		xAuthSettings.setup();
+		xAuthMessages.setup();
 
 		if (xAuthSettings.autoDisable && getServer().getOnlineMode()) {
 			xAuthLog.warning("Disabling - Server is running in online-mode");
@@ -76,6 +77,14 @@ public class xAuth extends JavaPlugin {
 		}
 
 		initializePlugins();
+
+		if (xAuthSettings.downloadLib && Database.getDBMS() == DBMS.H2 && !Util.checkLibrary()) {
+			xAuthLog.info("Downloading required library file..");
+			Util.downloadLibrary();
+			xAuthLog.info("Download complete! Please restart/reload the server.");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
 
 		Database.connect();
 		if (!Database.isConnected()) {
@@ -475,8 +484,8 @@ public class xAuth extends JavaPlugin {
 	}
 
 	public void reload() {
-		xAuthSettings.setup(dataFolder);
-		xAuthMessages.setup(dataFolder);
+		xAuthSettings.setup();
+		xAuthMessages.setup();
 	}
 
 	public UUID getGlobalUID() {

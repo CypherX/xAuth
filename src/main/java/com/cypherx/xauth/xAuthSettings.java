@@ -14,8 +14,9 @@ public class xAuthSettings {
 	public static boolean changed = false;
 
 	// main
-	public static String datasource = "default";
+	public static String datasource = "h2";
 	public static boolean autoDisable = true;
+	public static boolean downloadLib = true;
 	public static boolean reverseESS = true;
 
 	// authURL
@@ -88,8 +89,8 @@ public class xAuthSettings {
 	 */
 	public static int version = 3;
 
-	public static void setup(File dataFolder) {
-		file = new File(dataFolder, "config.yml");
+	public static void setup() {
+		file = new File(xAuth.dataFolder, "config.yml");
 
 		if (!file.exists()) {
 			xAuthLog.info("Creating file: config.yml");
@@ -105,6 +106,7 @@ public class xAuthSettings {
 	public static void loadSettings() {
 		datasource = getString("main.datasource", datasource);
 		autoDisable = getBool("main.auto-disable", autoDisable);
+		downloadLib = getBool("main.download-libraries", downloadLib);
 		reverseESS = getBool("main.reverse-enforce-single-session", reverseESS);
 
 		authURLEnabled = getBool("authurl.enabled", authURLEnabled);

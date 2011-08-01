@@ -1,14 +1,18 @@
 package com.cypherx.xauth;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -75,6 +79,48 @@ public class Util {
 		}
 
 		return sb.toString();
+	}
+
+	public static boolean checkLibrary() {
+		File file = new File("lib/h2.jar");
+		return file.exists() && !file.isDirectory();
+	}
+
+	public static void downloadLibrary() {
+		File dir = new File("lib");
+
+		if (!dir.exists())
+			dir.mkdir();
+
+		File file = new File(dir + File.separator + "h2.jar");
+		BufferedInputStream input = null;
+		FileOutputStream output = null;
+
+		try {
+			URL url = new URL("http://dl.dropbox.com/u/24661378/Bukkit/lib/h2.jar");
+			input = new BufferedInputStream(url.openStream());
+			output = new FileOutputStream(file);
+
+			byte data[] = new byte[1024];
+			int count;
+
+			while ((count = input.read(data)) != -1)
+				output.write(data, 0, count);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (input != null)
+					input.close();
+			} catch (IOException e) {}
+
+			try {
+				if (output != null)
+					output.close();
+			} catch (IOException e) {}
+		}
 	}
 
 	public static boolean isValidName(Player player) {

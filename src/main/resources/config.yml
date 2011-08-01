@@ -1,13 +1,11 @@
-#
-# Configuration file for xAuth
-#
-
 main:
     # How should xAuth store data (Accounts, sessions, etc.)?
-    # Possible values: default (H2), mysql
+    # Possible values: h2, mysql
     datasource: [datasource]
     # If set to true, xAuth will disable itself if the server is in online-mode
     auto-disable: [autoDisable]
+    # If set to true, all required library files will be automatically downloaded
+    download-libraries: [downloadLib]
     # When set to true, if a player connects with the same name as someone who is
     # already online, the player connecting will be kicked instead of the online player
     reverse-enforce-single-session: [reverseESS]
