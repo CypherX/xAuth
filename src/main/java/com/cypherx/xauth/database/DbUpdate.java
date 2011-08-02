@@ -20,7 +20,7 @@ import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthSettings;
 
 public class DbUpdate {
-	private File fVersion = new File(xAuth.dataFolder + File.separator + "DBVERSION");
+	private File fVersion = new File(xAuth.dataFolder, "DBVERSION");
 	private int version; // Current database version
 	private int sqlVersion = 0; // Version of the .sql files
 	private Map<Integer, String> sqlFiles = new HashMap<Integer, String>();

@@ -302,7 +302,7 @@ public class xAuth extends JavaPlugin {
 	}
 
 	public boolean checkPassword(Account account, String checkPass) {
-		if(xAuthSettings.authURLEnabled){
+		if (xAuthSettings.authURLEnabled) {
 			StringBuilder sb = new StringBuilder();
 
 			boolean result = checkAuthURLPass(account.getPlayerName(), checkPass, sb);

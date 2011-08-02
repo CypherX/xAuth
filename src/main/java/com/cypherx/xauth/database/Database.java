@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthSettings;
 
@@ -44,7 +45,7 @@ public class Database {
 	private static String getConnString() {
 		switch (dbms) {
 			case H2:
-				return "jdbc:h2:plugins" + File.separator + "xAuth" + File.separator + "xAuth;IGNORECASE=TRUE";
+				return "jdbc:h2:" + xAuth.dataFolder + File.separator + "xAuth;IGNORECASE=TRUE";
 			case MYSQL:
 				return "jdbc:mysql://" + xAuthSettings.mysqlHost + ":" + xAuthSettings.mysqlPort + "/" + xAuthSettings.mysqlDb + "?zeroDateTimeBehavior=convertToNull";
 			default:
