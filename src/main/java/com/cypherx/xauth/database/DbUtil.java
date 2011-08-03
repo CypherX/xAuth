@@ -329,6 +329,24 @@ public class DbUtil {
 		Database.queryWrite(sql);
 	}
 
+	public static void printStats() {
+		String sql = "SELECT" +
+				" (SELECT COUNT(*) FROM `" + xAuthSettings.tblAccount + "`) AS accounts," +
+				" (SELECT COUNT(*) FROM `" + xAuthSettings.tblSession + "`) AS sessions";
+		ResultSet rs = Database.queryRead(sql);
+
+		try {
+			if (rs.next())
+				xAuthLog.info("Accounts: " + rs.getInt("accounts") + ", Sessions: " + rs.getInt("sessions"));
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not fetch xAuth statistics!", e);
+		} finally {
+			try {
+				rs.close();
+			} catch (SQLException e) {}
+		}
+	}
+
 	public static boolean isHostUsed(String host) {
 		String sql = "SELECT * FROM `" + xAuthSettings.tblAccount + "` WHERE `registerip` = ?";
 		ResultSet rs = Database.queryRead(sql, host);

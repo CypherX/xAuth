@@ -6,9 +6,11 @@ import com.cypherx.xauth.database.Database.DBMS;
 import com.cypherx.xauth.listeners.*;
 import com.cypherx.xauth.plugins.*;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -54,12 +56,6 @@ public class xAuth extends JavaPlugin {
 		xAuthLog.info("v" + desc.getVersion() + " Disabled!");
 	}
 
-	private void initializePlugins() {
-		xBukkitContrib.setup(this);
-		xHelp.setup(this);
-		xPermissions.setup(this);
-	}
-
 	public void onEnable() {
 		desc = getDescription();
 		dataFolder = getDataFolder();
@@ -78,9 +74,9 @@ public class xAuth extends JavaPlugin {
 
 		initializePlugins();
 
-		if (xAuthSettings.downloadLib && Database.getDBMS() == DBMS.H2 && !Util.checkLibrary()) {
+		if (xAuthSettings.downloadLib && Database.getDBMS() == DBMS.H2 && !checkLibrary()) {
 			xAuthLog.info("Downloading required library file..");
-			Util.downloadLibrary();
+			downloadLibrary();
 			xAuthLog.info("Download complete! Please restart/reload the server.");
 			getServer().getPluginManager().disablePlugin(this);
 			return;
@@ -106,7 +102,7 @@ public class xAuth extends JavaPlugin {
 		if (oldAuthFile.exists())
 			importAccounts(oldAuthFile);
 
-		Database.printStats();
+		DbUtil.printStats();
 
 		Player[] players = getServer().getOnlinePlayers();
 		if (players.length > 0) // /reload was used
@@ -122,6 +118,51 @@ public class xAuth extends JavaPlugin {
 		getCommand("xauth").setExecutor(new xAuthCommand(this));
 
 		xAuthLog.info("v" + desc.getVersion() + " Enabled!");
+	}
+
+	private void initializePlugins() {
+		xBukkitContrib.setup(this);
+		xHelp.setup(this);
+		xPermissions.setup(this);
+	}
+
+	private boolean checkLibrary() {
+		File file = new File("lib/h2.jar");
+		return file.exists() && !file.isDirectory();
+	}
+
+	private void downloadLibrary() {
+		File dir = new File("lib");
+		if (!dir.exists())
+			dir.mkdir();
+
+		File file = new File(dir, "h2.jar");
+		BufferedInputStream input = null;
+		FileOutputStream output = null;
+
+		try {
+			URL url = new URL("http://dl.dropbox.com/u/24661378/Bukkit/lib/h2.jar");
+			input = new BufferedInputStream(url.openStream());
+			output = new FileOutputStream(file);
+
+			byte data[] = new byte[1024];
+			int count;
+
+			while ((count = input.read(data)) != -1)
+				output.write(data, 0, count);
+		} catch (IOException e) {
+			xAuthLog.severe("Could not downloaded required library file!", e);
+		} finally {
+			try {
+				if (input != null)
+					input.close();
+			} catch (IOException e) {}
+
+			try {
+				if (output != null)
+					output.close();
+			} catch (IOException e) {}
+		}
 	}
 
 	private void importAccounts(File oldAuthFile) {
@@ -227,8 +268,8 @@ public class xAuth extends JavaPlugin {
 		xPlayer.setGuest(false);
 	}
 
-	public void protect(xAuthPlayer xPlayer) {
-		Player player = xPlayer.getPlayer();
+	public void protect(final xAuthPlayer xPlayer) {
+		final Player player = xPlayer.getPlayer();
 		PlayerInventory playerInv = player.getInventory();
 
 		DbUtil.insertInventory(xPlayer);
@@ -239,11 +280,22 @@ public class xAuth extends JavaPlugin {
 		playerInv.setBoots(null);
 		player.saveData();
 
-		if (player.getHealth() > 0)
-			xPlayer.setLocation(player.getLocation());
+		//if (player.getHealth() > 0)
+			//xPlayer.setLocation(player.getLocation());
 
-		if (xAuthSettings.protectLoc)
-			player.teleport(getLocationToTeleport(player.getWorld()));
+		//if (xAuthSettings.protectLoc)
+			//player.teleport(getLocationToTeleport(player.getWorld()));
+
+		// possible fix for spawning issues
+		getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+			public void run() {
+				if (player.getHealth() > 0)
+					xPlayer.setLocation(player.getLocation());
+
+				if (xAuthSettings.protectLoc)
+					player.teleport(getLocationToTeleport(player.getWorld()));
+			}
+		}, 1);
 	}
 
 	public void restore(xAuthPlayer xPlayer) {
