@@ -8,7 +8,9 @@ public class xBukkitContrib {
 	private static Plugin bcPlugin;
 
 	public static void setup(xAuth plugin) {
-		bcPlugin = plugin.getServer().getPluginManager().getPlugin("BukkitContrib");
+		bcPlugin = plugin.getServer().getPluginManager().getPlugin("Spout");
+		if (bcPlugin == null)
+			bcPlugin = plugin.getServer().getPluginManager().getPlugin("BukkitContrib");
 	}
 
 	public static boolean isVersionCommand(String message) {
