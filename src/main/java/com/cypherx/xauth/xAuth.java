@@ -121,7 +121,7 @@ public class xAuth extends JavaPlugin {
 	}
 
 	private void initializePlugins() {
-		xBukkitContrib.setup(this);
+		xSpout.setup(this);
 		xHelp.setup(this);
 		xPermissions.setup(this);
 	}

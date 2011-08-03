@@ -16,7 +16,7 @@ import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
 import com.cypherx.xauth.database.DbUtil;
-import com.cypherx.xauth.plugins.xBukkitContrib;
+import com.cypherx.xauth.plugins.xSpout;
 
 public class xAuthPlayerListener extends PlayerListener {
 	private final xAuth plugin;
@@ -130,7 +130,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		//if (!xAuthSettings.rstrCommands && !xPlayer.isRegistered())
 			//return;
 
-		if (xPlayer.isGuest() && !xBukkitContrib.isVersionCommand(event.getMessage())) {
+		if (xPlayer.isGuest() && !xSpout.isVersionCommand(event.getMessage())) {
 			String command = event.getMessage().split(" ")[0].replaceFirst("/", "");
 
 			if (xAuthSettings.allowedCmds.contains(command))
