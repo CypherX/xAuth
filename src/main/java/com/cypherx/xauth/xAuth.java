@@ -295,7 +295,7 @@ public class xAuth extends JavaPlugin {
 				if (xAuthSettings.protectLoc)
 					player.teleport(getLocationToTeleport(player.getWorld()));
 			}
-		}, 1);
+		}, 2);
 	}
 
 	public void restore(xAuthPlayer xPlayer) {
