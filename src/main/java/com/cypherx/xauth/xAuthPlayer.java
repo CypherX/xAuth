@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.cypherx.xauth.plugins.xPermissions;
-//import org.bukkit.inventory.ItemStack;
 
 
 public class xAuthPlayer {
@@ -93,7 +92,11 @@ public class xAuthPlayer {
 	}
 
 	public Player getPlayer() {
-		return Bukkit.getServer().getPlayer(playerName);
+		Player player = Bukkit.getServer().getPlayer(playerName);
+		if (player.getName().equalsIgnoreCase(playerName))
+			return player;
+
+		return null;
 	}
 
 	public void setAccount(Account account) {
