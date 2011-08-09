@@ -37,8 +37,8 @@ CREATE TABLE IF NOT EXISTS `{TABLE_STRIKE}` (
 
 CREATE TABLE IF NOT EXISTS `{TABLE_INVENTORY}` (
 	`playername` VARCHAR(255) NOT NULL,
-	`itemid` TEXT NOT NULL,
-	`amount` TEXT NOT NULL,
-	`durability` TEXT NOT NULL,
+	`itemid` VARCHAR NOT NULL,
+	`amount` VARCHAR NOT NULL,
+	`durability` VARCHAR NOT NULL,
 	PRIMARY KEY (`playername`)
 );
