@@ -46,8 +46,8 @@ registration:
     require-email: [requireEmail]
     # If set to true, a valid email address is required
     validate-email: [validateEmail]
-    # Setting this to false will impose a limit of one account per IP address
-    allow-multiple: [allowMultiple]
+    # How many accounts per IP address will be allowed. Set as 0 for unlimited
+    account-limit: [accountLimit]
     # Used with web registrations that require account activation
     activation: [activation]
 

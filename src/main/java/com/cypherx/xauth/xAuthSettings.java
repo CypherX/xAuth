@@ -40,7 +40,7 @@ public class xAuthSettings {
 	public static boolean regForced = true;
 	public static boolean requireEmail = false;
 	public static boolean validateEmail = true;
-	public static boolean allowMultiple = true;
+	public static int accountLimit = 0;
 	public static boolean activation = false;
 
 	// login
@@ -87,7 +87,7 @@ public class xAuthSettings {
 	/*
 	 * REMEMBER TO CHANGE VERSION AFTER MODIFYING DEFAULT SETTINGS
 	 */
-	public static int version = 3;
+	public static int version = 5;
 
 	public static void setup() {
 		file = new File(xAuth.dataFolder, "config.yml");
@@ -127,7 +127,7 @@ public class xAuthSettings {
 		regForced = getBool("registration.forced", regForced);
 		requireEmail = getBool("registration.require-email", requireEmail);
 		validateEmail = getBool("registration.validate-email", validateEmail);
-		allowMultiple = getBool("registration.allow-multiple", allowMultiple);
+		accountLimit = getInt("registration.account-limit", accountLimit);
 		activation = getBool("registration.activation", activation);
 
 		maxStrikes = getInt("login.strikes.amount", maxStrikes);

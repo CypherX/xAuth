@@ -84,7 +84,7 @@ public class xAuthCommand implements CommandExecutor {
 			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (xPlayer.isRegistered()) {
-				xAuthMessages.send("admnRegRegistered", player, xPlayer.getPlayer());
+				xAuthMessages.send("admnRegRegistered", player, targetName);
 				return true;
 			}
 
@@ -92,7 +92,7 @@ public class xAuthCommand implements CommandExecutor {
 			xPlayer.setAccount(account);
 			DbUtil.saveAccount(account);
 
-			xAuthMessages.send("admnRegSuccess", player, xPlayer.getPlayer());
+			xAuthMessages.send("admnRegSuccess", player, targetName);
 			xAuthLog.info(player.getName() + " has registered an account for " + targetName);
 		} else if (sender instanceof ConsoleCommandSender) {
 			if (args.length < 3) {
@@ -136,7 +136,7 @@ public class xAuthCommand implements CommandExecutor {
 			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (!xPlayer.isRegistered()) {
-				xAuthMessages.send("admnCpwRegistered", player, xPlayer.getPlayer());
+				xAuthMessages.send("admnCpwRegistered", player, targetName);
 				return true;
 			}
 
@@ -144,7 +144,7 @@ public class xAuthCommand implements CommandExecutor {
 			String newPassword = args[2];
 
 			plugin.changePassword(targetAcc, newPassword);
-			xAuthMessages.send("admnCpwSuccess", player, xPlayer.getPlayer());
+			xAuthMessages.send("admnCpwSuccess", player, targetName);
 			xAuthLog.info(player.getName() + " changed " + targetName + "'s password");
 		} else if (sender instanceof ConsoleCommandSender) {
 			if (args.length < 3) {
@@ -186,13 +186,13 @@ public class xAuthCommand implements CommandExecutor {
 			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (!xPlayer.hasSession()) {
-				xAuthMessages.send("admnLogoutLogged", player, xPlayer.getPlayer());
+				xAuthMessages.send("admnLogoutLogged", player, targetName);
 				return true;
 			}
 
 			plugin.createGuest(xPlayer);
+			xAuthMessages.send("admnLogoutSuccess", player, targetName);
 			Player target = xPlayer.getPlayer();
-			xAuthMessages.send("admnLogoutSuccess", player, target);
 			if (target != null)
 				xAuthMessages.send("logoutSuccess", target);
 			xAuthLog.info(targetName + " was logged out by " + player.getName());
@@ -236,7 +236,7 @@ public class xAuthCommand implements CommandExecutor {
 			xAuthPlayer xPlayer = plugin.getPlayer(targetName);
 
 			if (!xPlayer.isRegistered()) {
-				xAuthMessages.send("admnUnregRegistered", player, xPlayer.getPlayer());
+				xAuthMessages.send("admnUnregRegistered", player, targetName);
 				return true;
 			}
 
@@ -249,7 +249,7 @@ public class xAuthCommand implements CommandExecutor {
 				xAuthMessages.send("admnUnregSuccessTgt", target);
 			}
 
-			xAuthMessages.send("admnUnregSuccessPlyr", player, target);
+			xAuthMessages.send("admnUnregSuccessPlyr", player, targetName);
 			xAuthLog.info(targetName + " has been unregistered by " + player.getName());
 		} else if (sender instanceof ConsoleCommandSender) {
 			if (args.length < 2) {

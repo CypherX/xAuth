@@ -162,18 +162,17 @@ public class DbUtil {
 	public static ItemStack[] getInventory(xAuthPlayer xPlayer) {
 		String sql = "SELECT * FROM `" + xAuthSettings.tblInventory + "` WHERE `playername` = ?";
 		ResultSet rs = Database.queryRead(sql, xPlayer.getPlayerName());
+		ItemStack[] inv = null;
 
 		try {
 			if (rs.next()) {
 				int[] itemid = Util.stringToInt(rs.getString("itemid").split(","));
 				int[] amount = Util.stringToInt(rs.getString("amount").split(","));
 				int[] durability = Util.stringToInt(rs.getString("durability").split(","));
-				ItemStack[] inv = new ItemStack[itemid.length];
+				inv = new ItemStack[itemid.length];
 
 				for (int i = 0; i < inv.length; i++)
 					inv[i] = new ItemStack(itemid[i], amount[i], (short)durability[i]);
-
-				return inv;
 			}
 		} catch (SQLException e) {
 			xAuthLog.severe("Could not load inventory for player: " + xPlayer.getPlayerName(), e);
@@ -183,7 +182,7 @@ public class DbUtil {
 			} catch (SQLException e) {}
 		}
 
-		return null;
+		return inv;
 	}
 
 	public static void insertInventory(xAuthPlayer xPlayer) {
@@ -251,6 +250,7 @@ public class DbUtil {
 		Database.queryWrite(sql, xPlayer.getPlayerName());
 	}
 	/* END INVENTORY FUNCTIONS */
+
 	public static xAuthPlayer getPlayerFromDb(String playerName) {
 		xAuthPlayer xPlayer = null;
 		String sql = "SELECT a.*, s.*" +
@@ -347,21 +347,22 @@ public class DbUtil {
 		}
 	}
 
-	public static boolean isHostUsed(String host) {
-		String sql = "SELECT * FROM `" + xAuthSettings.tblAccount + "` WHERE `registerip` = ?";
+	public static int getAccountCount(String host) {
+		String sql = "SELECT COUNT(*) FROM `" + xAuthSettings.tblAccount + "` WHERE `registerip` = ?";
 		ResultSet rs = Database.queryRead(sql, host);
+		int count = 0;
 
 		try {
 			if (rs.next())
-				return true;
+				count = rs.getInt(1);
 		} catch (SQLException e) {
-			xAuthLog.severe("Could not check if IP address has been used!", e);
+			xAuthLog.severe("Could not get account count for host: " + host, e);
 		} finally {
 			try {
 				rs.close();
 			} catch (SQLException e) {}
 		}
 
-		return false;
+		return count;
 	}
 }

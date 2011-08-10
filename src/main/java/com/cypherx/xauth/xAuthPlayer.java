@@ -93,7 +93,7 @@ public class xAuthPlayer {
 
 	public Player getPlayer() {
 		Player player = Bukkit.getServer().getPlayer(playerName);
-		if (player.getName().equalsIgnoreCase(playerName))
+		if (player != null && player.getName().equalsIgnoreCase(playerName))
 			return player;
 
 		return null;

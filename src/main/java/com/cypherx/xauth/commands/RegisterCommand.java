@@ -35,7 +35,7 @@ public class RegisterCommand implements CommandExecutor {
 			} else if (xPlayer.isRegistered()) {
 				xAuthMessages.send("regErrRegistered", player);
 				return true;
-			} else if (!xAuthSettings.allowMultiple && DbUtil.isHostUsed(Util.getHostFromPlayer(player))) {
+			} else if (xAuthSettings.accountLimit > 0 && DbUtil.getAccountCount(Util.getHostFromPlayer(player)) >= xAuthSettings.accountLimit) {
 				xAuthMessages.send("regErrMultiple", player);
 				return true;
 			}

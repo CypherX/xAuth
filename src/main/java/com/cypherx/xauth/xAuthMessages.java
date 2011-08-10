@@ -21,7 +21,7 @@ public class xAuthMessages {
 	public static String regSuccess = "{BRIGHTGREEN}You have successfully registered!";
 	public static String regErrDisabled = "{RED}Registrations are currently disabled!";
 	public static String regErrRegistered = "{RED}You are already registered!";
-	public static String regErrMultiple = "{RED}You may only register one account!";
+	public static String regErrMultiple = "{RED}You may not register any more accounts!";
 	public static String regErrPassword = "{RED}Your password must be at least {PWMINLENGTH} characters long!";
 	public static String regErrEmail = "{RED}Please use a valid email address when registering!";
 
@@ -193,14 +193,14 @@ public class xAuthMessages {
 			player.sendMessage(line);
 	}
 
-	public static void send(String fieldName, Player player, Player target) {
+	public static void send(String fieldName, Player player, String target) {
 		String message = get(fieldName, player, target);
 
 		for (String line : message.split("\n"))
 			player.sendMessage(line);
 	}
 
-	public static String get(String fieldName, Player player, Player target) {
+	public static String get(String fieldName, Player player, String target) {
 		String message = null;
 		try {
 			message = xAuthMessages.class.getField(fieldName).get(null).toString();
@@ -213,7 +213,7 @@ public class xAuthMessages {
 		return replace(message, player, target);
 	}
 
-	private static String replace(String message, Player player, Player target) {
+	private static String replace(String message, Player player, String target) {
 		// colors
 		message = message.replace("{BLACK}", "&0");
 		message = message.replace("{DARKBLUE}", "&1");
@@ -245,15 +245,14 @@ public class xAuthMessages {
 		}
 
 		// target
-		if (target != null) {
-			message = message.replace("{TARGET}", target.getName());
-			message = message.replace("{TARGETIP}", Util.getHostFromPlayer(target));
-		}
+		if (target != null)
+			message = message.replace("{TARGET}", target);
 
 		// settings
 		message = message.replace("{PWMINLENGTH}", Integer.toString(xAuthSettings.pwMinLength));
 		message = message.replace("{NAMEMINLENGTH}", Integer.toString(xAuthSettings.filterMinLength));
 		message = message.replace("{MAXSTRIKES}", Integer.toString(xAuthSettings.maxStrikes));
+		message = message.replace("{ACCOUNTLIMIT}", Integer.toString(xAuthSettings.accountLimit));
 
 		// misc
 		message = message.replace("{NEWLINE}", "\n");
