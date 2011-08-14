@@ -12,7 +12,7 @@ public class xAuthMessages {
 	// join
 	public static String joinRegister = "{RED}You are not registered.{NEWLINE}{RED}Please register using /register <password>.";
 	public static String joinLogin = "{RED}Please log in using /login <password>.";
-	public static String joinErrBanned = "You have are banned for exceeding the incorrect password threshold.";
+	public static String joinErrLockout = "You are temporarily locked out for exceeding the incorrect password threshold.";
 	public static String joinErrOnline = "You are already online!";
 	public static String joinErrName = "Your name contains one or more illegal characters.";
 
@@ -83,10 +83,7 @@ public class xAuthMessages {
 	public static String miscKickStrike = "You have entered too many invalid passwords!";
 	public static String miscReloaded = "{RED}Server reloaded, please log in.";
 
-	/*
-	 * REMEMBER TO CHANGE VERSION AFTER MODIFYING DEFAULT STRINGS
-	 */
-	public static int version = 2;	
+	public static int version = 3; // 2.0b5
 
 	public static void setup() {
 		file = new File(xAuth.dataFolder, "messages.yml");
@@ -105,7 +102,7 @@ public class xAuthMessages {
 	public static void loadMessages() {
 		joinRegister = getString("join.register", joinRegister);
 		joinLogin = getString("join.login", joinLogin);
-		joinErrBanned = getString("join.error.banned", joinErrBanned);
+		joinErrLockout = getString("join.error.lockout", joinErrLockout);
 		joinErrOnline = getString("join.error.online", joinErrOnline);
 		joinErrName = getString("join.error.name", joinErrOnline);
 

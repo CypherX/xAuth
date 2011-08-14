@@ -16,7 +16,6 @@ public class xAuthPlayer {
 	private boolean guest = false;
 	private Location location;
 	private Timestamp lastNotifyTime;
-	private int strikes = 0;
 	private int timeoutTaskId;
 
 	public xAuthPlayer(String playerName) {
@@ -131,36 +130,12 @@ public class xAuthPlayer {
 		return location;
 	}
 
-	/*public void setInventory(ItemStack[] inventory) {
-		this.inventory = inventory;
-	}
-
-	public ItemStack[] getInventory() {
-		return inventory;
-	}
-
-	public void setArmor(ItemStack[] armor) {
-		this.armor = armor;
-	}
-
-	public ItemStack[] getArmor() {
-		return armor;
-	}*/
-
 	public void setLastNotifyTime(Timestamp lastNotifyTime) {
 		this.lastNotifyTime = lastNotifyTime;
 	}
 
 	public Timestamp getLastNotifyTime() {
 		return lastNotifyTime;
-	}
-
-	public void setStrikes(int strikes) {
-		this.strikes = strikes;
-	}
-
-	public int getStrikes() {
-		return strikes;
 	}
 
 	public void setTimeoutTaskId(int timeoutTaskId) {

@@ -57,11 +57,12 @@ login:
         # Set as 0 to disable
         amount: [maxStrikes]
         # What action to take when the strike threshold is reached
-        # Possible values: kick, banip
+        # Possible values: kick, lockout
         action: [strikeAction]
-        # Length, in seconds, of a ban given by the strike system
-        # Set as 0 for a permanent ban
-        length: [banLength]
+        # Length of time, in seconds, that a strike will remain in the database
+        strike-length: [strikeLength]
+        # Length of time, in seconds, that a player will remain locked out
+        lockout-length: [lockoutLength]
 
 password:
     # Minimum length a password may be

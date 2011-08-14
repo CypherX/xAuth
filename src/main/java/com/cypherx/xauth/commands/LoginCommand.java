@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.cypherx.xauth.Account;
+import com.cypherx.xauth.Util;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthMessages;
@@ -21,6 +22,8 @@ public class LoginCommand implements CommandExecutor {
 	}
 
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		args = Util.fixArgs(args);
+
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 			xAuthPlayer xPlayer = plugin.getPlayer(player.getName());
@@ -45,9 +48,14 @@ public class LoginCommand implements CommandExecutor {
 
 			if (!plugin.checkPassword(account, password)) {
 				if (xAuthSettings.maxStrikes > 0) {
-					xPlayer.setStrikes(xPlayer.getStrikes() + 1);
-					if (xPlayer.getStrikes() >= xAuthSettings.maxStrikes)
-						plugin.strikeout(xPlayer);
+					String host = Util.getHostFromPlayer(player);
+					DbUtil.insertStrike(host, player.getName());
+					int strikes = DbUtil.getStrikeCount(host);
+
+					if (strikes >= xAuthSettings.maxStrikes) {
+						player.kickPlayer(xAuthMessages.get("miscKickStrike", player, null));
+						xAuthLog.info(player.getName() + " has exceeded the incorrect password threshold.");
+					}
 				}
 
 				xAuthMessages.send("loginErrPassword", player);

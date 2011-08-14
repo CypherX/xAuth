@@ -2,7 +2,7 @@ join:
     register: "[joinRegister]"
     login: "[joinLogin]"
     error:
-        banned: "[joinErrBanned]"
+        lockout: "[joinErrLockout]"
         online: "[joinErrOnline]"
         name: "[joinErrName]"
 

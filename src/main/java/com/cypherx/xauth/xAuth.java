@@ -5,6 +5,7 @@ import com.cypherx.xauth.database.*;
 import com.cypherx.xauth.database.Database.DBMS;
 import com.cypherx.xauth.listeners.*;
 import com.cypherx.xauth.plugins.*;
+import com.cypherx.xauth.spout.xSpoutManager;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -31,6 +32,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -40,6 +42,7 @@ public class xAuth extends JavaPlugin {
 	private ConcurrentHashMap<String, xAuthPlayer> playerCache = new ConcurrentHashMap<String, xAuthPlayer>();
 	private ConcurrentHashMap<UUID, TeleLocation> teleLocations = new ConcurrentHashMap<UUID, TeleLocation>();
 	private UUID globalUID = null;
+	private xSpoutManager spoutManager = null;
 
 	public void onDisable() {
 		Player[] players = getServer().getOnlinePlayers();
@@ -111,6 +114,11 @@ public class xAuth extends JavaPlugin {
 		(new xAuthPlayerListener(this)).registerEvents();
 		(new xAuthBlockListener(this)).registerEvents();
 		(new xAuthEntityListener(this)).registerEvents();
+
+		Plugin spoutPlugin = getServer().getPluginManager().getPlugin("Spout");
+		if (spoutPlugin != null)
+			spoutManager = new xSpoutManager(this);			
+
 		getCommand("register").setExecutor(new RegisterCommand(this));
 		getCommand("login").setExecutor(new LoginCommand(this));
 		getCommand("changepw").setExecutor(new ChangePasswordCommand(this));
@@ -121,7 +129,6 @@ public class xAuth extends JavaPlugin {
 	}
 
 	private void initializePlugins() {
-		xSpout.setup(this);
 		xHelp.setup(this);
 		xPermissions.setup(this);
 	}
@@ -345,7 +352,7 @@ public class xAuth extends JavaPlugin {
 		DbUtil.insertSession(session);
 
 		removeGuest(xPlayer);
-		xPlayer.setStrikes(0);
+		DbUtil.deleteStrikes(Util.getHostFromPlayer(xPlayer.getPlayer()));
 	}
 
 	public void changePassword(Account account, String newPass) {
@@ -386,12 +393,7 @@ public class xAuth extends JavaPlugin {
 		String salt = realPass.substring(saltPos, saltPos + 12);
 
 		// encrypt salt + checkPass
-		Whirlpool w = new Whirlpool();
-		byte[] digest = new byte[Whirlpool.DIGESTBYTES];
-		w.NESSIEinit();
-		w.NESSIEadd(salt + checkPass);
-		w.NESSIEfinalize(digest);
-		String hash = Whirlpool.display(digest);
+		String hash = Util.whirlpool(salt + checkPass);
 		return (hash.substring(0, saltPos) + salt + hash.substring(saltPos)).equals(realPass);
 	}
 
@@ -426,6 +428,28 @@ public class xAuth extends JavaPlugin {
 			response.append(e.getMessage());
 			return false;
 		}
+	}
+
+	public boolean isLockedOut(String host) {
+		if (!xAuthSettings.strikeAction.equals("lockout"))
+			return false;
+
+		String sql = "SELECT COUNT(*) AS strikes, MAX(striketime) AS lasttime FROM `" + xAuthSettings.tblStrike + "` WHERE `strikeip` = ?";
+		ResultSet rs = Database.queryRead(sql, host);
+
+		try {
+			if (rs.next()) {
+				int strikes = rs.getInt("strikes");
+				Timestamp lasttime = rs.getTimestamp("lasttime");
+
+				if (strikes >= xAuthSettings.maxStrikes && lasttime.compareTo(new Timestamp(Util.getNow().getTime() - (xAuthSettings.lockoutLength * 1000))) > 0)
+					return true;					
+			}
+		} catch (SQLException e) {
+			xAuthLog.severe("Could not check lockout status for host: " + host);
+		}
+
+		return false;
 	}
 
 	private void loadTeleLocations() {
@@ -502,39 +526,6 @@ public class xAuth extends JavaPlugin {
 		return (teleLocation == null ? world.getSpawnLocation() : teleLocation.getLocation());
 	}
 
-	public void strikeout(xAuthPlayer xPlayer) {
-		Player player = xPlayer.getPlayer();
-
-		if (xAuthSettings.strikeAction.equals("banip")) {
-			StrikeBan ban = new StrikeBan(Util.getHostFromPlayer(player));
-			DbUtil.insertStrikeBan(ban);
-			xAuthLog.info(ban.getHost() + " banned by strike system");
-		}
-
-		player.kickPlayer(xAuthMessages.get("miscKickStrike", player, null));
-		if (xAuthSettings.strikeAction.equals("kick"))
-			xAuthLog.info(player.getName() + " kicked by strike system");
-
-		xPlayer.setStrikes(0);
-	}
-
-	public boolean isBanned(String host) {
-		final StrikeBan ban = DbUtil.loadStrikeBan(host);
-		if (ban == null)
-			return false;
-
-		if (xAuthSettings.banLength == 0)
-			return true;
-
-		Timestamp unbanTime = new Timestamp(ban.getBanTime().getTime() + (xAuthSettings.banLength * 1000));
-		if (unbanTime.compareTo(Util.getNow()) > 0) // still banned
-			return true;
-		else // no longer banned, remove from database
-			DbUtil.deleteStrikeBan(ban);
-
-		return false;
-	}
-
 	public void reload() {
 		xAuthSettings.setup();
 		xAuthMessages.setup();
@@ -542,5 +533,13 @@ public class xAuth extends JavaPlugin {
 
 	public UUID getGlobalUID() {
 		return globalUID;
+	}
+
+	public boolean isSpoutEnabled() {
+		return spoutManager != null;
+	}
+
+	public xSpoutManager getSpoutManager() {
+		return spoutManager;
 	}
 }

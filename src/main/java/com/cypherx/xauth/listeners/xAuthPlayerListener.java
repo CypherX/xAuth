@@ -16,7 +16,8 @@ import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
 import com.cypherx.xauth.database.DbUtil;
-import com.cypherx.xauth.plugins.xSpout;
+import com.cypherx.xauth.spout.ScreenType;
+import com.cypherx.xauth.spout.xSpoutManager;
 
 public class xAuthPlayerListener extends PlayerListener {
 	private final xAuth plugin;
@@ -43,8 +44,9 @@ public class xAuthPlayerListener extends PlayerListener {
 			return;
 
 		String host = event.getKickMessage();
-		if (host != null && plugin.isBanned(host))
-			event.disallow(Result.KICK_OTHER, xAuthMessages.get("joinErrBanned", null, null));
+
+		if (host != null && plugin.isLockedOut(host))
+			event.disallow(Result.KICK_OTHER, xAuthMessages.get("joinErrLockout", null, null));
 
 		Player player = event.getPlayer();
 		if (xAuthSettings.reverseESS && player.isOnline())
@@ -119,6 +121,8 @@ public class xAuthPlayerListener extends PlayerListener {
 
 			event.setCancelled(true);
 		}
+
+		//plugin.getSpoutManager().showScreen(event.getPlayer(), ScreenType.LOGIN);
 	}
 
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
@@ -130,7 +134,10 @@ public class xAuthPlayerListener extends PlayerListener {
 		//if (!xAuthSettings.rstrCommands && !xPlayer.isRegistered())
 			//return;
 
-		if (xPlayer.isGuest() && !xSpout.isVersionCommand(event.getMessage())) {
+		if (xPlayer.isGuest()) {
+			if (plugin.isSpoutEnabled() && !xSpoutManager.isVersionCommand(event.getMessage()))
+				return;
+
 			String command = event.getMessage().split(" ")[0].replaceFirst("/", "");
 
 			if (xAuthSettings.allowedCmds.contains(command))

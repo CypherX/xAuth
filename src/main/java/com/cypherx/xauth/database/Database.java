@@ -45,7 +45,7 @@ public class Database {
 	private static String getConnString() {
 		switch (dbms) {
 			case H2:
-				return "jdbc:h2:" + xAuth.dataFolder + File.separator + "xAuth;IGNORECASE=TRUE";
+				return "jdbc:h2:" + xAuth.dataFolder.getPath() + File.separator + "xAuth;IGNORECASE=TRUE";
 			case MYSQL:
 				return "jdbc:mysql://" + xAuthSettings.mysqlHost + ":" + xAuthSettings.mysqlPort + "/" + xAuthSettings.mysqlDb + "?zeroDateTimeBehavior=convertToNull";
 			default:
@@ -58,6 +58,7 @@ public class Database {
 			connect();
 
 		PreparedStatement stmt = null;
+		ResultSet rs = null;
 
 		try {
 			stmt = connection.prepareStatement(sql);
@@ -65,12 +66,12 @@ public class Database {
 			for (int i = 0; i < params.length; i++)
 				stmt.setObject(i + 1, params[i]);
 
-			return stmt.executeQuery();
+			rs = stmt.executeQuery();
 		} catch (SQLException e) {
 			xAuthLog.severe("SQL query failure [read] (" + sql + ")", e);
 		}
 
-		return null;
+		return rs;
 	}
 
 	public static int queryWrite(String sql, Object... params) {
@@ -89,6 +90,11 @@ public class Database {
 			result = stmt.executeUpdate();
 		} catch (SQLException e) {
 			xAuthLog.severe("SQL query failure [write] (" + sql + ")", e);
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {}
 		}
 
 		return result;
@@ -99,6 +105,11 @@ public class Database {
 			stmt.executeBatch();
 		} catch (SQLException e) {
 			xAuthLog.severe("SQL query failure [batch]", e);
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {}
 		}
 	}
 

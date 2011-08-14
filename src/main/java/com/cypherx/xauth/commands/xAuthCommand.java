@@ -30,6 +30,8 @@ public class xAuthCommand implements CommandExecutor {
 		if (args.length < 1)
 			return false;
 
+		args = Util.fixArgs(args);
+
 		String subCommand = args[0];
 		if (subCommand.equals("register"))
 			return registerCommand(sender, args);
@@ -190,11 +192,12 @@ public class xAuthCommand implements CommandExecutor {
 				return true;
 			}
 
-			plugin.createGuest(xPlayer);
-			xAuthMessages.send("admnLogoutSuccess", player, targetName);
 			Player target = xPlayer.getPlayer();
-			if (target != null)
+			if (target != null) {
+				plugin.createGuest(xPlayer);
 				xAuthMessages.send("logoutSuccess", target);
+			}
+			xAuthMessages.send("admnLogoutSuccess", player, targetName);
 			xAuthLog.info(targetName + " was logged out by " + player.getName());
 		} else if (sender instanceof ConsoleCommandSender) {
 			if (args.length < 2) {
@@ -210,11 +213,12 @@ public class xAuthCommand implements CommandExecutor {
 				return true;
 			}
 
-			plugin.createGuest(xPlayer);
-			xAuthLog.info(targetName + " has been logged out");
 			Player target = xPlayer.getPlayer();
-			if (target != null)
+			if (target != null) {
+				plugin.createGuest(xPlayer);
 				xAuthMessages.send("logoutSuccess", target);
+			}
+			xAuthLog.info(targetName + " has been logged out");
 		}
 
 		return true;
@@ -368,11 +372,8 @@ public class xAuthCommand implements CommandExecutor {
 				type = "Boolean";
 
 			if (value == null) { // view setting info
-				//player.sendMessage("Setting: " + field.getName());
-				//player.sendMessage("Type:    " + type);
 				try {
 					xAuthMessages.sendConfigDesc(player, field.getName(), type, field.get(xAuthSettings.class));
-					//player.sendMessage("Value:   " + field.get(xAuthSettings.class));
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				}

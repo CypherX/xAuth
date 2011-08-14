@@ -10,7 +10,6 @@ import org.bukkit.inventory.PlayerInventory;
 
 import com.cypherx.xauth.Account;
 import com.cypherx.xauth.Session;
-import com.cypherx.xauth.StrikeBan;
 import com.cypherx.xauth.TeleLocation;
 import com.cypherx.xauth.Util;
 import com.cypherx.xauth.xAuthLog;
@@ -125,36 +124,43 @@ public class DbUtil {
 	/* END LOCATION METHODS */
 
 	/* START STRIKE METHODS */
-	public static StrikeBan loadStrikeBan(String host) {
-		String sql = "SELECT * FROM `" + xAuthSettings.tblStrike + "` WHERE `host` = ?";
+	public static int getStrikeCount(String host) {
+		deleteExpiredStrikes(host);
+		String sql = "SELECT COUNT(*) FROM `" + xAuthSettings.tblStrike + "` WHERE `strikeip` = ?";
 		ResultSet rs = Database.queryRead(sql, host);
-		StrikeBan ban = null;
+		int strikes = 0;
 
 		try {
-			if (rs.next()) {
-				ban = new StrikeBan();
-				ban.setHost(rs.getString(host));
-				ban.setBanTime(rs.getTimestamp("bantime"));
-			}
+			if (rs.next())
+				strikes = rs.getInt(1);
 		} catch (SQLException e) {
-			xAuthLog.severe("Could not load StrikeBan for host: " + host, e);
-		} finally {
-			try {
-				rs.close();
-			} catch (SQLException e) {}
+			xAuthLog.severe("Could not get strike count for host: " + host, e);
 		}
 
-		return ban;
+		return strikes;
 	}
 
-	public static void insertStrikeBan(StrikeBan ban) {
-		String sql = "INSERT INTO `" + xAuthSettings.tblStrike + "` VALUES (?, ?)";
-		Database.queryWrite(sql, ban.getHost(), ban.getBanTime());
+	public static void insertStrike(String host, String playerName) {
+		String sql = "INSERT INTO `" + xAuthSettings.tblStrike + "` VALUES (?, ?, ?)";
+		Database.queryWrite(sql, Util.getNow(), host, playerName);
 	}
 
-	public static void deleteStrikeBan(StrikeBan ban) {
-		String sql = "DELETE FROM `" + xAuthSettings.tblStrike + "` WHERE `host` = ?";
-		Database.queryWrite(sql, ban.getHost());
+	public static void deleteStrikes(String host) {
+		String sql = "DELETE FROM `" + xAuthSettings.tblStrike + "` WHERE `strikeip` = ?";
+		Database.queryWrite(sql, host);
+	}
+
+	private static void deleteExpiredStrikes(String host) {
+		String sql;
+
+		if (Database.getDBMS() == DBMS.H2)
+			sql = "DELETE FROM `" + xAuthSettings.tblStrike + "`" +
+					" WHERE NOW() > DATEADD('SECOND', " + xAuthSettings.strikeLength + ", `striketime`)";
+		else
+			sql = "DELETE FROM `" + xAuthSettings.tblStrike + "`" +
+					" WHERE NOW() > ADDDATE(`striketime`, INTERVAL " + xAuthSettings.strikeLength + " SECOND)";
+
+		Database.queryWrite(sql);
 	}
 	/* END STRIKE METHODS */
 

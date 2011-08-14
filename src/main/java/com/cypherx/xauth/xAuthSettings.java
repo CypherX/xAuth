@@ -31,7 +31,7 @@ public class xAuthSettings {
 	public static String mysqlDb = "";
 	public static String tblAccount = "accounts";
 	public static String tblSession = "sessions";
-	public static String tblStrike = "strike_bans";
+	public static String tblStrike = "strikes";
 	public static String tblLocation = "tele_locations";
 	public static String tblInventory = "inventory";
 
@@ -46,7 +46,8 @@ public class xAuthSettings {
 	// login
 	public static int maxStrikes = 5;
 	public static String strikeAction = "kick";
-	public static int banLength = 3600;
+	public static int strikeLength = 3600;
+	public static int lockoutLength = 900;
 
 	// password
 	public static int pwMinLength = 6;
@@ -84,10 +85,7 @@ public class xAuthSettings {
 	public static boolean rstrDmgGiven = true;
 	public static boolean rstrMobTarget = true;*/
 
-	/*
-	 * REMEMBER TO CHANGE VERSION AFTER MODIFYING DEFAULT SETTINGS
-	 */
-	public static int version = 5;
+	public static int version = 5; // 2.0b5
 
 	public static void setup() {
 		file = new File(xAuth.dataFolder, "config.yml");
@@ -132,7 +130,8 @@ public class xAuthSettings {
 
 		maxStrikes = getInt("login.strikes.amount", maxStrikes);
 		strikeAction = getString("login.strikes.action", strikeAction);
-		banLength = getInt("login.strikes.length", banLength);
+		strikeLength = getInt("login.strikes.strike-length", strikeLength);
+		lockoutLength = getInt("login.strikes.lockout-length", lockoutLength);
 
 		pwMinLength = getInt("password.min-length", pwMinLength);
 		pwAllowChange = getBool("password.allow-change", pwAllowChange);

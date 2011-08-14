@@ -1,0 +1,6 @@
+DROP TABLE `{TABLE_STRIKE}`;
+CREATE TABLE `{TABLE_STRIKE}` (
+	`striketime` DATETIME NOT NULL,
+	`strikeip` VARCHAR(39) NOT NULL,
+	`playername` VARCHAR(255) NOT NULL
+);

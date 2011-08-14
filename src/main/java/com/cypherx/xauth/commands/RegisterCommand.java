@@ -22,6 +22,8 @@ public class RegisterCommand implements CommandExecutor {
 	}
 
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		args = Util.fixArgs(args);
+
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 			xAuthPlayer xPlayer = plugin.getPlayer(player.getName());

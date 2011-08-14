@@ -3,10 +3,12 @@ package com.cypherx.xauth;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -20,6 +22,7 @@ import java.util.regex.Pattern;
 import org.bukkit.entity.Player;
 
 import com.avaje.ebean.validation.factory.EmailValidatorFactory;
+import com.martiansoftware.jsap.CommandLineTokenizer;
 
 public class Util {
 	public static void writeConfig(File file, Class<?> c) {
@@ -32,10 +35,10 @@ public class Util {
 			} catch (IllegalAccessException e) {}
 		}
 
-		BufferedWriter out = null;
+		Writer out = null;
 
 		try {
-			out = new BufferedWriter(new FileWriter(file));
+			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
 			out.write(content);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -231,5 +234,18 @@ public class Util {
 		}
 
 		return true;
+	}
+
+	public static String argsToString(String[] args) {
+		StringBuilder sb = new StringBuilder(args[0]);
+		for (int i = 1; i < args.length; i++)
+			sb.append(" " + args[i]);
+
+		return sb.toString();
+	}
+
+	// for lack of a better name..
+	public static String[] fixArgs(String[] args) {
+		return CommandLineTokenizer.tokenize(argsToString(args));
 	}
 }
