@@ -135,7 +135,7 @@ public class xAuthPlayerListener extends PlayerListener {
 			//return;
 
 		if (xPlayer.isGuest()) {
-			if (plugin.isSpoutEnabled() && !xSpoutManager.isVersionCommand(event.getMessage()))
+			if (plugin.isSpoutEnabled() && xSpoutManager.isVersionCommand(event.getMessage()))
 				return;
 
 			String command = event.getMessage().split(" ")[0].replaceFirst("/", "");
