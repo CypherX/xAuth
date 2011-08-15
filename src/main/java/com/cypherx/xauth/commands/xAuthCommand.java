@@ -1,6 +1,8 @@
 package com.cypherx.xauth.commands;
 
 import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,6 +18,7 @@ import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
+import com.cypherx.xauth.database.Database;
 import com.cypherx.xauth.database.DbUtil;
 import com.cypherx.xauth.plugins.xPermissions;
 
@@ -41,6 +44,8 @@ public class xAuthCommand implements CommandExecutor {
 			return logoutCommand(sender, args);
 		else if (subCommand.equals("unregister"))
 			return unregisterCommand(sender, args);
+		else if (subCommand.equals("strike"))
+			return strikeCommand(sender, args);
 		else if (subCommand.equals("location") || subCommand.equals("loc"))
 			return locationCommand(sender, args);
 		else if (subCommand.equals("config") || subCommand.equals("conf"))
@@ -54,6 +59,139 @@ public class xAuthCommand implements CommandExecutor {
 				xAuthMessages.send("admnUnknown", (Player)sender);
 			else if (sender instanceof ConsoleCommandSender)
 				xAuthLog.info("Unknown subcommand, try \"xauth\" for more information");
+		}
+
+		return true;
+	}
+
+	private boolean strikeCommand(CommandSender sender, String[] args) {
+		if (sender instanceof Player) {
+			Player player = (Player)sender;
+
+			if (!xPermissions.has(player, "xauth.admin.strike")) {
+				xAuthMessages.send("admnPermission", player);
+				return true;
+			} else if (args.length < 2) {
+				xAuthMessages.send("admnStrkUsage", player);
+				return true;
+			}
+
+			String subCommand = args[1];
+			String host = (args.length > 2 ? args[2] : null);
+
+			if (subCommand.equals("list")) {
+				if (host == null) {
+					String sql = "SELECT COUNT(*) AS `strikes`, `strikeip` FROM `" + xAuthSettings.tblStrike + "` GROUP BY `strikeip`";
+					ResultSet rs = Database.queryRead(sql);
+
+					try {
+						StringBuilder sb = new StringBuilder();
+
+						if (rs.next())
+							sb.append(rs.getString("strikeip") + " (" + rs.getInt("strikes") + ")");
+						else {
+							xAuthMessages.send("admnStrkListErrAll", player);
+							return true;
+						}
+
+						while (rs.next())
+							sb.append(", " + rs.getString("strikeip") + " (" + rs.getInt("strikes") + ")");
+
+						xAuthMessages.send("admnStrkListHead", player);
+						player.sendMessage(sb.toString());
+					} catch (SQLException e) {
+						xAuthLog.severe("Could not create strike list", e);
+					}
+				} else {
+					String sql = "SELECT `striketime`, `playername` FROM `" + xAuthSettings.tblStrike + "` WHERE `strikeip` = ?";
+					ResultSet rs = Database.queryRead(sql, host);
+
+					try {
+						if (rs.next())
+							player.sendMessage(xAuthMessages.get("admnStrkListStrk", null, null) + " " + rs.getRow() + ": " + rs.getTimestamp("striketime") + " (" + rs.getString("playername") + ")");
+						else {
+							xAuthMessages.send("admnStrkListErrIp", player);
+							return true;
+						}
+
+						while (rs.next())
+							player.sendMessage(xAuthMessages.get("admnStrkListStrk", null, null) + " " + rs.getRow() + ": " + rs.getTimestamp("striketime") + " (" + rs.getString("playername") + ")");
+					} catch (SQLException e) {
+						xAuthLog.severe("Could not create strike list for host: " + host, e);
+					}
+				}
+			} else if (subCommand.equals("clear")) {
+				if (host == null) {
+					String sql = "TRUNCATE TABLE `" + xAuthSettings.tblStrike + "`";
+					Database.queryWrite(sql);
+					xAuthMessages.send("admnStrkClrAll", player);
+				} else {
+					String sql = "DELETE FROM `" + xAuthSettings.tblStrike + "` WHERE `strikeip` = ?";
+					Database.queryWrite(sql, host);
+					xAuthMessages.send("admnStrkClrIp", player);
+				}
+			}
+		} else if (sender instanceof ConsoleCommandSender) {
+			if (args.length < 2) {
+				xAuthLog.info("Correct usage: /xauth strike list|clear [ip]");
+				return true;
+			}
+
+			String subCommand = args[1];
+			String host = (args.length > 2 ? args[2] : null);
+
+			if (subCommand.equals("list")) {
+				if (host == null) {
+					String sql = "SELECT COUNT(*) AS `strikes`, `strikeip` FROM `" + xAuthSettings.tblStrike + "` GROUP BY `strikeip`";
+					ResultSet rs = Database.queryRead(sql);
+
+					try {
+						StringBuilder sb = new StringBuilder();
+
+						if (rs.next())
+							sb.append(rs.getString("strikeip") + " (" + rs.getInt("strikes") + ")");
+						else {
+							xAuthLog.info("There are no strikes in the database!");
+							return true;
+						}
+
+						while (rs.next())
+							sb.append(", " + rs.getString("strikeip") + " (" + rs.getInt("strikes") + ")");
+
+						xAuthLog.info("Strike list:");
+						xAuthLog.info(sb.toString());
+					} catch (SQLException e) {
+						xAuthLog.severe("Could not create strike list", e);
+					}
+				} else {
+					String sql = "SELECT `striketime`, `playername` FROM `" + xAuthSettings.tblStrike + "` WHERE `strikeip` = ?";
+					ResultSet rs = Database.queryRead(sql, host);
+
+					try {
+						if (rs.next())
+							xAuthLog.info("Strike " + rs.getRow() + ": " + rs.getTimestamp("striketime") + " (" + rs.getString("playername") + ")");
+						else {
+							xAuthLog.info("This IP address has no strikes!");
+							return true;
+						}
+
+						while (rs.next())
+							xAuthLog.info("Strike " + rs.getRow() + ": " + rs.getTimestamp("striketime") + " (" + rs.getString("playername") + ")");
+					} catch (SQLException e) {
+						xAuthLog.severe("Could not create strike list for host: " + host, e);
+					}
+				}
+			} else if (subCommand.equals("clear")) {
+				if (host == null) {
+					String sql = "TRUNCATE TABLE `" + xAuthSettings.tblStrike + "`";
+					Database.queryWrite(sql);
+					xAuthLog.info("All strikes cleared!");
+				} else {
+					String sql = "DELETE FROM `" + xAuthSettings.tblStrike + "` WHERE `strikeip` = ?";
+					Database.queryWrite(sql, host);
+					xAuthLog.info("All strikes for this IP have been cleared!");
+				}
+			}
 		}
 
 		return true;

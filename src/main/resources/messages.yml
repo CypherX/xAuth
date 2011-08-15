@@ -60,6 +60,17 @@ admin:
         success:
             target: "[admnUnregSuccessTgt]"
             player: "[admnUnregSuccessPlyr]"
+    strike:
+        usage: "[admnStrkUsage]"
+        list:
+            header: "[admnStrkListHead]"
+            strike: "[admnStrkListStrk]"
+            error:
+                all: "[admnStrkListErrAll]"
+                ip: "[admnStrkListErrIp]"
+        clear:
+            all: "[admnStrkClrAll]"
+            ip: "[admnStrkClrIp]"
     location:
         usage: "[admnLocUsage]"
         set:

@@ -61,6 +61,13 @@ public class xAuthMessages {
 	public static String admnUnregRegistered = "{RED}This player is not registered!";
 	public static String admnUnregSuccessTgt = "{RED}You have been unregistered and logged out!";
 	public static String admnUnregSuccessPlyr = "{TARGET} {BRIGHTGREEN}has been unregistered!";
+	public static String admnStrkUsage = "{RED}Correct usage: /xauth strike list|clear [ip]";
+	public static String admnStrkListErrAll = "{RED}There are no strikes in the database!";
+	public static String admnStrkListErrIp = "{RED}This IP address has no strikes!";
+	public static String admnStrkListHead = "Strike list:";
+	public static String admnStrkListStrk = "Strike";
+	public static String admnStrkClrAll = "{BRIGHTGREEN}All strikes cleared!";
+	public static String admnStrkClrIp = "{BRIGHTGREEN}All strikes for this IP have been cleared!";
 	public static String admnLocUsage = "{RED}Correct Usage: /xauth location set|remove [global]";
 	public static String admnLocSetErrGlobal = "{YELLOW}{PLUGIN} {RED}Global teleport location is set to this world.{NEWLINE}{YELLOW}{PLUGIN} {RED}Please remove it first.";
 	public static String admnLocSetSuccess = "{YELLOW}{PLUGIN} {BRIGHTGREEN}Teleport location for this world set to your location!";
@@ -146,6 +153,13 @@ public class xAuthMessages {
 		admnUnregRegistered = getString("admin.unregister.registered", admnUnregRegistered);
 		admnUnregSuccessTgt = getString("admin.unregister.success.target", admnUnregSuccessTgt);
 		admnUnregSuccessPlyr = getString("admin.unregister.success.player", admnUnregSuccessPlyr);
+		admnStrkUsage = getString("admin.strike.usage", admnStrkUsage);
+		admnStrkListHead = getString("admin.strike.list.header", admnStrkListHead);
+		admnStrkListStrk = getString("admin.strike.list.strike", admnStrkListStrk);
+		admnStrkListErrAll = getString("admin.strike.list.error.all", admnStrkListErrAll);
+		admnStrkListErrIp = getString("admin.strike.list.error.ip", admnStrkListErrIp);
+		admnStrkClrAll = getString("admin.strike.clear.all", admnStrkClrAll);
+		admnStrkClrIp = getString("admin.strike.clear.ip", admnStrkClrIp);
 		admnLocUsage = getString("admin.location.usage", admnLocUsage);
 		admnLocSetErrGlobal = getString("admin.location.set.isglobal", admnLocSetErrGlobal);
 		admnLocSetSuccess = getString("admin.location.set.success", admnLocSetSuccess);

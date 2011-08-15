@@ -145,9 +145,9 @@ public class DbUtil {
 		Database.queryWrite(sql, Util.getNow(), host, playerName);
 	}
 
-	public static void deleteStrikes(String host) {
-		String sql = "DELETE FROM `" + xAuthSettings.tblStrike + "` WHERE `strikeip` = ?";
-		Database.queryWrite(sql, host);
+	public static void deleteStrikes(String host, String playerName) {
+		String sql = "DELETE FROM `" + xAuthSettings.tblStrike + "` WHERE `strikeip` = ? AND `playername` = ?";
+		Database.queryWrite(sql, host, playerName);
 	}
 
 	private static void deleteExpiredStrikes(String host) {

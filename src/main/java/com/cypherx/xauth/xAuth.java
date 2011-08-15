@@ -352,7 +352,7 @@ public class xAuth extends JavaPlugin {
 		DbUtil.insertSession(session);
 
 		removeGuest(xPlayer);
-		DbUtil.deleteStrikes(Util.getHostFromPlayer(xPlayer.getPlayer()));
+		DbUtil.deleteStrikes(Util.getHostFromPlayer(xPlayer.getPlayer()), xPlayer.getPlayerName());
 	}
 
 	public void changePassword(Account account, String newPass) {

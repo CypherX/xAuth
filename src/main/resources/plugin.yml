@@ -1,6 +1,6 @@
 name: xAuth
 main: com.cypherx.xauth.xAuth
-version: 2.0b4
+version: 2.0b5
 description: Offline-Mode Security Suite
 author: CypherX
 commands:
@@ -26,6 +26,7 @@ commands:
                /<command> changepw <player> <new password>
                /<command> logout <player>
                /<command> unregister <player>
+               /<command> strike list|clear [ip]
                /<command> location set|remove [global]
                /<command> config <setting> [value]
                /<command> reload
@@ -40,6 +41,7 @@ permissions:
             xauth.admin.changepw: true
             xauth.admin.logout: true
             xauth.admin.unregister: true
+            xauth.admin.strike: true
             xauth.admin.location: true
             xauth.admin.config: true
             xauth.admin.reload: true
@@ -54,6 +56,9 @@ permissions:
         default: op
     xauth.admin.unregister:
         description: Remove a players registration
+        default: op
+    xauth.admin.strike:
+        description: Manage the strike system
         default: op
     xauth.admin.location:
         description: Set/remove the current world or global teleport location
