@@ -27,21 +27,4 @@ public class xSpoutManager {
 
 		sPlayer.getMainScreen().attachPopupScreen(screen);
 	}
-
-	// TODO: Remove when next version of Spout is released
-	public static boolean isVersionCommand(String message) {
-		String split[] = message.substring(1).split("\\.");
-		if (split.length == 3) {
-			try {
-				Integer.valueOf(split[0]);
-				Integer.valueOf(split[1]);
-				Integer.valueOf(split[2]);
-				return true;
-			} catch (NumberFormatException e) {
-				return false;
-			}
-		}
-
-		return false;
-	}
 }
