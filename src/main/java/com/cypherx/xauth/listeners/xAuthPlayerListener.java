@@ -16,8 +16,8 @@ import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
 import com.cypherx.xauth.database.DbUtil;
-import com.cypherx.xauth.spout.ScreenType;
-import com.cypherx.xauth.spout.xSpoutManager;
+//import com.cypherx.xauth.spout.ScreenType;
+//import com.cypherx.xauth.spout.xSpoutManager;
 
 public class xAuthPlayerListener extends PlayerListener {
 	private final xAuth plugin;

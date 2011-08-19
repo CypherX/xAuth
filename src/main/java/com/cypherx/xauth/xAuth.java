@@ -287,13 +287,7 @@ public class xAuth extends JavaPlugin {
 		playerInv.setBoots(null);
 		player.saveData();
 
-		//if (player.getHealth() > 0)
-			//xPlayer.setLocation(player.getLocation());
-
-		//if (xAuthSettings.protectLoc)
-			//player.teleport(getLocationToTeleport(player.getWorld()));
-
-		// possible fix for spawning issues
+		// fix for spawning issues
 		getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
 			public void run() {
 				if (player.getHealth() > 0)
