@@ -96,6 +96,10 @@ public class xAuth extends JavaPlugin {
 		if (!dbUpdate.checkVersion()) {
 			xAuthLog.info("Updating database..");
 			dbUpdate.update();
+			if (!dbUpdate.isSuccess()) {
+				getServer().getPluginManager().disablePlugin(this);
+				return;
+			}
 		}
 
 		DbUtil.deleteExpiredSessions();
@@ -245,6 +249,9 @@ public class xAuth extends JavaPlugin {
 	}
 
 	public void createGuest(xAuthPlayer xPlayer) {
+		//if (!xPlayer.isRegistered() && !xPlayer.mustRegister())
+			//return;
+
 		final Player player = xPlayer.getPlayer();
 
 		// remove old session (if any)

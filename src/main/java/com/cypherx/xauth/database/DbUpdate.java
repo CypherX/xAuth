@@ -24,6 +24,7 @@ public class DbUpdate {
 	private int version; // Current database version
 	private int sqlVersion = 0; // Version of the .sql files
 	private Map<Integer, String> sqlFiles = new HashMap<Integer, String>();
+	boolean success = false;
 
 	public DbUpdate() {
 		loadVersion();
@@ -58,10 +59,16 @@ public class DbUpdate {
 				if (query.isEmpty())
 					continue;
 
-				Database.queryWrite(query);
+				int result = Database.queryWrite(query);
+				if (result == -1) {
+					xAuthLog.severe("Database update (" + (i - 1) + " -> " + i + ") failed!");
+					updateVersionFile(i - 1);
+					return;
+				}
 			}
 		}
 
+		success = true;
 		updateVersionFile(version);
 	}
 
@@ -144,5 +151,9 @@ public class DbUpdate {
 					writer.close();
 			} catch (IOException e) {}
 		}
+	}
+
+	public boolean isSuccess() {
+		return success;
 	}
 }

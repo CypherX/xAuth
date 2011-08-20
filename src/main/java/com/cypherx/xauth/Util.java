@@ -124,37 +124,39 @@ public class Util {
 		return EmailValidatorFactory.EMAIL.isValid(email);
 	}
 
-	public static String encrypt(String pass) {
-		Whirlpool w = new Whirlpool();
+	public static String encrypt(String toEncrypt) {
+		/*Whirlpool w = new Whirlpool();
 		byte[] digest = new byte[Whirlpool.DIGESTBYTES];
 
 		w.NESSIEinit();
 		w.NESSIEadd(UUID.randomUUID().toString());
 		w.NESSIEfinalize(digest);
-		String salt = Whirlpool.display(digest).substring(0, 12);
+		String salt = Whirlpool.display(digest).substring(0, 12);*/
+		String salt = whirlpool(UUID.randomUUID().toString()).substring(0, 12);
 
-		w.NESSIEinit();
-		w.NESSIEadd(salt + pass);
+		/*w.NESSIEinit();
+		w.NESSIEadd(salt + toEncrypt);
 		w.NESSIEfinalize(digest);
-		String hash = Whirlpool.display(digest);
+		String hash = Whirlpool.display(digest);*/
+		String hash = whirlpool(salt + toEncrypt);
 
-		int saltPos = (pass.length() >= hash.length() ? hash.length() : pass.length());
+		int saltPos = (toEncrypt.length() >= hash.length() ? hash.length() - 1 : toEncrypt.length());
 		return hash.substring(0, saltPos) + salt + hash.substring(saltPos);
 	}
 
-	public static String whirlpool(String pass) {
+	public static String whirlpool(String toEncrypt) {
 		Whirlpool w = new Whirlpool();
 		byte[] digest = new byte[Whirlpool.DIGESTBYTES];
 		w.NESSIEinit();
-		w.NESSIEadd(pass);
+		w.NESSIEadd(toEncrypt);
 		w.NESSIEfinalize(digest);
 		return Whirlpool.display(digest);
 	}
 
-	public static String md5(String pass) {
+	public static String md5(String toEncrypt) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] messageDigest = md.digest(pass.getBytes());
+			byte[] messageDigest = md.digest(toEncrypt.getBytes());
 			BigInteger number = new BigInteger(1, messageDigest);
 			String hashtext = number.toString(16);
 			while (hashtext.length() < 32)
