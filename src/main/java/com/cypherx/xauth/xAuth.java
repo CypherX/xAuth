@@ -94,9 +94,8 @@ public class xAuth extends JavaPlugin {
 
 		DbUpdate dbUpdate = new DbUpdate();
 		if (!dbUpdate.checkVersion()) {
-			xAuthLog.info("Updating database..");
-			dbUpdate.update();
-			if (!dbUpdate.isSuccess()) {
+			xAuthLog.info("Updating database..");			
+			if (!dbUpdate.update()) {
 				getServer().getPluginManager().disablePlugin(this);
 				return;
 			}

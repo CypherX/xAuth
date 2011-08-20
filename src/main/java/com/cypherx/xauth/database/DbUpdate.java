@@ -24,7 +24,6 @@ public class DbUpdate {
 	private int version; // Current database version
 	private int sqlVersion = 0; // Version of the .sql files
 	private Map<Integer, String> sqlFiles = new HashMap<Integer, String>();
-	boolean success = false;
 
 	public DbUpdate() {
 		loadVersion();
@@ -36,14 +35,14 @@ public class DbUpdate {
 	}
 
 	// Updates the database to the latest version
-	public void update() {
-		update(sqlVersion);
+	public boolean update() {
+		return update(sqlVersion);
 	}
 
 	// Updates the database to the specified version
-	public void update(int version) {
+	public boolean update(int version) {
 		if (version <= this.version)
-			return;
+			return true;
 
 		for (int i = this.version + 1; i <= version; i++) {
 			String sql = Util.getResourceAsString("/" + sqlFiles.get(i));
@@ -63,13 +62,13 @@ public class DbUpdate {
 				if (result == -1) {
 					xAuthLog.severe("Database update (" + (i - 1) + " -> " + i + ") failed!");
 					updateVersionFile(i - 1);
-					return;
+					return false;
 				}
 			}
 		}
 
-		success = true;
 		updateVersionFile(version);
+		return true;
 	}
 
 	private void loadVersion() {
@@ -151,9 +150,5 @@ public class DbUpdate {
 					writer.close();
 			} catch (IOException e) {}
 		}
-	}
-
-	public boolean isSuccess() {
-		return success;
 	}
 }
