@@ -86,7 +86,7 @@ public class xAuthSettings {
 	public static boolean rstrDmgGiven = true;
 	public static boolean rstrMobTarget = true;*/
 
-	public static int version = 5; // 2.0b5
+	public static int version = 5; // 2.0b4.1
 
 	public static void setup() {
 		file = new File(xAuth.dataFolder, "config.yml");

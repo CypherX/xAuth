@@ -92,7 +92,7 @@ public class xAuthMessages {
 	public static String miscKickStrike = "You have entered too many invalid passwords!";
 	public static String miscReloaded = "{RED}Server reloaded, please log in.";
 
-	public static int version = 3; // 2.0b5
+	public static int version = 3; // 2.0b4.1
 
 	public static void setup() {
 		file = new File(xAuth.dataFolder, "messages.yml");

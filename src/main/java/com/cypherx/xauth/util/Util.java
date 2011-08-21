@@ -156,6 +156,9 @@ public class Util {
 	}
 
 	public static String argsToString(String[] args) {
+		if (args.length < 1)
+			return null;
+
 		StringBuilder sb = new StringBuilder(args[0]);
 		for (int i = 1; i < args.length; i++)
 			sb.append(" " + args[i]);
