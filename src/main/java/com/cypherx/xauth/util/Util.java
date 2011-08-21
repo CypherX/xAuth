@@ -1,4 +1,4 @@
-package com.cypherx.xauth;
+package com.cypherx.xauth.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,18 +10,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.bukkit.entity.Player;
 
-import com.avaje.ebean.validation.factory.EmailValidatorFactory;
+import com.cypherx.xauth.Account;
+import com.cypherx.xauth.Session;
+import com.cypherx.xauth.xAuth;
+import com.cypherx.xauth.xAuthLog;
 import com.martiansoftware.jsap.CommandLineTokenizer;
 
 public class Util {
@@ -80,96 +79,6 @@ public class Util {
 		return sb.toString();
 	}
 
-	public static boolean isValidName(Player player) {
-		String playerName = player.getName().toLowerCase();
-		if (playerName.length() < xAuthSettings.filterMinLength)
-			return false;
-
-		String allowed = xAuthSettings.filterAllowed;
-		if (!allowed.equals("*")) {
-			for(int i = 0; i < playerName.length(); i++) {
-				if (allowed.indexOf(playerName.charAt(i)) == -1)
-					return false;
-			}
-		}
-
-		if (xAuthSettings.filterBlank && playerName.trim().equals(""))
-			return false;
-
-		return true;
-	}
-
-	public static boolean isValidPass(String pass) {
-		String pattern = "(";
-
-		if (xAuthSettings.pwCompLower)
-			pattern += "(?=.*[a-z])";
-
-		if (xAuthSettings.pwCompUpper)
-			pattern += "(?=.*[A-Z])";
-
-		if (xAuthSettings.pwCompNumber)
-			pattern += "(?=.*\\d)";
-
-		if (xAuthSettings.pwCompSymbol)
-			pattern += "(?=.*\\W)";
-
-		pattern += ".{" + xAuthSettings.pwMinLength + ",})";
-		Pattern p = Pattern.compile(pattern);
-		Matcher matcher = p.matcher(pass);
-		return matcher.matches();
-	}
-
-	public static boolean isValidEmail(String email) {
-		return EmailValidatorFactory.EMAIL.isValid(email);
-	}
-
-	public static String encrypt(String toEncrypt) {
-		/*Whirlpool w = new Whirlpool();
-		byte[] digest = new byte[Whirlpool.DIGESTBYTES];
-
-		w.NESSIEinit();
-		w.NESSIEadd(UUID.randomUUID().toString());
-		w.NESSIEfinalize(digest);
-		String salt = Whirlpool.display(digest).substring(0, 12);*/
-		String salt = whirlpool(UUID.randomUUID().toString()).substring(0, 12);
-
-		/*w.NESSIEinit();
-		w.NESSIEadd(salt + toEncrypt);
-		w.NESSIEfinalize(digest);
-		String hash = Whirlpool.display(digest);*/
-		String hash = whirlpool(salt + toEncrypt);
-
-		int saltPos = (toEncrypt.length() >= hash.length() ? hash.length() - 1 : toEncrypt.length());
-		return hash.substring(0, saltPos) + salt + hash.substring(saltPos);
-	}
-
-	public static String whirlpool(String toEncrypt) {
-		Whirlpool w = new Whirlpool();
-		byte[] digest = new byte[Whirlpool.DIGESTBYTES];
-		w.NESSIEinit();
-		w.NESSIEadd(toEncrypt);
-		w.NESSIEfinalize(digest);
-		return Whirlpool.display(digest);
-	}
-
-	public static String md5(String toEncrypt) {
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] messageDigest = md.digest(toEncrypt.getBytes());
-			BigInteger number = new BigInteger(1, messageDigest);
-			String hashtext = number.toString(16);
-			while (hashtext.length() < 32)
-				hashtext = "0" + hashtext;
-
-			return hashtext;
-		} catch (Exception e) {
-			xAuthLog.severe("Could not create MD5 hash!", e);
-		}
-
-		return null;
-	}
-
 	public static String getHostFromPlayer(Player player) {
 		if (player == null)
 			return null;
@@ -205,6 +114,10 @@ public class Util {
 			account.setActive(rs.getInt("active"));
 		} catch (SQLException e) {
 			xAuthLog.severe("Could not build Account from ResultSet!", e);
+		} finally {
+			try {
+				rs.close();
+			} catch (SQLException e) {}
 		}
 
 		return account;
@@ -223,6 +136,10 @@ public class Util {
 			session.setLoginTime(rs.getTimestamp("logintime"));
 		} catch (SQLException e) {
 			xAuthLog.severe("Could not build Session from ResultSet!", e);
+		} finally {
+			try {
+				rs.close();
+			} catch (SQLException e) {}
 		}
 
 		return session;

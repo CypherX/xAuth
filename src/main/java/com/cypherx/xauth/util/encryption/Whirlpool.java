@@ -1,4 +1,4 @@
-package com.cypherx.xauth;
+package com.cypherx.xauth.util.encryption;
 
 /**
  * The Whirlpool hashing function.

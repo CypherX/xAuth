@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.util.config.Configuration;
 
 import com.cypherx.xauth.database.Database;
+import com.cypherx.xauth.util.Util;
 
 public class xAuthSettings {
 	private static File file;

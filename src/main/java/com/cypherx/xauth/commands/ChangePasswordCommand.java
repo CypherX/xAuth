@@ -6,12 +6,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.cypherx.xauth.Account;
-import com.cypherx.xauth.Util;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
+import com.cypherx.xauth.util.Util;
+import com.cypherx.xauth.util.Validator;
 
 public class ChangePasswordCommand implements CommandExecutor {
 	private final xAuth plugin;
@@ -45,7 +46,7 @@ public class ChangePasswordCommand implements CommandExecutor {
 			if (!plugin.checkPassword(account, oldPassword)) {
 				xAuthMessages.send("cpwErrIncorrect", player);
 				return true;
-			} else if (!Util.isValidPass(newPassword)) {
+			} else if (!Validator.isValidPass(newPassword)) {
 				xAuthMessages.send("cpwErrInvalid", player);
 				return true;
 			}

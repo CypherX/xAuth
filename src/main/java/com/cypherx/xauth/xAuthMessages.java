@@ -5,6 +5,8 @@ import java.io.File;
 import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 
+import com.cypherx.xauth.util.Util;
+
 public class xAuthMessages {
 	private static File file;
 	private static Configuration config;

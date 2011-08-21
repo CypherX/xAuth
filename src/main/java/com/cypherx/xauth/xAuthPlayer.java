@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.cypherx.xauth.plugins.xPermissions;
+import com.cypherx.xauth.util.Util;
 
 
 public class xAuthPlayer {

@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 
 import com.cypherx.xauth.Account;
 import com.cypherx.xauth.TeleLocation;
-import com.cypherx.xauth.Util;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthMessages;
@@ -21,6 +20,8 @@ import com.cypherx.xauth.xAuthSettings;
 import com.cypherx.xauth.database.Database;
 import com.cypherx.xauth.database.DbUtil;
 import com.cypherx.xauth.plugins.xPermissions;
+import com.cypherx.xauth.util.Util;
+import com.cypherx.xauth.util.encryption.Encrypt;
 
 public class xAuthCommand implements CommandExecutor {
 	private final xAuth plugin;
@@ -228,7 +229,7 @@ public class xAuthCommand implements CommandExecutor {
 				return true;
 			}
 
-			Account account = new Account(targetName, Util.encrypt(password), email);
+			Account account = new Account(targetName, Encrypt.custom(password), email);
 			xPlayer.setAccount(account);
 			DbUtil.saveAccount(account);
 
@@ -250,7 +251,7 @@ public class xAuthCommand implements CommandExecutor {
 				return true;
 			}
 
-			Account account = new Account(targetName, Util.encrypt(password), email);
+			Account account = new Account(targetName, Encrypt.custom(password), email);
 			xPlayer.setAccount(account);
 			DbUtil.saveAccount(account);
 

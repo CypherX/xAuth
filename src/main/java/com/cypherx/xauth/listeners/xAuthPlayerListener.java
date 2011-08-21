@@ -10,7 +10,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 import com.cypherx.xauth.Session;
-import com.cypherx.xauth.Util;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
@@ -18,6 +17,7 @@ import com.cypherx.xauth.xAuthSettings;
 import com.cypherx.xauth.database.DbUtil;
 //import com.cypherx.xauth.spout.ScreenType;
 //import com.cypherx.xauth.spout.xSpoutManager;
+import com.cypherx.xauth.util.Validator;
 
 public class xAuthPlayerListener extends PlayerListener {
 	private final xAuth plugin;
@@ -44,7 +44,6 @@ public class xAuthPlayerListener extends PlayerListener {
 			return;
 
 		String host = event.getKickMessage();
-
 		if (host != null && plugin.isLockedOut(host))
 			event.disallow(Result.KICK_OTHER, xAuthMessages.get("joinErrLockout", null, null));
 
@@ -52,7 +51,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		if (xAuthSettings.reverseESS && player.isOnline())
 			event.disallow(Result.KICK_OTHER, xAuthMessages.get("joinErrOnline", null, null));
 
-		if (!Util.isValidName(player))
+		if (!Validator.isValidName(player))
 			event.disallow(Result.KICK_OTHER, xAuthMessages.get("joinErrName", null, null));
 	}
 

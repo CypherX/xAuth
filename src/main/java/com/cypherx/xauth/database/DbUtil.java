@@ -11,11 +11,11 @@ import org.bukkit.inventory.PlayerInventory;
 import com.cypherx.xauth.Account;
 import com.cypherx.xauth.Session;
 import com.cypherx.xauth.TeleLocation;
-import com.cypherx.xauth.Util;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
 import com.cypherx.xauth.database.Database.DBMS;
+import com.cypherx.xauth.util.Util;
 
 public class DbUtil {
 	/* START ACCOUNT METHODS */

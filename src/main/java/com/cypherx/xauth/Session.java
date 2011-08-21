@@ -2,6 +2,8 @@ package com.cypherx.xauth;
 
 import java.sql.Timestamp;
 
+import com.cypherx.xauth.util.Util;
+
 
 public class Session {
 	private int accountId;

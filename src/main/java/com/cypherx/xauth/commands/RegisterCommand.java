@@ -1,13 +1,15 @@
 package com.cypherx.xauth.commands;
 
 import com.cypherx.xauth.Account;
-import com.cypherx.xauth.Util;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
 import com.cypherx.xauth.database.DbUtil;
+import com.cypherx.xauth.util.Util;
+import com.cypherx.xauth.util.Validator;
+import com.cypherx.xauth.util.encryption.Encrypt;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -45,15 +47,15 @@ public class RegisterCommand implements CommandExecutor {
 			String password = args[0];
 			String email = (args.length > 1 ? args[1] : null);
 
-			if (!Util.isValidPass(password)) {
+			if (!Validator.isValidPass(password)) {
 				xAuthMessages.send("regErrPassword", player);
 				return true;
-			} else if (xAuthSettings.validateEmail && !Util.isValidEmail(email)) {
+			} else if (xAuthSettings.validateEmail && !Validator.isValidEmail(email)) {
 				xAuthMessages.send("regErrEmail", player);
 				return true;
 			}
 
-			xPlayer.setAccount(new Account(player.getName(), Util.encrypt(password), email));
+			xPlayer.setAccount(new Account(player.getName(), Encrypt.custom(password), email));
 			plugin.login(xPlayer);
 
 			xAuthMessages.send("regSuccess", player);

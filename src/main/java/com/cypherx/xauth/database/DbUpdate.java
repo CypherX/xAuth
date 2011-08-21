@@ -14,10 +14,10 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import com.cypherx.xauth.Util;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthSettings;
+import com.cypherx.xauth.util.Util;
 
 public class DbUpdate {
 	private File fVersion = new File(xAuth.dataFolder, "DBVERSION");

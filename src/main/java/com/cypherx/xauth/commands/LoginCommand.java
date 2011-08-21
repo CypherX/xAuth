@@ -6,13 +6,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.cypherx.xauth.Account;
-import com.cypherx.xauth.Util;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
 import com.cypherx.xauth.database.DbUtil;
+import com.cypherx.xauth.util.Util;
 
 public class LoginCommand implements CommandExecutor {
 	private final xAuth plugin;

@@ -6,6 +6,8 @@ import com.cypherx.xauth.database.Database.DBMS;
 import com.cypherx.xauth.listeners.*;
 import com.cypherx.xauth.plugins.*;
 import com.cypherx.xauth.spout.xSpoutManager;
+import com.cypherx.xauth.util.Util;
+import com.cypherx.xauth.util.encryption.Encrypt;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -356,7 +358,8 @@ public class xAuth extends JavaPlugin {
 	}
 
 	public void changePassword(Account account, String newPass) {
-		account.setPassword(Util.encrypt(newPass));
+		//account.setPassword(Util.encrypt(newPass));
+		account.setPassword(Encrypt.custom(newPass));
 		DbUtil.saveAccount(account);
 	}
 
@@ -378,7 +381,7 @@ public class xAuth extends JavaPlugin {
 
 		// check for old encryption (md5 or whirlpool)
 		if (realPass.length() == 32 || realPass.length() == 128) {
-			String hash = (realPass.length() == 32 ? Util.md5(checkPass) : Util.whirlpool(checkPass));
+			String hash = (realPass.length() == 32 ? Encrypt.md5(checkPass) : Encrypt.whirlpool(checkPass));
 			if (realPass.equals(hash)) {
 				changePassword(account, checkPass); // change password to use new encryption
 				return true;
@@ -387,13 +390,13 @@ public class xAuth extends JavaPlugin {
 		}
 
 		// xAuth 2 encryption
-		int saltPos = (checkPass.length() >= realPass.length() ? realPass.length() : checkPass.length());
+		int saltPos = (checkPass.length() >= realPass.length() ? realPass.length() - 1 : checkPass.length());
 
 		// extract salt
 		String salt = realPass.substring(saltPos, saltPos + 12);
 
 		// encrypt salt + checkPass
-		String hash = Util.whirlpool(salt + checkPass);
+		String hash = Encrypt.whirlpool(salt + checkPass);
 		return (hash.substring(0, saltPos) + salt + hash.substring(saltPos)).equals(realPass);
 	}
 
