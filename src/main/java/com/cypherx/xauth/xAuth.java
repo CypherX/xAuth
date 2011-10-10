@@ -5,7 +5,6 @@ import com.cypherx.xauth.database.*;
 import com.cypherx.xauth.database.Database.DBMS;
 import com.cypherx.xauth.listeners.*;
 import com.cypherx.xauth.plugins.*;
-//import com.cypherx.xauth.spout.xSpoutManager;
 import com.cypherx.xauth.util.Util;
 import com.cypherx.xauth.util.encryption.Encrypt;
 
@@ -35,7 +34,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-//import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -45,7 +43,6 @@ public class xAuth extends JavaPlugin {
 	private ConcurrentHashMap<String, xAuthPlayer> playerCache = new ConcurrentHashMap<String, xAuthPlayer>();
 	private ConcurrentHashMap<UUID, TeleLocation> teleLocations = new ConcurrentHashMap<UUID, TeleLocation>();
 	private UUID globalUID = null;
-	//private xSpoutManager spoutManager = null;
 
 	public void onDisable() {
 		Player[] players = getServer().getOnlinePlayers();
@@ -120,10 +117,6 @@ public class xAuth extends JavaPlugin {
 		(new xAuthPlayerListener(this)).registerEvents();
 		(new xAuthBlockListener(this)).registerEvents();
 		(new xAuthEntityListener(this)).registerEvents();
-
-		/*Plugin spoutPlugin = getServer().getPluginManager().getPlugin("Spout");
-		if (spoutPlugin != null)
-			spoutManager = new xSpoutManager(this);*/
 
 		getCommand("register").setExecutor(new RegisterCommand(this));
 		getCommand("login").setExecutor(new LoginCommand(this));
@@ -545,12 +538,4 @@ public class xAuth extends JavaPlugin {
 	public UUID getGlobalUID() {
 		return globalUID;
 	}
-
-	/*public boolean isSpoutEnabled() {
-		return spoutManager != null;
-	}
-
-	public xSpoutManager getSpoutManager() {
-		return spoutManager;
-	}*/
 }
