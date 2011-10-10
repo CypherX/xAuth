@@ -114,10 +114,6 @@ public class Util {
 			account.setActive(rs.getInt("active"));
 		} catch (SQLException e) {
 			xAuthLog.severe("Could not build Account from ResultSet!", e);
-		} finally {
-			try {
-				rs.close();
-			} catch (SQLException e) {}
 		}
 
 		return account;
@@ -136,10 +132,6 @@ public class Util {
 			session.setLoginTime(rs.getTimestamp("logintime"));
 		} catch (SQLException e) {
 			xAuthLog.severe("Could not build Session from ResultSet!", e);
-		} finally {
-			try {
-				rs.close();
-			} catch (SQLException e) {}
 		}
 
 		return session;

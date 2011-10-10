@@ -18,6 +18,7 @@ public class xAuthPlayer {
 	private Location location;
 	private Timestamp lastNotifyTime;
 	private int timeoutTaskId;
+	private boolean creative = false;
 
 	public xAuthPlayer(String playerName) {
 		this.playerName = playerName;
@@ -145,5 +146,13 @@ public class xAuthPlayer {
 
 	public int getTimeoutTaskId() {
 		return timeoutTaskId;
+	}
+
+	public void setCreative(boolean creative) {
+		this.creative = creative;
+	}
+
+	public boolean isCreative() {
+		return creative;
 	}
 }

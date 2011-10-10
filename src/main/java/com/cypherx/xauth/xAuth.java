@@ -5,7 +5,7 @@ import com.cypherx.xauth.database.*;
 import com.cypherx.xauth.database.Database.DBMS;
 import com.cypherx.xauth.listeners.*;
 import com.cypherx.xauth.plugins.*;
-import com.cypherx.xauth.spout.xSpoutManager;
+//import com.cypherx.xauth.spout.xSpoutManager;
 import com.cypherx.xauth.util.Util;
 import com.cypherx.xauth.util.encryption.Encrypt;
 
@@ -29,12 +29,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.plugin.Plugin;
+//import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -44,7 +45,7 @@ public class xAuth extends JavaPlugin {
 	private ConcurrentHashMap<String, xAuthPlayer> playerCache = new ConcurrentHashMap<String, xAuthPlayer>();
 	private ConcurrentHashMap<UUID, TeleLocation> teleLocations = new ConcurrentHashMap<UUID, TeleLocation>();
 	private UUID globalUID = null;
-	private xSpoutManager spoutManager = null;
+	//private xSpoutManager spoutManager = null;
 
 	public void onDisable() {
 		Player[] players = getServer().getOnlinePlayers();
@@ -120,9 +121,9 @@ public class xAuth extends JavaPlugin {
 		(new xAuthBlockListener(this)).registerEvents();
 		(new xAuthEntityListener(this)).registerEvents();
 
-		Plugin spoutPlugin = getServer().getPluginManager().getPlugin("Spout");
+		/*Plugin spoutPlugin = getServer().getPluginManager().getPlugin("Spout");
 		if (spoutPlugin != null)
-			spoutManager = new xSpoutManager(this);			
+			spoutManager = new xSpoutManager(this);*/
 
 		getCommand("register").setExecutor(new RegisterCommand(this));
 		getCommand("login").setExecutor(new LoginCommand(this));
@@ -250,9 +251,6 @@ public class xAuth extends JavaPlugin {
 	}
 
 	public void createGuest(xAuthPlayer xPlayer) {
-		//if (!xPlayer.isRegistered() && !xPlayer.mustRegister())
-			//return;
-
 		final Player player = xPlayer.getPlayer();
 
 		// remove old session (if any)
@@ -293,7 +291,6 @@ public class xAuth extends JavaPlugin {
 		playerInv.setChestplate(null);
 		playerInv.setLeggings(null);
 		playerInv.setBoots(null);
-		player.saveData();
 
 		// fix for spawning issues
 		getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
@@ -305,11 +302,17 @@ public class xAuth extends JavaPlugin {
 					player.teleport(getLocationToTeleport(player.getWorld()));
 			}
 		}, 2);
+
+		xPlayer.setCreative(player.getGameMode().equals(GameMode.CREATIVE));
+		if (xPlayer.isCreative())
+			player.setGameMode(GameMode.SURVIVAL);
+
+		player.saveData();
 	}
 
 	public void restore(xAuthPlayer xPlayer) {
 		Player player = xPlayer.getPlayer();
-		PlayerInventory playerInv = player.getInventory();
+		PlayerInventory playerInv = player.getInventory();		
 
 		ItemStack[] inv = DbUtil.getInventory(xPlayer);
 		ItemStack[] items = new ItemStack[inv.length - 4];
@@ -340,6 +343,10 @@ public class xAuth extends JavaPlugin {
 
 		if (xPlayer.getLocation() != null)
 			xPlayer.getPlayer().teleport(xPlayer.getLocation());
+
+		if (xPlayer.isCreative())
+			player.setGameMode(GameMode.CREATIVE);
+
 		player.saveData();
 	}
 
@@ -444,9 +451,10 @@ public class xAuth extends JavaPlugin {
 			if (rs.next()) {
 				int strikes = rs.getInt("strikes");
 				Timestamp lasttime = rs.getTimestamp("lasttime");
+				int lockoutLength = xAuthSettings.lockoutLength;
 
-				if (strikes >= xAuthSettings.maxStrikes && lasttime.compareTo(new Timestamp(Util.getNow().getTime() - (xAuthSettings.lockoutLength * 1000))) > 0)
-					return true;					
+				if (strikes >= xAuthSettings.maxStrikes && (lockoutLength == 0 || lasttime.compareTo(new Timestamp(Util.getNow().getTime() - (xAuthSettings.lockoutLength * 1000))) > 0))
+					return true;
 			}
 		} catch (SQLException e) {
 			xAuthLog.severe("Could not check lockout status for host: " + host);
@@ -538,11 +546,11 @@ public class xAuth extends JavaPlugin {
 		return globalUID;
 	}
 
-	public boolean isSpoutEnabled() {
+	/*public boolean isSpoutEnabled() {
 		return spoutManager != null;
 	}
 
 	public xSpoutManager getSpoutManager() {
 		return spoutManager;
-	}
+	}*/
 }

@@ -35,14 +35,7 @@
 		<dependency>
 			<groupId>me.taylorkelly</groupId>
 			<artifactId>Help</artifactId>
-			<version>[2.4,)</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.getspout</groupId>
-			<artifactId>spoutapi</artifactId>
-			<version>1.0.0</version>
+			<version>0.3.2</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>

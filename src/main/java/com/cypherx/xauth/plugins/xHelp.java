@@ -25,7 +25,6 @@ public class xHelp {
 			helpPlugin.registerCommand("xauth config [setting] (new value)", "View info about or change a setting", plugin, permissions[5]);
 			helpPlugin.registerCommand("xauth reload", "Reload the xAuth configuration and accounts", plugin, permissions[6]);
 			xAuthLog.info("'Help' support enabled");
-		}/* else
-			xAuthLog.info("'Help' isn't detected. No /help support");*/
+		}
 	}
 }
