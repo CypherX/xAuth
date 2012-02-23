@@ -2,11 +2,11 @@ package com.cypherx.xauth.listeners;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.plugin.PluginManager;
@@ -14,7 +14,7 @@ import org.bukkit.plugin.PluginManager;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthPlayer;
 
-public class xAuthEntityListener extends EntityListener {
+public class xAuthEntityListener implements Listener {
 	private final xAuth plugin;
 
 	public xAuthEntityListener(xAuth plugin) {
@@ -23,11 +23,10 @@ public class xAuthEntityListener extends EntityListener {
 
 	public void registerEvents()  {
 		PluginManager pm = plugin.getServer().getPluginManager();
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.ENTITY_TARGET, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, this, Priority.Lowest, plugin);
+		pm.registerEvents(this, plugin);
 	}
 
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onEntityDamage(EntityDamageEvent event) {
 		if (event.isCancelled())
 			return;
@@ -64,6 +63,7 @@ public class xAuthEntityListener extends EntityListener {
 		}
 	}
 
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onEntityTarget(EntityTargetEvent event) {
 		if (event.isCancelled())
 			return;
@@ -80,6 +80,7 @@ public class xAuthEntityListener extends EntityListener {
 		}
 	}
 
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onFoodLevelChange(FoodLevelChangeEvent event) {
 		if (event.isCancelled())
 			return;

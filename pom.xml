@@ -8,27 +8,22 @@
 	<repositories>
 		<repository>
 			<id>bukkit-repo</id>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<url>http://artifacts.lukegb.com/artifactory/repo/</url>
+			<url>http://acampadas21.net:8026/nexus-2.0/content/groups/public</url>
 		</repository>
+		<repository>
+            <id>nexis-repo</id>
+            <url>http://repo.nexisonline.net:8080/nexus/content/repositories/public</url>
+        </repository>
+        <repository>
+            <id>repobo-snap</id>
+            <url>http://repo.bukkit.org/content/groups/public</url>
+        </repository>
 	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.nijikokun.bukkit</groupId>
-			<artifactId>Permissions</artifactId>
-			<version>[3.1,)</version>
+			<version>1.1-R5-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>

@@ -19,7 +19,6 @@ import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthSettings;
 import com.cypherx.xauth.database.Database;
 import com.cypherx.xauth.database.DbUtil;
-import com.cypherx.xauth.plugins.xPermissions;
 import com.cypherx.xauth.util.Util;
 import com.cypherx.xauth.util.encryption.Encrypt;
 
@@ -69,7 +68,7 @@ public class xAuthCommand implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 
-			if (!xPermissions.has(player, "xauth.admin.strike")) {
+			if (!player.hasPermission("xauth.admin.strike")) {
 				xAuthMessages.send("admnPermission", player);
 				return true;
 			} else if (args.length < 2) {
@@ -211,7 +210,7 @@ public class xAuthCommand implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 
-			if (!xPermissions.has(player, "xauth.admin.register")) {
+			if (!player.hasPermission("xauth.admin.register")) {
 				xAuthMessages.send("admnPermission", player);
 				return true;
 			} else if (args.length < 3) {
@@ -265,7 +264,7 @@ public class xAuthCommand implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 
-			if (!xPermissions.has(player, "xauth.admin.changepw")) {
+			if (!player.hasPermission("xauth.admin.changepw")) {
 				xAuthMessages.send("admnPermission", player);
 				return true;
 			} else if (args.length < 3) {
@@ -315,7 +314,7 @@ public class xAuthCommand implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 
-			if (!xPermissions.has(player, "xauth.admin.logout")) {
+			if (!player.hasPermission("xauth.admin.logout")) {
 				xAuthMessages.send("admnPermission", player);
 				return true;
 			} else if (args.length < 2) {
@@ -367,7 +366,7 @@ public class xAuthCommand implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 
-			if (!xPermissions.has(player, "xauth.admin.unregister")) {
+			if (!player.hasPermission("xauth.admin.unregister")) {
 				xAuthMessages.send("admnPermission", player);
 				return true;
 			} else if (args.length < 2) {
@@ -427,7 +426,7 @@ public class xAuthCommand implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 
-			if (!xPermissions.has(player, "xauth.admin.location")) {
+			if (!player.hasPermission("xauth.admin.location")) {
 				xAuthMessages.send("admnPermission", player);
 				return true;
 			} else if (args.length < 2 || !(args[1].equals("set") || args[1].equals("remove"))) {
@@ -483,7 +482,7 @@ public class xAuthCommand implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 
-			if (!xPermissions.has(player, "xauth.admin.config")) {
+			if (!player.hasPermission("xauth.admin.config")) {
 				xAuthMessages.send("admnPermission", player);
 				return true;
 			} else if (args.length < 2) {
@@ -604,7 +603,7 @@ public class xAuthCommand implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 
-			if (xPermissions.has(player, "xauth.admin.reload")) {
+			if (player.hasPermission("xauth.admin.reload")) {
 				plugin.reload();
 				xAuthMessages.send("admnReloadSuccess", player);
 				xAuthLog.info("Reloaded by " + player.getName());

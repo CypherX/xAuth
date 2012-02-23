@@ -1,15 +1,18 @@
 package com.cypherx.xauth;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.bukkit.entity.Player;
-import org.bukkit.util.config.Configuration;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import com.cypherx.xauth.util.Util;
 
 public class xAuthMessages {
 	private static File file;
-	private static Configuration config;
+	private static FileConfiguration config;
 
 	// join
 	public static String joinRegister = "{RED}You are not registered.{NEWLINE}{RED}Please register using /register <password>.";
@@ -101,8 +104,15 @@ public class xAuthMessages {
 			xAuthLog.info("Creating file: messages.yml");
 			Util.writeConfig(file, xAuthMessages.class);
 		} else {
-			config = new Configuration(file);
-			config.load();
+			try {
+				config.load(file);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InvalidConfigurationException e) {
+				e.printStackTrace();
+			}
 			loadMessages();
 			update();
 		}

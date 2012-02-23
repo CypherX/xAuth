@@ -129,7 +129,6 @@ public class xAuth extends JavaPlugin {
 
 	private void initializePlugins() {
 		xHelp.setup(this);
-		xPermissions.setup(this);
 	}
 
 	private boolean checkLibrary() {
