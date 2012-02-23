@@ -66,7 +66,7 @@ public class xAuth extends JavaPlugin {
 		if (!dataFolder.exists())
 			dataFolder.mkdirs();
 
-		xAuthSettings.setup();
+		xAuthSettings.setup(this);
 		xAuthMessages.setup();
 
 		if (xAuthSettings.autoDisable && getServer().getOnlineMode()) {
@@ -530,7 +530,7 @@ public class xAuth extends JavaPlugin {
 	}
 
 	public void reload() {
-		xAuthSettings.setup();
+		xAuthSettings.setup(this);
 		xAuthMessages.setup();
 	}
 

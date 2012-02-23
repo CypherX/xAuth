@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.bukkit.entity.Player;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.cypherx.xauth.util.Util;
 
@@ -104,15 +105,7 @@ public class xAuthMessages {
 			xAuthLog.info("Creating file: messages.yml");
 			Util.writeConfig(file, xAuthMessages.class);
 		} else {
-			try {
-				config.load(file);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InvalidConfigurationException e) {
-				e.printStackTrace();
-			}
+			config = YamlConfiguration.loadConfiguration(file);
 			loadMessages();
 			update();
 		}

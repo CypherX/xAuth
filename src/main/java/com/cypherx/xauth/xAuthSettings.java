@@ -91,25 +91,10 @@ public class xAuthSettings {
 
 	public static int version = 5; // 2.0b4.1
 
-	public static void setup() {
-		file = new File(xAuth.dataFolder, "config.yml");
-
-		if (!file.exists()) {
-			xAuthLog.info("Creating file: config.yml");
-			Util.writeConfig(file, xAuthSettings.class);
-		} else {
-			try {
-				config.load(file);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InvalidConfigurationException e) {
-				e.printStackTrace();
-			}
-			loadSettings();
-			update();
-		}
+	public static void setup(xAuth instance) {
+		config = instance.getConfig();
+		loadSettings();
+		update();
 	}
 
 	public static void loadSettings() {
@@ -200,7 +185,12 @@ public class xAuthSettings {
 	}
 
 	private static List<String> getStrList(String key, List<String> def) {
-		return config.getStringList(key);
+		if(config.getStringList(key).isEmpty()){
+			config.set(key, def);
+			return def;
+		}else{
+			return config.getStringList(key);
+		}
 	}
 
 	private static void update() {
