@@ -1,15 +1,16 @@
 package com.cypherx.xauth.listeners;
 
-import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockListener;
+import org.bukkit.event.Listener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.PluginManager;
 
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthPlayer;
 
-public class xAuthBlockListener extends BlockListener {
+public class xAuthBlockListener implements Listener {
 	private final xAuth plugin;
 
 	public xAuthBlockListener(xAuth plugin) {
@@ -18,10 +19,10 @@ public class xAuthBlockListener extends BlockListener {
 
 	public void registerEvents() {
 		PluginManager pm = plugin.getServer().getPluginManager();
-		pm.registerEvent(Event.Type.BLOCK_BREAK, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.BLOCK_PLACE, this, Event.Priority.Lowest, plugin);
+		pm.registerEvents(this, plugin);
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockBreak(BlockBreakEvent event) {
 		if (event.isCancelled())
 			return;
@@ -39,6 +40,7 @@ public class xAuthBlockListener extends BlockListener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockPlace(BlockPlaceEvent event) {
 		if (event.isCancelled())
 			return;

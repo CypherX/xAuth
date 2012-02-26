@@ -1,17 +1,20 @@
 package com.cypherx.xauth;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.util.config.Configuration;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import com.cypherx.xauth.database.Database;
 import com.cypherx.xauth.util.Util;
 
 public class xAuthSettings {
 	private static File file;
-	private static Configuration config;
+	private static FileConfiguration config;
 	public static boolean changed = false;
 
 	// main
@@ -88,18 +91,10 @@ public class xAuthSettings {
 
 	public static int version = 5; // 2.0b4.1
 
-	public static void setup() {
-		file = new File(xAuth.dataFolder, "config.yml");
-
-		if (!file.exists()) {
-			xAuthLog.info("Creating file: config.yml");
-			Util.writeConfig(file, xAuthSettings.class);
-		} else {
-			config = new Configuration(file);
-			config.load();
-			loadSettings();
-			update();
-		}
+	public static void setup(xAuth instance) {
+		config = instance.getConfig();
+		loadSettings();
+		update();
 	}
 
 	public static void loadSettings() {
@@ -190,7 +185,12 @@ public class xAuthSettings {
 	}
 
 	private static List<String> getStrList(String key, List<String> def) {
-		return config.getStringList(key, def);
+		if(config.getStringList(key).isEmpty()){
+			config.set(key, def);
+			return def;
+		}else{
+			return config.getStringList(key);
+		}
 	}
 
 	private static void update() {

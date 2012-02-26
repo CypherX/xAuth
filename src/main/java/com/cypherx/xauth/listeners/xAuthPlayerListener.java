@@ -2,12 +2,22 @@ package com.cypherx.xauth.listeners;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.event.Listener;
+import org.bukkit.event.EventHandler;
 
 import com.cypherx.xauth.Session;
 import com.cypherx.xauth.xAuth;
@@ -19,7 +29,7 @@ import com.cypherx.xauth.database.DbUtil;
 //import com.cypherx.xauth.spout.xSpoutManager;
 import com.cypherx.xauth.util.Validator;
 
-public class xAuthPlayerListener extends PlayerListener {
+public class xAuthPlayerListener implements Listener {
 	private final xAuth plugin;
 
 	public xAuthPlayerListener(xAuth plugin) {
@@ -28,17 +38,10 @@ public class xAuthPlayerListener extends PlayerListener {
 
 	public void registerEvents() {
 		PluginManager pm = plugin.getServer().getPluginManager();
-		pm.registerEvent(Event.Type.PLAYER_CHAT, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_JOIN, this, Event.Priority.Monitor, plugin);
-		pm.registerEvent(Event.Type.PLAYER_KICK, this, Event.Priority.Monitor, plugin);
-		pm.registerEvent(Event.Type.PLAYER_LOGIN, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_QUIT, this, Event.Priority.Monitor, plugin);
+		pm.registerEvents(this, plugin);
 	}
 
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerLogin(PlayerLoginEvent event) {
 		if (!event.getResult().equals(Result.ALLOWED))
 			return;
@@ -55,6 +58,7 @@ public class xAuthPlayerListener extends PlayerListener {
 			event.disallow(Result.KICK_OTHER, xAuthMessages.get("joinErrName", null, null));
 	}
 
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
 		if (player == null)
@@ -81,6 +85,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		}
 	}
 
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerKick(PlayerKickEvent event) {
 		// prevent WorldGuard from kicking the already online player
 		// if another with the same name joins
@@ -92,6 +97,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		}
 	}
 
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		xAuthPlayer xPlayer = plugin.getPlayer(player.getName());
@@ -105,6 +111,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		}
 	}
 
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerChat(PlayerChatEvent event) {
 		if (event.isCancelled())
 			return;
@@ -124,6 +131,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		//plugin.getSpoutManager().showScreen(event.getPlayer(), ScreenType.LOGIN);
 	}
 
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 		if (event.isCancelled())
 			return;
@@ -147,6 +155,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		}
 	}
 
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.isCancelled())
 			return;
@@ -198,6 +207,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		}
 	}
 
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerMove(PlayerMoveEvent event) {
 		if (event.isCancelled())
 			return;
@@ -219,6 +229,7 @@ public class xAuthPlayerListener extends PlayerListener {
 		}
 	}
 
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
 		if (event.isCancelled())
 			return;
