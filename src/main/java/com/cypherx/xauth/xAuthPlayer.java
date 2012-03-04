@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import com.cypherx.xauth.plugins.xPermissions;
 import com.cypherx.xauth.util.Util;
 
 
@@ -54,7 +53,7 @@ public class xAuthPlayer {
 		if (xAuthSettings.regForced)
 			return true;
 
-		return xPermissions.has(getPlayer(), "xauth.register");
+		return getPlayer().hasPermission("xauth.register");
 	}
 
 	public boolean canNotify() {
