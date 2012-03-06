@@ -59,7 +59,7 @@ public class xAuth extends JavaPlugin {
 		if (dbCtrl.isConnectable()) { // Able to connect to MySQL server, proceed normally
 			xAuthLog.info("Successfully established connection to MySQL server");
 			dbCtrl.runUpdater();			
-		} else/* if (getConfig().getBoolean("main.use-safemode")) */{ // Failed to connect to MySQL server, start in "safe-mode"
+		} else/* if (getConfig().getBoolean("main.use-safemode")) */{ // Failed to connect to MySQL server, disable plugin
 			//xAuthLog.warning("MySQL server connection not found, safe-mode enabled");
 			xAuthLog.severe("Failed to establish MySQL server connection!");
 			//safeMode = true;

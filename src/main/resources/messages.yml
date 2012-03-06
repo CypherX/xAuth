@@ -49,4 +49,4 @@ misc:
     illegal: '{GRAY}You must be logged in to do that!'
     timeout: 'You have taken too long to log in!'
     strikeout: 'You have entered too many invalid passwords!'
-    reloaded: '{RED}Server reloaded, you must log in again.'
+    reloaded: '{RED}Server reloaded, you must log in.'

@@ -29,9 +29,11 @@ public class PlayerDataHandler {
 		String strArmor = buildString(pInv.getArmorContents());
 		String strLoc = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
 
+		// Keep a cached copy for more efficient restoration
 		xp.setLocation(loc);
 		xp.setInventory(pInv);
 
+		// Also keep a record in the database to prevent data loss from a server crash
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
 		try {
@@ -143,7 +145,7 @@ public class PlayerDataHandler {
 
 		Location loc = xp.getLocation();
 
-		// Only query the database is a local record doesn't exist
+		// Only query the database if a local record doesn't exist
 		if (items == null || armor == null || loc == null) {
 			Connection conn = plugin.getDbCtrl().getConnection();
 			PreparedStatement ps = null;
