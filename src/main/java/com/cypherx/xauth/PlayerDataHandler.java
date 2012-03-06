@@ -132,36 +132,46 @@ public class PlayerDataHandler {
 	public void restoreData(xAuthPlayer xp, Player p) {
 		ItemStack[] items = null;
 		ItemStack[] armor = null;
-		Location loc = null;
-
-		Connection conn = plugin.getDbCtrl().getConnection();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			String sql = String.format("SELECT `items`, `armor`, `location` FROM `%s` WHERE `playername` = ?",
-					plugin.getConfig().getString("mysql.tables.playerdata"));
-			ps = conn.prepareStatement(sql);
-			ps.setString(1, p.getName());
-			rs = ps.executeQuery();
-
-			if (rs.next()) {
-				items = buildItemStack(rs.getString("items"));
-				armor = buildItemStack(rs.getString("armor"));				
-
-				String[] locSplit = rs.getString("location").split(":");
-				loc = new Location(Bukkit.getWorld(locSplit[0]), Double.parseDouble(locSplit[1]), Double.parseDouble(locSplit[2]),
-						Double.parseDouble(locSplit[3]), Float.parseFloat(locSplit[4]), Float.parseFloat(locSplit[5]));
-			}
-		} catch (SQLException e) {
-			xAuthLog.severe("Failed to load playerdata from database for player: " + p.getName(), e);
-		} finally {
-			plugin.getDbCtrl().close(conn, ps, rs);
-		}
 
 		PlayerInventory pInv = p.getInventory();
 		PlayerInventory xpInv = xp.getInventory();
-		if (items != null) { // restore items from database record
+
+		if (xpInv != null) {
+			items = xpInv.getContents();
+			armor = xpInv.getArmorContents();
+		}
+
+		Location loc = xp.getLocation();
+
+		// Only query the database is a local record doesn't exist
+		if (items == null || armor == null || loc == null) {
+			Connection conn = plugin.getDbCtrl().getConnection();
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+	
+			try {
+				String sql = String.format("SELECT `items`, `armor`, `location` FROM `%s` WHERE `playername` = ?",
+						plugin.getConfig().getString("mysql.tables.playerdata"));
+				ps = conn.prepareStatement(sql);
+				ps.setString(1, p.getName());
+				rs = ps.executeQuery();
+	
+				if (rs.next()) {
+					items = buildItemStack(rs.getString("items"));
+					armor = buildItemStack(rs.getString("armor"));				
+	
+					String[] locSplit = rs.getString("location").split(":");
+					loc = new Location(Bukkit.getWorld(locSplit[0]), Double.parseDouble(locSplit[1]), Double.parseDouble(locSplit[2]),
+							Double.parseDouble(locSplit[3]), Float.parseFloat(locSplit[4]), Float.parseFloat(locSplit[5]));
+				}
+			} catch (SQLException e) {
+				xAuthLog.severe("Failed to load playerdata from database for player: " + p.getName(), e);
+			} finally {
+				plugin.getDbCtrl().close(conn, ps, rs);
+			}
+		}
+
+		if (items != null) {
 			// Fix for inventory extension plugins
 			if (pInv.getSize() > items.length) {
 				ItemStack[] newItems = new ItemStack[pInv.getSize()];
@@ -173,30 +183,32 @@ public class PlayerDataHandler {
 			//End Fix for inventory extension plugins
 
 			pInv.setContents(items);
-		} else // restore items from cached record (hopefully the server didn't crash!)
+		}/* else
 			if (xpInv != null)
-				pInv.setContents(xpInv.getContents());
+				pInv.setContents(xpInv.getContents());*/
 
 		if (armor != null)
 			pInv.setArmorContents(armor);
-		else 		
+		/*else 		
 			if (xpInv != null)
-				pInv.setArmorContents(xpInv.getArmorContents());
+				pInv.setArmorContents(xpInv.getArmorContents());*/
 
 		xp.setInventory(null);
 
 		if (loc != null) {
 			p.teleport(loc);
-		} else {
+		}/* else {
 			loc = xp.getLocation();
 			if (loc != null)
 				p.teleport(loc);
-		}
+		}*/
 
 		xp.setLocation(null);
 		p.saveData();
 
-		conn = plugin.getDbCtrl().getConnection();
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
+
 		try {
 			String sql = String.format("DELETE FROM `%s` WHERE `playername` = ?", plugin.getConfig().getString("mysql.tables.playerdata"));
 			ps = conn.prepareStatement(sql);
