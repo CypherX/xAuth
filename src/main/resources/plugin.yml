@@ -1,71 +1,44 @@
 name: xAuth
-main: com.cypherx.xauth.xAuth
-version: 2.0b4.1
-description: Offline-Mode Security Suite
+version: 2.0-dev
+description: Offline-mode Authentication
 author: CypherX
+#website: http://forums.bukkit.org/threads/MyPlugin.31337/
+
+main: com.cypherx.xauth.xAuth
+database: false
+#depend: [NewFire, FlameWire]
+
 commands:
-    register:
-        description: Create an account linked to your player name
-        usage: /<command> <password> [email]
-    login:
-        aliases: [l]
-        description: Authenticate yourself as the account owner
-        usage: /<command> <password>
-    changepw:
-        aliases: [changepassword, changepass, cpw]
-        description: Change your password
-        usage: /<command> <old password> <new password>
-    logout:
-        description: Terminate your session early
-        usage: /<command>
-    xauth:
-        aliases: [x]
-        description: All of the xAuth Admin commands
-        usage: |
-               /<command> register <player> <password> [email]
-               /<command> changepw <player> <new password>
-               /<command> logout <player>
-               /<command> unregister <player>
-               /<command> strike list|clear [ip]
-               /<command> location set|remove [global]
-               /<command> config <setting> [value]
-               /<command> reload
-               /<command> version
+  register:
+    description: Register your player with the supplied password.
+    usage: /<command> <password> [email]
+  login:
+    description: Authenticate yourself as the owner of this player.
+    aliases: [l]
+    usage: /<command> <password>
+  logout:
+    description: Manually end your login session.
+    usage: /<command>
+  changepw:
+    description: Change your password.
+    aliases: [changepassword, changepass, cpw]
+    usage: /<command> <old password> <new password>
+
 permissions:
-    xauth.register:
-        description: Used when forced registration is disabled to specify which groups/players must register
-    xauth.admin.*:
-        description: Gives access to all xAuth admin commands
-        children:
-            xauth.admin.register: true
-            xauth.admin.changepw: true
-            xauth.admin.logout: true
-            xauth.admin.unregister: true
-            xauth.admin.strike: true
-            xauth.admin.location: true
-            xauth.admin.config: true
-            xauth.admin.reload: true
-    xauth.admin.register:
-        description: Allows you to register other players
-        default: op
-    xauth.admin.changepw:
-        description: Allows changing of other players passwords
-        default: op
-    xauth.admin.logout:
-        description: Allows you to end a players session
-        default: op
-    xauth.admin.unregister:
-        description: Remove a players registration
-        default: op
-    xauth.admin.strike:
-        description: Manage the strike system
-        default: op
-    xauth.admin.location:
-        description: Set/remove the current world or global teleport location
-        default: op
-    xauth.admin.config:
-        description: View information about or change a xAuth setting
-        default: op
-    xauth.admin.reload:
-        description: Allows reloading of the xAuth configuration
-        default: op
+#  inferno.*:
+#    description: Gives access to all Inferno commands
+#    children:
+#      inferno.flagrate: true
+#      inferno.burningdeaths: true
+#      inferno.burningdeaths.others: true
+  xauth.register:
+    description: Allows players/groups to register when new registrations are disabled.
+    default: true
+#  inferno.burningdeaths:
+#    description: Allows you to see how many times you have burned to death
+#    default: true
+#  inferno.burningdeaths.others:
+#    description: Allows you to see how many times others have burned to death
+#    default: op
+#    children:
+#      inferno.burningdeaths: true

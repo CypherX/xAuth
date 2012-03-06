@@ -6,30 +6,36 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.cypherx.xauth.xAuth;
-import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
+import com.cypherx.xauth.xAuthPlayer.Status;
+import com.martiansoftware.jsap.CommandLineTokenizer;
 
 public class LogoutCommand implements CommandExecutor {
 	private final xAuth plugin;
 
-	public LogoutCommand(xAuth plugin) {
-	    this.plugin = plugin;
+	public LogoutCommand(final xAuth plugin) {
+		this.plugin = plugin;
 	}
 
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		args = CommandLineTokenizer.tokenize(args);
+
 		if (sender instanceof Player) {
-			Player player = (Player)sender;
-			xAuthPlayer xPlayer = plugin.getPlayer(player.getName());
+			xAuthPlayer p = plugin.getPlyrMngr().getPlayer((Player) sender);
+			String response = null;
 
-			if (!xPlayer.hasSession()) {
-				xAuthMessages.send("logoutErrLogged", player);
-				return true;
-			}
+			if (p.isAuthenticated()) {
+				plugin.getPlyrMngr().protect(p);
+				p.setStatus(Status.Registered);
+				plugin.getAuthClass(p).offline(p.getPlayerName());
+				response = "logout.success";
+			} else
+				response = "logout.error";
 
-			plugin.createGuest(xPlayer);
-			xAuthMessages.send("logoutSuccess", player);
+			plugin.getMsgHndlr().sendMessage(response, p.getPlayer());
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 }

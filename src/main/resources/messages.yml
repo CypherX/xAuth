@@ -1,105 +1,52 @@
 join:
-    register: "[joinRegister]"
-    login: "[joinLogin]"
+    register: '{RED}You are not registered.{NEWLINE}{RED}Please register using /register <password>.'
+    login: '{RED}Please log in using /login <password>.'
+    resume: '{BRIGHTGREEN}Welcome back, your login session has been resumed.'
     error:
-        lockout: "[joinErrLockout]"
-        online: "[joinErrOnline]"
-        name: "[joinErrName]"
+        lockout: 'You are temporarily locked out for exceeding the incorrect password threshold.'
+        name: 'Your name contains one or more illegal characters.'
 
 register:
-    usage: "[regUsage]"
-    success: "[regSuccess]"
+    usage: '{RED}Correct Usage: /register <password> [email]'
+    success: '{BRIGHTGREEN}You have successfully registered! You may now log in.'
     error:
-        disabled: "[regErrDisabled]"
-        registered: "[regErrRegistered]"
-        multiple: "[regErrMultiple]"
-        password: "[regErrPassword]"
-        email: "[regErrEmail]"
+        disabled: '{RED}Registrations are currently disabled!'
+        registered: '{RED}You are already registered!'
+        limit: '{RED}You may not register any more accounts!'
+        password: '{RED}Your password must be at least {PWMINLENGTH} characters long!'
+        email: '{RED}Please use a valid email address when registering!'
+        general: '{RED}Something went wrong while creating your account!'
 
 login:
-    usage: "[loginUsage]"
-    success: "[loginSuccess]"
+    usage: '{RED}Correct Usage: /login <password>'
+    success: '{BRIGHTGREEN}You are now logged in!'
     error:
-        registered: "[loginErrRegistered]"
-        logged: "[loginErrLogged]"
-        password: "[loginErrPassword]"
-        activate: "[loginErrActivate]"
+        registered: '{RED}You are not registered!'
+        authenticated: '{RED}You are already logged in!'
+        password: '{RED}Incorrect password!'
+        active: '{RED}Your account is not activated!'
+        general: '{RED}Something went wrong while logging you in!'
 
 logout:
-    success: "[logoutSuccess]"
-    error:
-        logged: "[logoutErrLogged]"
+    success: '{BRIGHTGREEN}You have been logged out!'
+    error: '{RED}You are not logged in!'
 
 changepw:
-    usage: "[cpwUsage]"
-    success: "[cpwSuccess]"
+    usage: '{RED}Correct Usage: /changepw <old password> <new password>'
+    success: '{BRIGHTGREEN}Password changed!'
     error:
-        disabled: "[cpwErrDisabled]"
-        logged: "[cpwErrLogged]"
-        incorrect: "[cpwErrIncorrect]"
-        invalid: "[cpwErrInvalid]"
+        disabled: '{RED}Password changes are currently disabled.'
+        logged: '{RED}You are not logged in!'
+        incorrect: '{RED}Incorrect old password!'
+        invalid: '{RED}Your new password does not meet complexity requirements!'
+        general: '{RED}Something went wrong while changing your password!'
 
-admin:
-    unknown: "[admnUnknown]"
-    permission: "[admnPermission]"
-    register:
-        usage: "[admnRegUsage]"
-        registered: "[admnRegRegistered]"
-        success: "[admnRegSuccess]"
-    changepw:
-        usage: "[admnCpwUsage]"
-        registered: "[admnCpwRegistered]"
-        success: "[admnCpwSuccess]"
-    logout:
-        usage: "[admnLogoutUsage]"
-        logged: "[admnLogoutLogged]"
-        success: "[admnLogoutSuccess]"
-    unregister:
-        usage: "[admnUnregUsage]"
-        registered: "[admnUnregRegistered]"
-        success:
-            target: "[admnUnregSuccessTgt]"
-            player: "[admnUnregSuccessPlyr]"
-    strike:
-        usage: "[admnStrkUsage]"
-        list:
-            header: "[admnStrkListHead]"
-            strike: "[admnStrkListStrk]"
-            error:
-                all: "[admnStrkListErrAll]"
-                ip: "[admnStrkListErrIp]"
-        clear:
-            all: "[admnStrkClrAll]"
-            ip: "[admnStrkClrIp]"
-    location:
-        usage: "[admnLocUsage]"
-        set:
-            isglobal: "[admnLocSetErrGlobal]"
-            success: "[admnLocSetSuccess]"
-            global:
-                success: "[admnLocSetGlobalSuccess]"
-        remove:
-            no: "[admnLocRmvNo]"
-            isglobal: "[admnLocRmvErrGlobal]"
-            success: "[admnLocRmvSuccess]"
-            global:
-                no: "[admnLocRmvGlobalNo]"
-                success: "[admnLocRmvGlobalSuccess]"
-    config:
-        usage: "[admnConfUsage]"
-        no: "[admnConfNo]"
-        desc: "[admnConfDesc]"
-        invalid: "[admnConfInvalid]"
-        success: "[admnConfSuccess]"
-    reload:
-        sucess: "[admnReloadSuccess]"      
+authurl:
+    registration: '{RED}AuthURL registration is disabled.'
+    changepw: '{RED}AuthURL does not support password changes.'
 
 misc:
-    illegal: "[miscIllegal]"
-    reloaded: "[miscReloaded]"
-    kick:
-        timeout: "[miscKickTimeout]"
-        strike: "[miscKickStrike]"
-
-# INTERNAL USE ONLY! DO NOT TOUCH!
-version: [version]
+    illegal: '{GRAY}You must be logged in to do that!'
+    timeout: 'You have taken too long to log in!'
+    strikeout: 'You have entered too many invalid passwords!'
+    reloaded: '{RED}Server reloaded, you must log in again.'

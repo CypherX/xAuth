@@ -1,108 +1,76 @@
 main:
-    # How should xAuth store data (Accounts, sessions, etc.)?
-    # Possible values: h2, mysql
-    datasource: [datasource]
-    # If set to true, xAuth will disable itself if the server is in online-mode
-    auto-disable: [autoDisable]
-    # If set to true, all required library files will be automatically downloaded
-    download-libraries: [downloadLib]
-    # When set to true, if a player connects with the same name as someone who is
-    # already online, the player connecting will be kicked instead of the online player
-    reverse-enforce-single-session: [reverseESS]
-
-authurl:
-    # Send user/pass data to authURL for authentication instead of the database
-    # This option disables registration and password changes
-    enabled: [authURLEnabled]
-    # The URL to send user/pass data to, look at the example auth.php for an
-    # example that works with SMF forums.
-    url: [authURL]
+    auto-disable: true
 
 mysql:
-    # Location of the MySQL server. Can be either a host name or IP address
-    host: [mysqlHost]
-    # Port used by MySQL. Default is 3306
-    port: [mysqlPort]
-    # User name used to connect to the MySQL server
-    username: [mysqlUser]
-    # Password used to connect to the MySQL server
-    password: [mysqlPass]
-    # Name of the database that will be used by xAuth
-    database: [mysqlDb]
-    # Names of the tables xAuth will use to store data
+    host: localhost
+    port: 3306
+    user: xauth
+    password: password
+    database: xauth
     tables:
-        account: [tblAccount]
-        session: [tblSession]
-        strike: [tblStrike]
-        location: [tblLocation]
-        inventory: [tblInventory]
+        account: accounts
+        location: locations
+        lockout: lockouts
+        playerdata: playerdata
+        session: sessions
+
+authurl:
+    enabled: false
+    url: http://google.com
+    registration: false
+    status: false
+    groups: false
 
 registration:
-    # Enable/disable new registrations
-    enabled: [regEnabled]
-    # If set to true, everyone must register
-    forced: [regForced]
-    # Setting this to true requires a player to enter an email address when they register
-    require-email: [requireEmail]
-    # If set to true, a valid email address is required
-    validate-email: [validateEmail]
-    # How many accounts per IP address will be allowed. Set as 0 for unlimited
-    account-limit: [accountLimit]
-    # Used with web registrations that require account activation
-    activation: [activation]
-
-login:
-    strikes:
-        # Amount of times a player can enter an incorrect password before action is taken
-        # Set as 0 to disable
-        amount: [maxStrikes]
-        # What action to take when the strike threshold is reached
-        # Possible values: kick, lockout
-        action: [strikeAction]
-        # Length of time, in seconds, that a strike will remain in the database
-        strike-length: [strikeLength]
-        # Length of time, in seconds, that a player will remain locked out
-        lockout-length: [lockoutLength]
+    enabled: true
+    forced: true
+    require-email: false
+    validate-email: false
+    account-limit: 1
+    activation: false
 
 password:
-    # Minimum length a password may be
-    min-length: [pwMinLength]
-    # Enable/disable password changes
-    allow-change: [pwAllowChange]
-    # Require at least one of the character types below that are set to true
+    min-length: 6
+    allow-change: true
     complexity:
-        lowercase: [pwCompLower]
-        uppercase: [pwCompUpper]
-        number: [pwCompNumber]
-        symbol: [pwCompSymbol]
+        lowercase: false
+        uppercase: false
+        number: false
+        symbol: false
 
 guest:
-    # Amount of time, in seconds, that a player has to log in before they are kicked
-    # Set as 0 to disable
-    timeout: [guestTimeout]
-    # Amount of time, in seconds, between "You must be logged in.." messages
-    notify-cooldown: [notifyCooldown]
-    # Commands that players who are not registered or logged in may execute
-    allowed-commands: [allowedCmds]
-    # Turn on/off location protection
-    protect-location: [protectLoc]
-
+    timeout: 300
+    notify-cooldown: 5
+    protect-location: true
+    allowed-commands:
+        - register
+        - login
+        - l
+    restrict:
+        player:
+            chat: true
+            interact: true
+            move: true
+            pickup: true
+        block:
+            place: true
+            break: true
+        entity:
+            damage: true
+            target: true
 session:
-    # Amount of time, in seconds, that a session will remain valid
-    length: [sessionLength]
-    # Verify a player's IP address when resuming a session
-    verifyip: [verifyIp]
-    # Length of time, in seconds, that a player will have godmode upon logging in
-    # set as 0 to disable
-    godmode-length: [godmodeLength]
+    length: 3600
+    verifyip: true
+    godmode-length: 5
+
+strikes:
+    amount: 5
+    lockout:
+        enabled: true
+        length: 3600
 
 filter:
-    # Minimum length a players name can be
-    min-length: [filterMinLength]
-    # Characters that may be present in a players name. Use an asterisk (*) to allow all
-    allowed: '[filterAllowed]'
-    # If set to false, players with blank names can connect
-    blankname: [filterBlank]
-
-# INTERNAL USE ONLY! DO NOT TOUCH!
-version: [version]
+    min-length: 2
+    allowed: ''
+    disallowed: ''
+    blank-name: true

@@ -1,165 +1,142 @@
 package com.cypherx.xauth.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.cypherx.xauth.Session;
+import com.cypherx.xauth.PlayerManager;
+import com.cypherx.xauth.Utils;
 import com.cypherx.xauth.xAuth;
-import com.cypherx.xauth.xAuthMessages;
 import com.cypherx.xauth.xAuthPlayer;
-import com.cypherx.xauth.xAuthSettings;
-import com.cypherx.xauth.database.DbUtil;
-//import com.cypherx.xauth.spout.ScreenType;
-//import com.cypherx.xauth.spout.xSpoutManager;
-import com.cypherx.xauth.util.Validator;
+import com.cypherx.xauth.xAuthPlayer.Status;
+import com.cypherx.xauth.database.Table;
 
-public class xAuthPlayerListener extends PlayerListener {
+public class xAuthPlayerListener implements Listener {
 	private final xAuth plugin;
+	private final PlayerManager plyrMngr;
 
-	public xAuthPlayerListener(xAuth plugin) {
+	public xAuthPlayerListener(final xAuth plugin) {
 		this.plugin = plugin;
+		this.plyrMngr = plugin.getPlyrMngr();
+		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	public void registerEvents() {
-		PluginManager pm = plugin.getServer().getPluginManager();
-		pm.registerEvent(Event.Type.PLAYER_CHAT, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_JOIN, this, Event.Priority.Monitor, plugin);
-		pm.registerEvent(Event.Type.PLAYER_KICK, this, Event.Priority.Monitor, plugin);
-		pm.registerEvent(Event.Type.PLAYER_LOGIN, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.PLAYER_QUIT, this, Event.Priority.Monitor, plugin);
-	}
-
-	public void onPlayerLogin(PlayerLoginEvent event) {
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerLogin(final PlayerLoginEvent event) {
 		if (!event.getResult().equals(Result.ALLOWED))
 			return;
 
-		String host = event.getKickMessage();
-		if (host != null && plugin.isLockedOut(host))
-			event.disallow(Result.KICK_OTHER, xAuthMessages.get("joinErrLockout", null, null));
+		Player p = event.getPlayer();
+		String ipAddress = event.getKickMessage();
+		if (Utils.isIPAddress(ipAddress))
+			if (plugin.getStrkMngr().isLockedOut(ipAddress, p.getName()))
+				event.disallow(Result.KICK_OTHER, plugin.getMsgHndlr().get("join.error.lockout"));
 
-		Player player = event.getPlayer();
-		if (xAuthSettings.reverseESS && player.isOnline())
-			event.disallow(Result.KICK_OTHER, xAuthMessages.get("joinErrOnline", null, null));
-
-		if (!Validator.isValidName(player))
-			event.disallow(Result.KICK_OTHER, xAuthMessages.get("joinErrName", null, null));
+		if (!isValidName(p.getName()))
+			event.disallow(Result.KICK_OTHER, plugin.getMsgHndlr().get("join.error.name"));
 	}
 
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		final Player player = event.getPlayer();
-		if (player == null)
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerJoin(final PlayerJoinEvent event) {
+		Player p = event.getPlayer();
+		if (p == null || !p.isOnline())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getPlayerJoin(player.getName());
-		boolean isRegistered = xPlayer.isRegistered();
+		xAuthPlayer xp = plyrMngr.getPlayer(p, true);
+		String node = "";
 
-		if (!xPlayer.isAuthenticated() && (isRegistered || (!isRegistered && xPlayer.mustRegister()))) {
-			final String fieldName;
-			plugin.createGuest(xPlayer);
-
-			if (isRegistered || xAuthSettings.authURLEnabled)
-				fieldName = "joinLogin";
-			else
-				fieldName = "joinRegister";
-
-			// this is needed to send the message after the "xxx has joined.." announcement
-			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
-				public void run() {
-					xAuthMessages.send(fieldName, player);
-				}
-			}, 1);
+		if (xp.isRegistered()) {
+			if (plyrMngr.checkSession(xp)) {
+				xp.setStatus(Status.Authenticated);
+				plugin.getAuthClass(xp).online(p.getName());
+				node = "join.resume";
+			} else {
+				node = "join.login";
+				plyrMngr.protect(xp);
+			}
+		} else if (plyrMngr.mustRegister(p)) {
+			node = "join.register";
+			plyrMngr.protect(xp);
 		}
+
+		if (!node.isEmpty())
+			plugin.getSchdlr().sendDelayedMessage(p, node, 1);
 	}
 
-	public void onPlayerKick(PlayerKickEvent event) {
-		// prevent WorldGuard from kicking the already online player
-		// if another with the same name joins
-		if (xAuthSettings.reverseESS) {
-			Plugin wgPlugin = plugin.getServer().getPluginManager().getPlugin("WorldGuard");
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerQuit(final PlayerQuitEvent event) {
+		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
+		if (p.isProtected())
+			plyrMngr.unprotect(p);
 
-			if (wgPlugin != null && event.getReason().equals("Logged in from another location."))
-				event.setCancelled(true);
-		}
+		plugin.getAuthClass(p).offline(event.getPlayer().getName());
 	}
 
-	public void onPlayerQuit(PlayerQuitEvent event) {
-		Player player = event.getPlayer();
-		xAuthPlayer xPlayer = plugin.getPlayer(player.getName());
-
-		if (xPlayer.isGuest())
-			plugin.removeGuest(xPlayer);
-		else if (xPlayer.hasSession()) {
-			Session session = xPlayer.getSession();
-			if (session.isExpired())
-				DbUtil.deleteSession(xPlayer);
-		}
-	}
-
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerChat(PlayerChatEvent event) {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getPlayer(event.getPlayer().getName());
-
-		//if (!xAuthSettings.rstrChat && !xPlayer.isRegistered())
-			//return;
-		
-		if (xPlayer.isGuest()) {
-			if (xPlayer.canNotify())
-				xPlayer.sendIllegalActionNotice();
-
+		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
+		if (plyrMngr.isRestricted(p, event)) {
+			plyrMngr.sendNotice(p);
 			event.setCancelled(true);
 		}
-
-		//plugin.getSpoutManager().showScreen(event.getPlayer(), ScreenType.LOGIN);
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getPlayer(event.getPlayer().getName());
-
-		//if (!xAuthSettings.rstrCommands && !xPlayer.isRegistered())
-			//return;
-
-		if (xPlayer.isGuest()) {
+		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer().getName());
+		if (plyrMngr.isRestricted(p, event)) {
 			String command = event.getMessage().split(" ")[0].replaceFirst("/", "");
 
-			if (xAuthSettings.allowedCmds.contains(command))
-				return;
+			// Idea was to auto-detect command aliases so they didn't have to be added to the allow list.
+			// Currently doesn't work as it allows native Minecraft commands to slip through
+			/*PluginCommand pCommand = plugin.getServer().getPluginCommand(command);
+			if (pCommand == null)
+			return;
 
-			if (xPlayer.canNotify())
-				xPlayer.sendIllegalActionNotice();
+			if (!plugin.getConfig().getStringList("guest.allowed-commands").contains(pCommand.getName())) {
+				plyrMngr.sendNotice(p);
+				event.setMessage("/");
+				event.setCancelled(true);
+			}*/
 
-			event.setMessage("/");
-			event.setCancelled(true);
+			if (!plugin.getConfig().getStringList("guest.allowed-commands").contains(command)) {
+				plyrMngr.sendNotice(p);
+				event.setMessage("/");
+				event.setCancelled(true);
+			}
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getPlayer(event.getPlayer().getName());
-
-		//if (!xAuthSettings.rstrInteract && !xPlayer.isRegistered())
-			//return;
-
-		if (xPlayer.isGuest()) {
+		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer().getName());
+		if (plyrMngr.isRestricted(p, event)) {
 			Action action = event.getAction();
 			Material type = event.getClickedBlock().getType();
 
+			// TODO add missing blocks
 			if (action == Action.LEFT_CLICK_BLOCK) {
 				if (type == Material.NOTE_BLOCK
 						|| type == Material.WOODEN_DOOR
@@ -167,9 +144,7 @@ public class xAuthPlayerListener extends PlayerListener {
 						|| type == Material.IRON_DOOR
 						|| type == Material.STONE_BUTTON
 						|| type == Material.TRAP_DOOR) {
-					if (xPlayer.canNotify())
-						xPlayer.sendIllegalActionNotice();
-
+					plyrMngr.sendNotice(p);
 					event.setCancelled(true);
 				}
 			} else if (action == Action.RIGHT_CLICK_BLOCK) {
@@ -185,10 +160,9 @@ public class xAuthPlayerListener extends PlayerListener {
 						|| type == Material.IRON_DOOR
 						|| type == Material.STONE_BUTTON
 						|| type == Material.JUKEBOX
-						|| type == Material.TRAP_DOOR) {
-					if (xPlayer.canNotify())
-						xPlayer.sendIllegalActionNotice();
-
+						|| type == Material.TRAP_DOOR
+						|| type == Material.ENCHANTMENT_TABLE) {
+					plyrMngr.sendNotice(p);
 					event.setCancelled(true);
 				}
 			} else if (action == Action.PHYSICAL) {
@@ -198,37 +172,52 @@ public class xAuthPlayerListener extends PlayerListener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerMove(PlayerMoveEvent event) {
 		if (event.isCancelled())
 			return;
 
-		Player player = event.getPlayer();
-		xAuthPlayer xPlayer = plugin.getPlayer(player.getName());
-
-		//if (!xAuthSettings.rstrMovement && !xPlayer.isRegistered())
-			//return;
-
-		if (xPlayer.isGuest()) {
-			if (xAuthSettings.protectLoc)
-				event.setTo(plugin.getLocationToTeleport(player.getWorld()));
-			else
-				event.setTo(xPlayer.getLocation());
-
-			if (xPlayer.canNotify())
-				xPlayer.sendIllegalActionNotice();
+		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
+		if (plyrMngr.isRestricted(p, event)) {
+			event.setTo(plugin.getDbCtrl().isTableActive(Table.LOCATION) ?
+					plugin.getLocMngr().getLocation(event.getPlayer().getWorld()) : p.getLocation());
+			plyrMngr.sendNotice(p);
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
 		if (event.isCancelled())
 			return;
 
-		xAuthPlayer xPlayer = plugin.getPlayer(event.getPlayer().getName());
-
-		//if (!xAuthSettings.rstrPickup && !xPlayer.isRegistered())
-			//return;
-
-		if (xPlayer.isGuest())
+		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
+		if (plyrMngr.isRestricted(p, event))
 			event.setCancelled(true);
+	}
+
+	private boolean isValidName(String pName) {
+		if (pName.length() < plugin.getConfig().getInt("filter.min-length"))
+			return false;
+
+		String allowed = plugin.getConfig().getString("filter.allowed");
+		if (allowed.length() > 0) {
+			for (int i = 0; i < pName.length(); i++) {
+				if (allowed.indexOf(pName.charAt(i)) == -1)
+					return false;
+			}
+		}
+
+		String disallowed = plugin.getConfig().getString("filter.disallowed");
+		if (disallowed.length() > 0) {
+			for (int i = 0; i < pName.length(); i++) {
+				if (disallowed.indexOf(pName.charAt(i)) >= 0)
+					return false;
+			}
+		}
+
+		if (plugin.getConfig().getBoolean("filter.blank-name") && Utils.isWhitespace(pName))
+			return false;
+
+		return true;
 	}
 }

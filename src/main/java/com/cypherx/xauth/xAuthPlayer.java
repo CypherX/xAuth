@@ -5,145 +5,59 @@ import java.sql.Timestamp;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
-import com.cypherx.xauth.plugins.xPermissions;
-import com.cypherx.xauth.util.Util;
-
+import org.bukkit.inventory.PlayerInventory;
 
 public class xAuthPlayer {
 	private String playerName;
-	private Account account;
-	private Session session;
-	private boolean guest = false;
+	private int accountId = 0;
+	private Status status = Status.Guest;
+	private PlayerInventory inventory;
 	private Location location;
 	private Timestamp lastNotifyTime;
-	private int timeoutTaskId;
+	private Timestamp loginTime;
+	private boolean creativeMode;
+	private int timeoutTaskId = -1;
+	private boolean isProtected = false;
 
-	public xAuthPlayer(String playerName) {
+	public xAuthPlayer(final String playerName) {
 		this.playerName = playerName;
 	}
 
-	public xAuthPlayer(String playerName, Account account, Session session) {
+	public xAuthPlayer(final String playerName, final int accountId) {
 		this.playerName = playerName;
-		this.account = account;
-
-		if (session != null)
-			this.session = session;
+		this.accountId = accountId;
+		status = Status.Registered;
 	}
 
-	public boolean isRegistered() {
-		return (account != null);
-	}
+	public String getPlayerName() { return playerName; }
+	public Player getPlayer() { return Bukkit.getServer().getPlayerExact(playerName); }
+	public int getAccountId() { return accountId; }
+	public void setAccountId(int accountId) { this.accountId = accountId; }
+	public Status getStatus() { return status; }
+	public void setStatus(Status status) { this.status = status; }
+	public PlayerInventory getInventory() { return inventory; }
+	public void setInventory(PlayerInventory inventory) { this.inventory = inventory; }
+	public Location getLocation() { return location; }
+	public void setLocation(Location location) { this.location = location; }
+	public Timestamp getLastNotifyTime() { return lastNotifyTime; }
+	public void setLastNotifyTime(Timestamp lastNotifyTime) { this.lastNotifyTime = lastNotifyTime; }
+	public Timestamp getLoginTime() { return loginTime; }
+	public void setLoginTime(Timestamp loginTime) { this.loginTime = loginTime; }
+	public boolean isCreativeMode() { return creativeMode; }
+	public void setCreative(boolean creativeMode) { this.creativeMode = creativeMode; }
+	public int getTimeoutTaskId() { return timeoutTaskId; }
+	public void setTimeoutTaskId(int timeoutTaskId) { this.timeoutTaskId = timeoutTaskId; }
+	public boolean isProtected() { return isProtected; }
+	public void setProtected(boolean isProtected) { this.isProtected = isProtected; }
 
-	public boolean hasSession() {
-		return (session != null);
-	}
+	public boolean isGuest() { return status == Status.Guest; }
+	public boolean isRegistered() {	return status != Status.Guest; }
+	public boolean isAuthenticated() { return status == Status.Authenticated; }
+	public String getIPAddress() { return getPlayer().getAddress().getHostString(); }
 
-	public boolean isAuthenticated() {
-		if (session == null)
-			return false;
-
-		if (session.isExpired() || !session.getHost().equals(Util.getHostFromPlayer(getPlayer())))
-			return false;
-
-		return true;
-	}
-
-	public boolean mustRegister() {
-		if (xAuthSettings.regForced)
-			return true;
-
-		return xPermissions.has(getPlayer(), "xauth.register");
-	}
-
-	public boolean canNotify() {
-		if (lastNotifyTime == null)
-			return true;
-
-		Timestamp nextNotifyTime = new Timestamp(lastNotifyTime.getTime() + (xAuthSettings.notifyCooldown * 1000));
-		if (nextNotifyTime.compareTo(Util.getNow()) < 0)
-			return true;
-
-		return false;
-	}
-
-	public void sendIllegalActionNotice() {
-		xAuthMessages.send("miscIllegal", getPlayer());
-		lastNotifyTime = Util.getNow();
-	}
-
-	public boolean hasGodmode() {
-		if (xAuthSettings.godmodeLength < 1)
-			return false;
-
-		Timestamp expireTime = new Timestamp(session.getLoginTime().getTime() + (xAuthSettings.godmodeLength * 1000));
-		if (expireTime.compareTo(Util.getNow()) < 0)
-			return false;
-
-		return true;
-	}
-
-	public void setPlayerName(String playerName) {
-		this.playerName = playerName;
-	}
-
-	public String getPlayerName() {
-		return playerName;
-	}
-
-	public Player getPlayer() {
-		Player player = Bukkit.getServer().getPlayer(playerName);
-		if (player != null && player.getName().equalsIgnoreCase(playerName))
-			return player;
-
-		return null;
-	}
-
-	public void setAccount(Account account) {
-		this.account = account;
-	}
-
-	public Account getAccount() {
-		return account;
-	}
-
-	public void setSession(Session session) {
-		this.session = session;
-	}
-
-	public Session getSession() {
-		return session;
-	}
-
-	public void setGuest(boolean guest) {
-		this.guest = guest;
-	}
-
-	public boolean isGuest() {
-		return guest;
-	}
-
-	public void setLocation(Location location) {
-		this.location = location;
-	}
-
-	public Location getLocation() {
-		return location;
-	}
-
-	public void setLastNotifyTime(Timestamp lastNotifyTime) {
-		this.lastNotifyTime = lastNotifyTime;
-	}
-
-	public Timestamp getLastNotifyTime() {
-		return lastNotifyTime;
-	}
-
-	public void setTimeoutTaskId(int timeoutTaskId) {
-		this.timeoutTaskId = timeoutTaskId;
-	}
-
-	public int getTimeoutTaskId() {
-		return timeoutTaskId;
+	public enum Status {
+		Guest, // not registered
+		Registered, // registered but not logged in
+		Authenticated // logged in
 	}
 }

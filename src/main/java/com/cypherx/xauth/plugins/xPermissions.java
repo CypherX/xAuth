@@ -1,43 +1,85 @@
 package com.cypherx.xauth.plugins;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 
-import com.cypherx.xauth.xAuth;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
+
 import com.cypherx.xauth.xAuthLog;
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
+
+import de.bananaco.bpermissions.api.ApiLayer;
+import de.bananaco.bpermissions.api.util.CalculableType;
 
 public class xPermissions {
-	private static PermType permType;
-	private static PermissionHandler permissionHandler;
+	private static PermissionsType type = null;
+	private static Plugin permissionsPlugin;
 
-	public static void setup(xAuth plugin) {
-		Plugin permissionsPlugin = plugin.getServer().getPluginManager().getPlugin("Permissions");
+	public static void init() {
+		Plugin permissionsEx = Bukkit.getServer().getPluginManager().getPlugin("PermissionsEx");
+		Plugin bPermissions = Bukkit.getServer().getPluginManager().getPlugin("bPermissions");
+
+		if (permissionsEx != null) {
+			type = PermissionsType.PermissionsEx;
+			permissionsPlugin = permissionsEx;
+		} else if (bPermissions != null) {
+			type = PermissionsType.bPermissions;
+			permissionsPlugin = bPermissions;
+		} else
+			type = PermissionsType.BukkitPerms;
 
 		if (permissionsPlugin != null) {
-			permType = PermType.PERMISSIONS;
-			permissionHandler = ((Permissions) permissionsPlugin).getHandler();
-			xAuthLog.info("'Permissions' v" + permissionsPlugin.getDescription().getVersion() + " support enabled!");
-		} else {
-			permType = PermType.SUPERPERMS;
-			xAuthLog.info("'Permissions' not detected, using Bukkit Superperms");
-		}
+			PluginDescriptionFile desc = permissionsPlugin.getDescription();
+			xAuthLog.info("Permissions support enabled: " + desc.getName() + " v" + desc.getVersion());
+		} else
+			xAuthLog.info("Bukkit Permissions enabled (no plugin detected)");
 	}
 
 	public static boolean has(Player player, String permission) {
-		switch (permType) {
-			case PERMISSIONS:
-				return permissionHandler.has(player, permission);
-			case SUPERPERMS:
-				return player.hasPermission(permission);
-			default:
-				return player.isOp();
+		switch (type) {
+		case PermissionsEx:
+			return PermissionsEx.getPermissionManager().has(player, permission);
+		case bPermissions:
+			return ApiLayer.hasPermission(player.getWorld().getName(), CalculableType.USER, player.getName(), permission);
+		case BukkitPerms:
+			return player.hasPermission(permission);
+		default:
+			return player.isOp();
 		}
 	}
 
-	private enum PermType {
-		PERMISSIONS,
-		SUPERPERMS
+	/*public static void addGroup(Player player, String group) {
+		switch (type) {
+		case PermissionsEx:
+			PermissionsEx.getUser(player).addGroup(group);
+			break;
+		case bPermissions:
+			ApiLayer.addGroup(player.getWorld().getName(), CalculableType.USER, player.getName(), group);
+			break;
+		case BukkitPerms:
+			xAuthLog.warning("Bukkit Permissions does not support modifying groups");
+			break;
+		}
+	}
+
+	public static void removeGroup(Player player, String group) {
+		switch (type) {
+		case PermissionsEx:
+			PermissionsEx.getUser(player).removeGroup(group);
+			break;
+		case bPermissions:
+			ApiLayer.removeGroup(player.getWorld().getName(), CalculableType.USER, player.getName(), group);
+			break;
+		case BukkitPerms:
+			xAuthLog.warning("Bukkit Permissions does not support modifying groups");
+			break;
+		}
+	}*/
+
+	private enum PermissionsType {
+		PermissionsEx,
+		bPermissions,
+		BukkitPerms
 	}
 }

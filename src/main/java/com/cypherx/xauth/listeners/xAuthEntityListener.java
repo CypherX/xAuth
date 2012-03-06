@@ -1,78 +1,73 @@
 package com.cypherx.xauth.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 
+import com.cypherx.xauth.PlayerManager;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthPlayer;
 
-public class xAuthEntityListener extends EntityListener {
-	private final xAuth plugin;
+public class xAuthEntityListener implements Listener {
+	private final PlayerManager plyrMngr;
 
-	public xAuthEntityListener(xAuth plugin) {
-		this.plugin = plugin;
+	public xAuthEntityListener(final xAuth plugin) {
+		this.plyrMngr = plugin.getPlyrMngr();
+		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	public void registerEvents()  {
-		PluginManager pm = plugin.getServer().getPluginManager();
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, this, Event.Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.ENTITY_TARGET, this, Event.Priority.Lowest, plugin);
-	}
-
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onEntityDamage(EntityDamageEvent event) {
 		if (event.isCancelled())
 			return;
 
 		Entity entity = event.getEntity();
 		if (entity instanceof Player && ((Player)entity).isOnline()) { // player taking damage
-			xAuthPlayer xPlayer = plugin.getPlayer(((Player)entity).getName());
-
-			//if (!xAuthSettings.rstrDmgTaken && !xPlayer.isRegistered())
-				//return;
-
-			if (xPlayer.isGuest())
+			xAuthPlayer xp = plyrMngr.getPlayer(((Player)entity).getName());
+			if (plyrMngr.isRestricted(xp, event) || plyrMngr.hasGodmode(xp))
 				event.setCancelled(true);
-			else if (xPlayer.hasSession())
-				if (xPlayer.hasGodmode())
-					event.setCancelled(true);
 		} else if (event instanceof EntityDamageByEntityEvent) { // player dealing damage to other entity
-			EntityDamageByEntityEvent edbeEvent = (EntityDamageByEntityEvent)event;
+			EntityDamageByEntityEvent edbeEvent = (EntityDamageByEntityEvent) event;
 			Entity damager = edbeEvent.getDamager();
-
 			if (damager instanceof Player) {
-				xAuthPlayer xPlayer = plugin.getPlayer(((Player)damager).getName());
-
-				//if (!xAuthSettings.rstrDmgGiven && !xPlayer.isRegistered())
-					//return;
-
-				if (xPlayer.isGuest()) {
-					if (xPlayer.canNotify())
-						xPlayer.sendIllegalActionNotice();
-
+				xAuthPlayer player = plyrMngr.getPlayer(((Player)damager).getName());
+				if (plyrMngr.isRestricted(player, edbeEvent)) {
+					plyrMngr.sendNotice(player);
 					event.setCancelled(true);
 				}
 			}
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onEntityTarget(EntityTargetEvent event) {
 		if (event.isCancelled())
 			return;
 
 		Entity target = event.getTarget();
 		if (target instanceof Player) {
-			xAuthPlayer xPlayer = plugin.getPlayer(((Player)target).getName());
+			xAuthPlayer xp = plyrMngr.getPlayer(((Player) target).getName());
+			if (plyrMngr.isRestricted(xp, event))
+				event.setCancelled(true);
+		}
+	}
 
-			//if (!xAuthSettings.rstrMobTarget && !xPlayer.isRegistered())
-				//return;
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+		if (event.isCancelled())
+			return;
 
-			if (xPlayer.isGuest())
+		Entity entity = event.getEntity();
+		if (entity instanceof Player) {
+			xAuthPlayer xp = plyrMngr.getPlayer(((Player) entity).getName());
+			if (plyrMngr.isRestricted(xp, event))
 				event.setCancelled(true);
 		}
 	}

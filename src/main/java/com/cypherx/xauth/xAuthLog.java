@@ -3,8 +3,10 @@ package com.cypherx.xauth;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
+
 public class xAuthLog {
-	private static final Logger logger = Logger.getLogger("Minecraft");
+	private static final Logger logger = Bukkit.getLogger();
 
 	public static void info(String msg) {
 		logger.log(Level.INFO, "[xAuth] " + msg);

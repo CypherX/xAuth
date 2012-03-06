@@ -4,9 +4,15 @@
  * LICENSE.TXT file.
  */
 
+/*
+ * Slightly modified by CypherX to clean up warnings.
+ */
+
 package com.martiansoftware.jsap;
 
+import java.util.ArrayList;
 import java.util.List;
+
 /**
  * <p>A utility class to parse a command line contained in a single String into
  * an array of argument tokens, much as the JVM (or more accurately, your
@@ -46,13 +52,23 @@ public class CommandLineTokenizer {
      * argument array.
      * @param buf the StringBuffer storing the current argument.
      */
-    private static void appendToBuffer(
-        List resultBuffer,
-        StringBuffer buf) {
+    private static void appendToBuffer(List<String> resultBuffer, StringBuffer buf) {
         if (buf.length() > 0) {
             resultBuffer.add(buf.toString());
             buf.setLength(0);
         }
+    }
+
+    // Added by CypherX for ease of use.
+    public static String[] tokenize(String[] args) {
+    	if (args == null || args.length == 0)
+    		return tokenize("");
+
+		StringBuilder sb = new StringBuilder(args[0]);
+		for (int i = 1; i < args.length; i++)
+			sb.append(" ").append(args[i]);
+
+		return tokenize(sb.toString());
     }
 
     /**
@@ -66,7 +82,7 @@ public class CommandLineTokenizer {
      * @return an argument array representing the specified command line.
      */
     public static String[] tokenize(String commandLine) {
-        List resultBuffer = new java.util.ArrayList();
+        List<String> resultBuffer = new ArrayList<String>();
 
         if (commandLine != null) {
             int z = commandLine.length();
