@@ -23,22 +23,20 @@ public class PlayerDataHandler {
 
 	public void storeData(xAuthPlayer xp, Player p) {
 		PlayerInventory pInv = p.getInventory();
-		Location loc = p.getLocation();
+		Location loc = p.getHealth() > 0 ? p.getLocation() : null;
 
 		String strItems = buildString(pInv.getContents());
 		String strArmor = buildString(pInv.getArmorContents());
 		String strLoc = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
 
-		// Keep a cached copy for more efficient restoration
-		xp.setLocation(loc);
 		xp.setInventory(pInv);
+		xp.setLocation(loc);
 
-		// Also keep a record in the database to prevent data loss from a server crash
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
 		try {
 			// Store player inventory and location in database.
-			String sql = String.format("INSERT INTO `%s` VALUES (?, ?, ?, ?)",
+			String sql = String.format("INSERT IGNORE INTO `%s` VALUES (?, ?, ?, ?)",
 					plugin.getConfig().getString("mysql.tables.playerdata"));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, p.getName());
@@ -47,7 +45,7 @@ public class PlayerDataHandler {
 			ps.setString(4, strLoc);
 			ps.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			xAuthLog.severe("Failed to insert player data into database!", e);
 		} finally {
 			plugin.getDbCtrl().close(conn, ps);
 		}
@@ -134,44 +132,48 @@ public class PlayerDataHandler {
 	public void restoreData(xAuthPlayer xp, Player p) {
 		ItemStack[] items = null;
 		ItemStack[] armor = null;
+		Location loc = null;
 
 		PlayerInventory pInv = p.getInventory();
 		PlayerInventory xpInv = xp.getInventory();
 
-		if (xpInv != null) {
+		/*if (xpInv != null) {
 			items = xpInv.getContents();
 			armor = xpInv.getArmorContents();
 		}
 
-		Location loc = xp.getLocation();
+		Location loc = xp.getLocation();*/
 
-		// Only query the database if a local record doesn't exist
-		if (items == null || armor == null || loc == null) {
-			Connection conn = plugin.getDbCtrl().getConnection();
-			PreparedStatement ps = null;
-			ResultSet rs = null;
-	
-			try {
-				String sql = String.format("SELECT `items`, `armor`, `location` FROM `%s` WHERE `playername` = ?",
-						plugin.getConfig().getString("mysql.tables.playerdata"));
-				ps = conn.prepareStatement(sql);
-				ps.setString(1, p.getName());
-				rs = ps.executeQuery();
-	
-				if (rs.next()) {
-					items = buildItemStack(rs.getString("items"));
-					armor = buildItemStack(rs.getString("armor"));				
-	
-					String[] locSplit = rs.getString("location").split(":");
+		// Only query the database if a cached record doesn't exist
+		//if (items == null || armor == null || loc == null) {
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			String sql = String.format("SELECT `items`, `armor`, `location` FROM `%s` WHERE `playername` = ?",
+					plugin.getConfig().getString("mysql.tables.playerdata"));
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, p.getName());
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				items = buildItemStack(rs.getString("items"));
+				armor = buildItemStack(rs.getString("armor"));				
+
+				String rsLoc = rs.getString("location");
+				if (rsLoc != null) {
+					String[] locSplit = rsLoc.split(":");
 					loc = new Location(Bukkit.getWorld(locSplit[0]), Double.parseDouble(locSplit[1]), Double.parseDouble(locSplit[2]),
 							Double.parseDouble(locSplit[3]), Float.parseFloat(locSplit[4]), Float.parseFloat(locSplit[5]));
 				}
-			} catch (SQLException e) {
-				xAuthLog.severe("Failed to load playerdata from database for player: " + p.getName(), e);
-			} finally {
-				plugin.getDbCtrl().close(conn, ps, rs);
 			}
+		} catch (SQLException e) {
+			xAuthLog.severe("Failed to load playerdata from database for player: " + p.getName(), e);
+		} finally {
+			plugin.getDbCtrl().close(conn, ps, rs);
 		}
+		//}
 
 		if (items != null) {
 			// Fix for inventory extension plugins
@@ -185,34 +187,33 @@ public class PlayerDataHandler {
 			//End Fix for inventory extension plugins
 
 			pInv.setContents(items);
-		}/* else
+		} else
 			if (xpInv != null)
-				pInv.setContents(xpInv.getContents());*/
+				pInv.setContents(xpInv.getContents());
 
 		if (armor != null)
 			pInv.setArmorContents(armor);
-		/*else 		
+		else 		
 			if (xpInv != null)
-				pInv.setArmorContents(xpInv.getArmorContents());*/
+				pInv.setArmorContents(xpInv.getArmorContents());
 
 		xp.setInventory(null);
 
 		if (loc != null) {
 			p.teleport(loc);
-		}/* else {
+		} else {
 			loc = xp.getLocation();
 			if (loc != null)
 				p.teleport(loc);
-		}*/
+		}
 
 		xp.setLocation(null);
 		p.saveData();
 
-		Connection conn = plugin.getDbCtrl().getConnection();
-		PreparedStatement ps = null;
-
+		conn = plugin.getDbCtrl().getConnection();
 		try {
-			String sql = String.format("DELETE FROM `%s` WHERE `playername` = ?", plugin.getConfig().getString("mysql.tables.playerdata"));
+			String sql = String.format("DELETE FROM `%s` WHERE `playername` = ?",
+					plugin.getConfig().getString("mysql.tables.playerdata"));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, p.getName());
 			ps.executeUpdate();
