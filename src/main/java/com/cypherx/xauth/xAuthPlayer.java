@@ -53,7 +53,11 @@ public class xAuthPlayer {
 	public boolean isGuest() { return status == Status.Guest; }
 	public boolean isRegistered() {	return status != Status.Guest; }
 	public boolean isAuthenticated() { return status == Status.Authenticated; }
-	public String getIPAddress() { return getPlayer().getAddress().getHostString(); }
+
+	public String getIPAddress() {
+		Player player = getPlayer();
+		return player == null ? null : player.getAddress().getHostString();
+	}
 
 	public enum Status {
 		Guest, // not registered

@@ -55,6 +55,16 @@ public abstract class Auth {
     public abstract boolean register(String user, String pass, String email);
 
     /**
+     * Attempts to register an account for the user specified. 
+     * This is reserved for the /xauth register command and skips most checks.
+     * @param user
+     * @param pass
+     * @param email
+     * @return success
+     */
+    public abstract boolean adminRegister(String user, String pass, String email);
+
+    /**
      * Attempts to change a user's password.
      * @param user Username
      * @param oldPass Old password
@@ -62,6 +72,15 @@ public abstract class Auth {
      * @return success
      */
     public abstract boolean changePassword(String user, String oldPass, String newPass);
+
+    /**
+     * Attempts to change the specified user's password.
+     * This is reserved for the /xauth changepw command skips most checks.
+     * @param user
+     * @param newPass
+     * @return success
+     */
+    public abstract boolean adminChangePassword(String user, String newPass);
 
     /**
      * Sets status of user to online if supported.  This is for use when a user doesn't need to supply

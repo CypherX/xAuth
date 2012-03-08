@@ -1,6 +1,8 @@
 package com.cypherx.xauth.plugins;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -34,6 +36,15 @@ public class xPermissions {
 			xAuthLog.info("Permissions support enabled: " + desc.getName() + " v" + desc.getVersion());
 		} else
 			xAuthLog.info("Bukkit Permissions enabled (no plugin detected)");
+	}
+
+	public static boolean has(CommandSender sender, String permission) {
+		if (sender instanceof Player)
+			return has((Player)sender, permission);
+		else if (sender instanceof ConsoleCommandSender)
+			return true;
+		else
+			return false;
 	}
 
 	public static boolean has(Player player, String permission) {

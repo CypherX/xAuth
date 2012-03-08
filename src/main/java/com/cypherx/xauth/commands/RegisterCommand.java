@@ -9,7 +9,6 @@ import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.auth.Auth;
-import com.cypherx.xauth.xAuthPlayer.Status;
 import com.martiansoftware.jsap.CommandLineTokenizer;
 
 public class RegisterCommand implements CommandExecutor {
@@ -42,7 +41,7 @@ public class RegisterCommand implements CommandExecutor {
 				plugin.getMsgHndlr().sendMessage(response, p.getPlayer());
 
 			if (success) {
-				p.setStatus(Status.Registered);
+				//p.setStatus(Status.Registered);
 				xAuthLog.info(playerName + " has registered");
 				//plugin.getMsgCtrl().sendMessage("join.login", p.getPlayer());
 			}

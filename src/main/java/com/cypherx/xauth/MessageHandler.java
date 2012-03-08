@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 public class MessageHandler {
 	private final xAuth plugin;
@@ -44,17 +44,15 @@ public class MessageHandler {
 		}
 	}
 
-	public void sendMessage(String node, Player player) {
-		sendMessage(node, player, null);
+	public void sendMessage(String node, CommandSender sender) {
+		sendMessage(node, sender, null);
 	}
 
-	public void sendMessage(String node, Player player, String targetName) {
-		if (player != null && player.isOnline()) {
-			String message = get(node, player.getName(), targetName);
+	public void sendMessage(String node, CommandSender sender, String targetName) {
+		String message = get(node, sender.getName(), targetName);
 
-			for (String line : message.split("\n"))
-				player.sendMessage(line);
-		}
+		for (String line : message.split("\n"))
+			sender.sendMessage(line);
 	}
 
 	public String get(String node) {

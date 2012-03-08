@@ -132,7 +132,16 @@ public class AuthURL extends Auth {
 	    return checkAuthURL("register", "user", user, "pass", pass, "email", email);
 	}
 
+	public boolean adminRegister(String user, String pass, String email) {
+		return false;
+	}
+
 	public boolean changePassword(String user, String oldPass, String newPass) {
+		 response = "authurl.changepw";
+		 return false;
+	}
+
+	public boolean adminChangePassword(String user, String newPass) {
 		 response = "authurl.changepw";
 		 return false;
 	}

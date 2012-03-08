@@ -14,6 +14,7 @@ import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.database.Table;
+import com.cypherx.xauth.xAuthPlayer.Status;
 
 public class AuthSQL extends Auth {
 	private final xAuth plugin;
@@ -106,6 +107,19 @@ public class AuthSQL extends Auth {
 			return false;
 		}
 
+		return execRegQuery(user, pass, email, false);
+	}
+
+	public boolean adminRegister(String user, String pass, String email) {
+		if (player.isRegistered()) {
+			response = "admin.register.error.registered";
+			return false;
+		}
+
+		return execRegQuery(user, pass, email, true);
+	}
+
+	private boolean execRegQuery(String user, String pass, String email, boolean admin) {
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -123,13 +137,14 @@ public class AuthSQL extends Auth {
 			rs = ps.getGeneratedKeys();
 			if (rs.next()) {
 				player.setAccountId(rs.getInt(1));
-				response = "register.success";
+				response = admin ? "admin.register.success" : "register.success";
+				player.setStatus(Status.Registered);
 				return true;
 			} else
 				throw new SQLException();
 		} catch (SQLException e) {
 			xAuthLog.severe("Failed to create account for player: " + user, e);
-			response = "register.error.general";
+			response = admin ? "admin.register.error.general" : "register.error.general";
 			return false;
 		} finally {
 			plugin.getDbCtrl().close(conn, ps, rs);
@@ -151,6 +166,19 @@ public class AuthSQL extends Auth {
 			return false;
 		}
 
+		return execCpwQuery(user, newPass, false);
+	}
+
+	public boolean adminChangePassword(String user, String newPass) {
+		if (!player.isRegistered()) {
+			response = "admin.changepw.registered";
+			return false;
+		}
+
+		return execCpwQuery(user, newPass, true);
+	}
+
+	public boolean execCpwQuery(String user, String newPass, boolean admin) {
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
 
@@ -161,10 +189,11 @@ public class AuthSQL extends Auth {
 			ps.setString(1, plugin.getPwdHndlr().hash(newPass));
 			ps.setInt(2, player.getAccountId());
 			ps.executeUpdate();
-			response = "changepw.success";
+			response = admin ? "admin.changepw.success" : "changepw.success";
 			return true;
 		} catch (SQLException e) {
 			xAuthLog.severe("Failed to change password for player: " + user, e);
+			response = admin ? "admin.changepw.error.general" : "changepw.error.general";
 			return false;
 		} finally {
 			plugin.getDbCtrl().close(conn, ps);

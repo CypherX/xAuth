@@ -45,6 +45,21 @@ authurl:
     registration: '{RED}AuthURL registration is disabled.'
     changepw: '{RED}AuthURL does not support password changes.'
 
+admin:
+    permissions: 'You do not have permission to use this command!'
+    register:
+        usage: '{RED}Correct Usage: /xauth register <player> <password> [email]'
+        success: '{BRIGHTGREEN}Account successfully created for: {WHITE}{TARGET}'
+        error:
+            registered: '{RED}This player is already registered!'
+            general: '{RED}Something went wrong while creating an account for {TARGET}'
+    changepw:
+        usage: '{RED}Correct Usage: /xauth changepw <player> <new password>'
+        success: '{TARGET}''s {BRIGHTGREEN}password has been changed!'
+        error:
+            registered: '{RED}This player is not registered!'
+            general: '{RED}Something went wrong while changing {TARGET}''s pasword!'
+
 misc:
     illegal: '{GRAY}You must be logged in to do that!'
     timeout: 'You have taken too long to log in!'

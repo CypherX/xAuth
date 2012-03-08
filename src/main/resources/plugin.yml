@@ -23,6 +23,17 @@ commands:
     description: Change your password.
     aliases: [changepassword, changepass, cpw]
     usage: /<command> <old password> <new password>
+  xauth:
+    description: Access all xAuth admin commands.
+    aliases: [x]
+    usage: |
+           /<command> register <player> <password> [email]
+           /<command> changepw <player> <new password>
+           /<command> logout <player>
+           /<command> unregister <player>
+           /<command> strike list|clear [ip]
+           /<command> location set|remove [global]
+           /<command> reload
 
 permissions:
 #  inferno.*:
