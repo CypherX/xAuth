@@ -51,6 +51,8 @@ public class PasswordHandler {
 			String salt = realPass.substring(saltPos, saltPos + 12);
 			String hash = whirlpool(salt + checkPass);
 			checkPassHash = hash.substring(0, saltPos) + salt + hash.substring(saltPos);
+		} else if (type == PasswordType.WHIRLPOOL) {
+			checkPassHash = whirlpool(checkPass);
 		} else
 			checkPassHash = hash(checkPass, type.getAlgorithm());
 

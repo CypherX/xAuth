@@ -2,9 +2,10 @@ package com.cypherx.xauth.password;
 
 public enum PasswordType {
 	DEFAULT(0),
-	MD5(1, "MD5"),
-	SHA1(2, "SHA1"),
-	SHA256(3, "SHA-256");
+	WHIRLPOOL(1),
+	MD5(2, "MD5"),
+	SHA1(3, "SHA1"),
+	SHA256(4, "SHA-256");
 
 	private int type;
 	private String algorithm;
