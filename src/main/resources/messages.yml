@@ -29,7 +29,9 @@ login:
 
 logout:
     success: '{BRIGHTGREEN}You have been logged out!'
-    error: '{RED}You are not logged in!'
+    error:
+        logged: '{RED}You are not logged in!'
+        general: '{RED}Something went wrong while logging you out!'
 
 changepw:
     usage: '{RED}Correct Usage: /changepw <old password> <new password>'

@@ -25,12 +25,16 @@ public class LogoutCommand implements CommandExecutor {
 			String response = null;
 
 			if (p.isAuthenticated()) {
-				plugin.getPlyrMngr().protect(p);
-				p.setStatus(Status.Registered);
-				plugin.getAuthClass(p).offline(p.getPlayerName());
-				response = "logout.success";
+				boolean success = plugin.getPlyrMngr().deleteSession(p.getAccountId());
+				if (success) {
+					plugin.getPlyrMngr().protect(p);
+					p.setStatus(Status.Registered);
+					plugin.getAuthClass(p).offline(p.getPlayerName());
+					response = "logout.success";
+				} else
+					response = "logout.error.general";
 			} else
-				response = "logout.error";
+				response = "logout.error.logged";
 
 			plugin.getMsgHndlr().sendMessage(response, p.getPlayer());
 			return true;
