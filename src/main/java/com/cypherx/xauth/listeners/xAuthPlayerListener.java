@@ -65,7 +65,6 @@ public class xAuthPlayerListener implements Listener {
 				node = "join.resume";
 			} else {
 				node = "join.login";
-				plyrMngr.deleteSession(xp.getAccountId());
 				plyrMngr.protect(xp);
 			}
 		} else if (plyrMngr.mustRegister(p)) {

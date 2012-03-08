@@ -85,7 +85,6 @@ public class PlayerManager {
 			if (xp.isRegistered()) {
 				if (!checkSession(xp)) {
 					mustLogin = true;
-					deleteSession(xp.getAccountId());
 					plugin.getAuthClass(xp).offline(p.getName());
 				} else
 					plugin.getAuthClass(xp).online(p.getName());
@@ -126,17 +125,32 @@ public class PlayerManager {
 			String ipAddress = rs.getString("ipaddress");
 			Timestamp loginTime = rs.getTimestamp("logintime");
 
-			if (plugin.getConfig().getBoolean("session.verifyip") && !ipAddress.equals(player.getIPAddress()))
+			boolean valid = isSessionValid(player, ipAddress, loginTime);
+			if (valid)
+				return true;
+
+			deleteSession(player.getAccountId());
+			return false;
+
+			/*if (plugin.getConfig().getBoolean("session.verifyip") && !ipAddress.equals(player.getIPAddress()))
 				return false;
 
 			Timestamp expireTime = new Timestamp(loginTime.getTime() + (plugin.getConfig().getInt("session.length") * 1000));
-			return expireTime.compareTo(new Timestamp(System.currentTimeMillis())) > 0;
+			return expireTime.compareTo(new Timestamp(System.currentTimeMillis())) > 0;*/
 		} catch (SQLException e) {
 			xAuthLog.severe(String.format("Failed to load session for account: %d", player.getAccountId()), e);
 			return false;
 		} finally {
 			plugin.getDbCtrl().close(conn, ps, rs);
 		}
+	}
+
+	private boolean isSessionValid(xAuthPlayer xp, String ipAddress, Timestamp loginTime) {
+		if (plugin.getConfig().getBoolean("session.verifyip") && !ipAddress.equals(xp.getIPAddress()))
+			return false;
+
+		Timestamp expireTime = new Timestamp(loginTime.getTime() + (plugin.getConfig().getInt("session.length") * 1000));
+		return expireTime.compareTo(new Timestamp(System.currentTimeMillis())) > 0;
 	}
 
 	public void protect(xAuthPlayer xp) {
