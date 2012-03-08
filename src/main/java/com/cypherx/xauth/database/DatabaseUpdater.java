@@ -38,7 +38,7 @@ public class DatabaseUpdater {
 			if (!dbVersionFile.exists())
 				dbVersionFile.createNewFile();
 
-			dbVersionProp.load(new FileInputStream(dbVersionFile));			
+			dbVersionProp.load(new FileInputStream(dbVersionFile));
 		} catch (IOException e) {
 			xAuthLog.severe("Failed to load database version file!");
 		}
