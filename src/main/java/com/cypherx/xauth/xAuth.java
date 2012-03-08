@@ -118,10 +118,6 @@ public class xAuth extends JavaPlugin {
 	public StrikeManager getStrkMngr() { return strkMngr; }
 
 	public Auth getAuthClass(xAuthPlayer p){
-		return getAuthClass(p, false);
-	}
-
-	public Auth getAuthClass(xAuthPlayer p, boolean skipChecks) {
 		if(this.getConfig().getBoolean("authurl.enabled"))
 			/*return new AuthURL(getConfig().getString("authurl.url"), p.getIPAddress(), getConfig().getBoolean("authurl.registration"),
 					getConfig().getBoolean("authurl.status"), getConfig().getBoolean("authurl.groups"));*/
