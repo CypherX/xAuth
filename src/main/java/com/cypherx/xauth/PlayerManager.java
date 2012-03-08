@@ -139,10 +139,8 @@ public class PlayerManager {
 	}
 
 	public void protect(xAuthPlayer xp) {
-		Player p = xp.getPlayer();
-
 		// TODO find a better place to put this?
-		Connection conn = plugin.getDbCtrl().getConnection();
+		/*Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
 		try {
 			// Delete active session, if one exists
@@ -155,8 +153,9 @@ public class PlayerManager {
 			e.printStackTrace();
 		} finally {
 			plugin.getDbCtrl().close(conn, ps);
-		}
+		}*/
 
+		Player p = xp.getPlayer();
 		plugin.getPlyrDtHndlr().storeData(xp, p);
 
 		xp.setCreative(p.getGameMode().equals(GameMode.CREATIVE));
@@ -241,5 +240,43 @@ public class PlayerManager {
 
 	public void reload() {
 		players.clear();
+	}
+
+	public boolean deleteAccount(int accountId) {
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			String sql = String.format("DELETE FROM `%s` WHERE `id` = ?",
+					plugin.getConfig().getString("mysql.tables.account"));
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, accountId);
+			ps.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			xAuthLog.severe("Something went wrong while deleting account: " + accountId, e);
+			return false;
+		} finally {
+			plugin.getDbCtrl().close(conn, ps);
+		}
+	}
+
+	public boolean deleteSession(int accountId) {
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			String sql = String.format("DELETE FROM `%s` WHERE `accountid` = ?",
+					plugin.getConfig().getString("mysql.tables.session"));
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, accountId);
+			ps.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			xAuthLog.severe("something went wrong while deleting session for account: " + accountId, e);
+			return false;
+		} finally {
+			plugin.getDbCtrl().close(conn, ps);
+		}
 	}
 }

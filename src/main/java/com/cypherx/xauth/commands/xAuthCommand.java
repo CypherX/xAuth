@@ -11,6 +11,7 @@ import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.auth.Auth;
 import com.cypherx.xauth.plugins.xPermissions;
+import com.cypherx.xauth.xAuthPlayer.Status;
 import com.martiansoftware.jsap.CommandLineTokenizer;
 
 public class xAuthCommand implements CommandExecutor {
@@ -31,6 +32,10 @@ public class xAuthCommand implements CommandExecutor {
 				return registerCommand(sender, args);
 			else if (subCommand.equals("changepw") || subCommand.equals("cpw") || subCommand.equals("changepassword") || subCommand.equals("changepass"))
 				return changePwCommand(sender, args);
+			else if (subCommand.equals("logout"))
+				return logoutCommand(sender, args);
+			else if (subCommand.equals("unregister") || subCommand.equals("unreg"))
+				return unregisterCommand(sender, args);
 
 			return true;
 		}
@@ -62,23 +67,6 @@ public class xAuthCommand implements CommandExecutor {
 		if (success)
 			xAuthLog.info(sender.getName() + " has registered an account for " + targetName);
 
-		/*if (xp.isRegistered()) {
-			plugin.getMsgHndlr().sendMessage("admin.register.registered", sender);
-			return true;
-		}
-
-		Auth a = plugin.getAuthClass(xp, true);
-		boolean success = a.register(targetName, password, email);
-
-		if (success) {
-			plugin.getMsgHndlr().sendMessage("admin.register.success", sender, targetName);
-			//Player target = xp.getPlayer();
-			//if (target != null)
-				//plugin.getMsgHndlr().sendMessage(a.getResponse(), target);
-		} else {
-			plugin.getMsgHndlr().sendMessage(a.getResponse(), sender, targetName);
-		}*/
-
 		return true;
 	}
 
@@ -104,6 +92,74 @@ public class xAuthCommand implements CommandExecutor {
 
 		if (success)
 			xAuthLog.info(sender.getName() + " changed " + targetName + "'s password");
+
+		return true;
+	}
+
+	private boolean logoutCommand(CommandSender sender, String[] args) {
+		if (!xPermissions.has(sender, "xauth.admin.logout")) {
+			plugin.getMsgHndlr().sendMessage("admin.permission", sender);
+			return true;
+		} else if (args.length < 2) {
+			plugin.getMsgHndlr().sendMessage("admin.logout.usage", sender);
+			return true;
+		}
+
+		String targetName = args[1];
+		xAuthPlayer xp = plugin.getPlyrMngr().getPlayer(targetName);
+
+		if (!xp.isAuthenticated()) {
+			plugin.getMsgHndlr().sendMessage("admin.logout.error.logged", sender, targetName);
+			return true;
+		}
+
+		boolean success = plugin.getPlyrMngr().deleteSession(xp.getAccountId());
+		if (success) {
+			xp.setStatus(Status.Registered);
+			plugin.getAuthClass(xp).offline(xp.getPlayerName());
+			plugin.getMsgHndlr().sendMessage("admin.logout.success.player", sender, targetName);
+
+			Player target = xp.getPlayer();
+			if (target != null) {
+				plugin.getPlyrMngr().protect(xp);
+				plugin.getMsgHndlr().sendMessage("admin.logout.success.target", target);
+			}
+		} else
+			plugin.getMsgHndlr().sendMessage("admin.logout.error.general", sender);
+
+		return true;
+	}
+
+	private boolean unregisterCommand(CommandSender sender, String[] args) {
+		if (!xPermissions.has(sender, "xauth.admin.unregister")) {
+			plugin.getMsgHndlr().sendMessage("admin.permission", sender);
+			return true;
+		} else if (args.length < 2) {
+			plugin.getMsgHndlr().sendMessage("admin.unregister.usage", sender);
+			return true;
+		}
+
+		String targetName = args[1];
+		xAuthPlayer xp = plugin.getPlyrMngr().getPlayer(targetName);
+
+		if (!xp.isRegistered()) {
+			plugin.getMsgHndlr().sendMessage("admin.unregister.error.registered", sender, targetName);
+			return true;
+		}
+
+		boolean success = plugin.getPlyrMngr().deleteAccount(xp.getAccountId());
+		if (success) {
+			xp.setStatus(Status.Guest);
+			plugin.getAuthClass(xp).offline(xp.getPlayerName());
+			plugin.getMsgHndlr().sendMessage("admin.unregister.success.player", sender, targetName);
+
+			Player target = xp.getPlayer();
+			if (target != null) {
+				plugin.getPlyrMngr().protect(xp);
+				plugin.getMsgHndlr().sendMessage("admin.unregister.success.target", target);
+			}
+		} else
+			plugin.getMsgHndlr().sendMessage("admin.unregister.error.general", sender);
 
 		return true;
 	}

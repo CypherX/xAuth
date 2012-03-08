@@ -59,6 +59,22 @@ admin:
         error:
             registered: '{RED}This player is not registered!'
             general: '{RED}Something went wrong while changing {TARGET}''s pasword!'
+    logout:
+        usage: '{RED}Correct Usage: /xauth logout <player>'
+        error:
+            logged: '{TARGET} {RED}is not logged in!'
+            general: '{RED}Something went wrong while logging this player out!'
+        success:
+            player: '{TARGET} {BRIGHTGREEN}has been logged out!'
+            target: '{BRIGHTGREEN}You have been logged out by an Administrator!'
+    unregister:
+        usage: '{RED}Correct Usage: /xauth unregister <player>'
+        error:
+            registered: '{RED}This player is not registered!'
+            general: '{RED}Something went wrong while unregistering this player!'
+        success:
+            player: '{TARGET} {BRIGHTGREEN}has been unregistered!'
+            target: '{RED}You have been unregistered and logged out!'
 
 misc:
     illegal: '{GRAY}You must be logged in to do that!'
