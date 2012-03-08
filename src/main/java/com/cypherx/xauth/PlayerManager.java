@@ -85,6 +85,7 @@ public class PlayerManager {
 			if (xp.isRegistered()) {
 				if (!checkSession(xp)) {
 					mustLogin = true;
+					deleteSession(xp.getAccountId());
 					plugin.getAuthClass(xp).offline(p.getName());
 				} else
 					plugin.getAuthClass(xp).online(p.getName());
@@ -139,22 +140,6 @@ public class PlayerManager {
 	}
 
 	public void protect(xAuthPlayer xp) {
-		// TODO find a better place to put this?
-		/*Connection conn = plugin.getDbCtrl().getConnection();
-		PreparedStatement ps = null;
-		try {
-			// Delete active session, if one exists
-			String sql = String.format("DELETE FROM `%s` WHERE `accountid` = ?",
-					plugin.getConfig().getString("mysql.tables.session"));
-			ps = conn.prepareStatement(sql);
-			ps.setInt(1, xp.getAccountId());
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			plugin.getDbCtrl().close(conn, ps);
-		}*/
-
 		Player p = xp.getPlayer();
 		plugin.getPlyrDtHndlr().storeData(xp, p);
 
