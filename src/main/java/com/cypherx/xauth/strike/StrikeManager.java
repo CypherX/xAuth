@@ -35,7 +35,7 @@ public class StrikeManager {
 		xAuthLog.info(player.getName() + " kicked for passing the incorrect password threshold");
 
 		if (plugin.getConfig().getBoolean("strikes.lockout.enabled")) {
-			String ipAddress = player.getAddress().getHostString();
+			String ipAddress = player.getAddress().getAddress().getHostAddress();
 			String playerName = player.getName();
 
 			Connection conn = plugin.getDbCtrl().getConnection();
