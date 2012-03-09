@@ -55,7 +55,7 @@ public class PlayerDataHandler {
 		pInv.setChestplate(null);
 		pInv.setLeggings(null);
 		pInv.setBoots(null);
-		p.teleport(p.getWorld().getSpawnLocation());
+		p.teleport(plugin.getLocMngr().getLocation(p.getWorld()));
 		p.saveData();
 	}
 
@@ -136,16 +136,6 @@ public class PlayerDataHandler {
 
 		PlayerInventory pInv = p.getInventory();
 		PlayerInventory xpInv = xp.getInventory();
-
-		/*if (xpInv != null) {
-			items = xpInv.getContents();
-			armor = xpInv.getArmorContents();
-		}
-
-		Location loc = xp.getLocation();*/
-
-		// Only query the database if a cached record doesn't exist
-		//if (items == null || armor == null || loc == null) {
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -173,7 +163,6 @@ public class PlayerDataHandler {
 		} finally {
 			plugin.getDbCtrl().close(conn, ps, rs);
 		}
-		//}
 
 		if (items != null) {
 			// Fix for inventory extension plugins
