@@ -15,6 +15,7 @@ import org.bukkit.event.Event;
 
 import com.cypherx.xauth.database.Table;
 import com.cypherx.xauth.plugins.xPermissions;
+import com.cypherx.xauth.xAuthPlayer.Status;
 
 public class PlayerManager {
 	private final xAuth plugin;
@@ -86,8 +87,10 @@ public class PlayerManager {
 				if (!checkSession(xp)) {
 					mustLogin = true;
 					plugin.getAuthClass(xp).offline(p.getName());
-				} else
+				} else {
+					xp.setStatus(Status.Authenticated);
 					plugin.getAuthClass(xp).online(p.getName());
+				}
 			}
 			else if (mustRegister(p)) {
 				mustLogin = true;
@@ -131,12 +134,6 @@ public class PlayerManager {
 
 			deleteSession(player.getAccountId());
 			return false;
-
-			/*if (plugin.getConfig().getBoolean("session.verifyip") && !ipAddress.equals(player.getIPAddress()))
-				return false;
-
-			Timestamp expireTime = new Timestamp(loginTime.getTime() + (plugin.getConfig().getInt("session.length") * 1000));
-			return expireTime.compareTo(new Timestamp(System.currentTimeMillis())) > 0;*/
 		} catch (SQLException e) {
 			xAuthLog.severe(String.format("Failed to load session for account: %d", player.getAccountId()), e);
 			return false;
