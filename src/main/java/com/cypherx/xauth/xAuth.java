@@ -105,6 +105,7 @@ public class xAuth extends JavaPlugin {
 		msgCtrl = new MessageHandler(this);
 		msgCtrl.getConfig().options().copyDefaults(true);
 		msgCtrl.saveConfig();
+		msgCtrl.reloadConfig();
 	}
 
 	public File getJar() { return getFile(); }

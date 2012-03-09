@@ -26,7 +26,7 @@ public class MessageHandler {
 		return config;
 	}
 
-	private void reloadConfig() {
+	public void reloadConfig() {
 		config = YamlConfiguration.loadConfiguration(configFile);
 
 		InputStream defConfigStream = plugin.getResource(fileName);
