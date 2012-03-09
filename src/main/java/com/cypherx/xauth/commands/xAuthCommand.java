@@ -183,22 +183,19 @@ public class xAuthCommand implements CommandExecutor {
 
 		String action = args[1];
 		boolean global = args.length > 2 && args[2].equals("global") ? true : false;
+		String response;
 
 		if (action.equals("set")) {
 			if (!global && player.getWorld().getUID().equals(plugin.getLocMngr().getGlobalUID())) {
-				plugin.getMsgHndlr().sendMessage("admin.loc.set.error.global", player);
+				plugin.getMsgHndlr().sendMessage("admin.location.set.error.global", player);
 				return true;
 			}
 
 			boolean success = plugin.getLocMngr().setLocation(player.getLocation(), global);
-			String response;
-
 			if (success)
-				response = global ? "admin.location.set.success.global" : "admin.location.set.success.regular";
+				response = "admin.locaton.set.success." + (global ? "global" : "regular");
 			else
 				response = "admin.location.set.error.general";
-
-			plugin.getMsgHndlr().sendMessage(response, player);
 		} else {
 			if (global) {
 				if (plugin.getLocMngr().getGlobalUID() == null) {
@@ -216,16 +213,13 @@ public class xAuthCommand implements CommandExecutor {
 			}
 
 			boolean success = plugin.getLocMngr().removeLocation(player.getWorld());
-			String response;
-
 			if (success)
-				response = global ? "admin.location.remove.success.global" : "admin.location.remove.success.regular";
+				response = "admin.location.remove.success." + (global ? "global" : "regular");
 			else
 				response = "admin.location.remove.error.general";
-
-			plugin.getMsgHndlr().sendMessage(response, player);
 		}
 
+		plugin.getMsgHndlr().sendMessage(response, player);
 		return true;
 	}
 }

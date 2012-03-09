@@ -94,9 +94,9 @@ admin:
                 global: '{BRIGHTGREEN}Global teleport location set to your location!'
         remove:
             error:
-            	noglobal: '{RED}A global teleport location is not set!'
-            	notset: '{RED}This world does not have a teleport location!'
-            	global: '{RED}Global teleport location is set to this world.{NEWLINE}{RED}Please use /xauth location remove global'
+                noglobal: '{RED}A global teleport location is not set!'
+                notset: '{RED}This world does not have a teleport location!'
+                global: '{RED}Global teleport location is set to this world.{NEWLINE}{RED}Please use /xauth location remove global'
                 general: '{RED}Something went wrong while removing this location!'
             success:
                 regular: '{BRIGHTGREEN}Teleport location for this world has been removed!'
