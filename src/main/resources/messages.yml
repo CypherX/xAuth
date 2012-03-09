@@ -47,6 +47,12 @@ authurl:
     registration: '{RED}AuthURL registration is disabled.'
     changepw: '{RED}AuthURL does not support password changes.'
 
+misc:
+    illegal: '{GRAY}You must be logged in to do that!'
+    timeout: 'You have taken too long to log in!'
+    strikeout: 'You have entered too many invalid passwords!'
+    reloaded: '{RED}Server reloaded, you must log in.'
+
 admin:
     permissions: 'You do not have permission to use this command!'
     register:
@@ -77,9 +83,21 @@ admin:
         success:
             player: '{TARGET} {BRIGHTGREEN}has been unregistered!'
             target: '{RED}You have been unregistered and logged out!'
-
-misc:
-    illegal: '{GRAY}You must be logged in to do that!'
-    timeout: 'You have taken too long to log in!'
-    strikeout: 'You have entered too many invalid passwords!'
-    reloaded: '{RED}Server reloaded, you must log in.'
+    location:
+        usage: '{RED}Correct Usage: /xauth location set|remove [global]'
+        set:
+            error:
+                global: '{RED}Global teleport location is set to this world.{NEWLINE}{RED}Please remove it first.'
+                general: '{RED}Something went wrong while setting this location!'
+            success:
+                regular: '{BRIGHTGREEN}Teleport location for this world set to your location!'
+                global: '{BRIGHTGREEN}Global teleport location set to your location!'
+        remove:
+            error:
+            	noglobal: '{RED}A global teleport location is not set!'
+            	notset: '{RED}This world does not have a teleport location!'
+            	global: '{RED}Global teleport location is set to this world.{NEWLINE}{RED}Please use /xauth location remove global'
+                general: '{RED}Something went wrong while removing this location!'
+            success:
+                regular: '{BRIGHTGREEN}Teleport location for this world has been removed!'
+                global: '{BRIGHTGREEN}Global teleport location has been removed!'

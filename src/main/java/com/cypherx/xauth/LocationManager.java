@@ -14,7 +14,7 @@ import org.bukkit.World;
 
 public class LocationManager {
 	private final xAuth plugin;
-	private Map<UUID, Location> locations = new HashMap<UUID, Location> ();
+	private Map<UUID, Location> locations = new HashMap<UUID, Location>();
 	private UUID globalUID = null;
 
 	public LocationManager(final xAuth plugin) {
@@ -58,4 +58,68 @@ public class LocationManager {
 		Location loc = locations.get(uid);
 		return loc == null ? world.getSpawnLocation() : loc;
 	}
+
+	public boolean setLocation(Location loc, boolean global) {
+		UUID uid = loc.getWorld().getUID();
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			String sql = String.format("INSERT INTO `%s` VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `uid` = VALUES(`uid`), `x` = VALUES(`x`), `y` = VALUES(`y`), `z` = VALUES(`z`), `yaw` = VALUES(`yaw`), `pitch` = VALUES(`pitch`), `global` = VALUES(`global`)",
+					plugin.getConfig().getString("mysql.tables.location"));
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, uid.toString());
+			ps.setDouble(2, loc.getX());
+			ps.setDouble(3, loc.getY());
+			ps.setDouble(4, loc.getZ());
+			ps.setFloat(5, loc.getYaw());
+			ps.setFloat(6, loc.getPitch());
+			ps.setInt(7, global ? 1 : 0);
+			ps.executeUpdate();
+
+			locations.put(uid, loc);
+			if (global)
+				globalUID = uid;
+			else if (!global && globalUID != null && globalUID == uid)
+				globalUID = null;
+
+			return true;
+		} catch (SQLException e) {
+			xAuthLog.severe("Failed to set location!", e);
+			return false;
+		} finally {
+			plugin.getDbCtrl().close(conn, ps);
+		}
+	}
+
+	public boolean removeLocation(World world) {
+		UUID uid = world.getUID();
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			String sql = String.format("DELETE FROM `%s` WHERE `uid` = ?",
+					plugin.getConfig().getString("mysql.tables.location"));
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, uid.toString());
+			ps.executeUpdate();
+
+			locations.remove(uid);
+			if (uid == globalUID)
+				globalUID = null;
+
+			return true;
+		} catch (SQLException e) {
+			xAuthLog.severe("Failed to remove location!", e);
+			return false;
+		} finally {
+			plugin.getDbCtrl().close(conn, ps);
+		}
+	}
+
+	public boolean isLocationSet(World world) {
+		return locations.containsKey(world.getUID());
+	}
+
+	public UUID getGlobalUID() { return globalUID; }
 }

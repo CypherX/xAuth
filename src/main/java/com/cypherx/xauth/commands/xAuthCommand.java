@@ -36,6 +36,8 @@ public class xAuthCommand implements CommandExecutor {
 				return logoutCommand(sender, args);
 			else if (subCommand.equals("unregister") || subCommand.equals("unreg"))
 				return unregisterCommand(sender, args);
+			else if (subCommand.equals("location") || subCommand.equals("loc"))
+				return locationCommand(sender, args);
 
 			return true;
 		}
@@ -160,6 +162,69 @@ public class xAuthCommand implements CommandExecutor {
 			}
 		} else
 			plugin.getMsgHndlr().sendMessage("admin.unregister.error.general", sender);
+
+		return true;
+	}
+
+	private boolean locationCommand(CommandSender sender, String[] args) {
+		if (sender instanceof ConsoleCommandSender) {
+			xAuthLog.info("This command cannot be executed from the console!");
+			return true;
+		}
+
+		Player player = (Player) sender;
+		if (!xPermissions.has(player, "xauth.admin.location")) {
+			plugin.getMsgHndlr().sendMessage("admin.permission", player);
+			return true;
+		} else if (args.length < 2 || !(args[1].equals("set") || args[1].equals("remove"))) {
+			plugin.getMsgHndlr().sendMessage("admin.location.usage", player);
+			return true;
+		}
+
+		String action = args[1];
+		boolean global = args.length > 2 && args[2].equals("global") ? true : false;
+
+		if (action.equals("set")) {
+			if (!global && player.getWorld().getUID().equals(plugin.getLocMngr().getGlobalUID())) {
+				plugin.getMsgHndlr().sendMessage("admin.loc.set.error.global", player);
+				return true;
+			}
+
+			boolean success = plugin.getLocMngr().setLocation(player.getLocation(), global);
+			String response;
+
+			if (success)
+				response = global ? "admin.location.set.success.global" : "admin.location.set.success.regular";
+			else
+				response = "admin.location.set.error.general";
+
+			plugin.getMsgHndlr().sendMessage(response, player);
+		} else {
+			if (global) {
+				if (plugin.getLocMngr().getGlobalUID() == null) {
+					plugin.getMsgHndlr().sendMessage("admin.location.remove.error.noglobal", player);
+					return true;
+				}
+			} else {
+				if (!plugin.getLocMngr().isLocationSet(player.getWorld())) {
+					plugin.getMsgHndlr().sendMessage("admin.location.remove.error.notset", player);
+					return true;
+				} else if (player.getWorld().getUID().equals(plugin.getLocMngr().getGlobalUID())) {
+					plugin.getMsgHndlr().sendMessage("admin.location.remove.error.global", player);
+					return true;
+				}
+			}
+
+			boolean success = plugin.getLocMngr().removeLocation(player.getWorld());
+			String response;
+
+			if (success)
+				response = global ? "admin.location.remove.success.global" : "admin.location.remove.success.regular";
+			else
+				response = "admin.location.remove.error.general";
+
+			plugin.getMsgHndlr().sendMessage(response, player);
+		}
 
 		return true;
 	}
