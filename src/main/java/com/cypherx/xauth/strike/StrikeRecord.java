@@ -3,8 +3,6 @@ package com.cypherx.xauth.strike;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.cypherx.xauth.xAuthLog;
-
 public class StrikeRecord {
 	private Map<String, Integer> strikes = new HashMap<String, Integer>();
 
@@ -19,7 +17,6 @@ public class StrikeRecord {
 			count = 0;
 
 		strikes.put(playerName, ++count);
-		xAuthLog.info("Strike " + count + " added to [" + playerName + "]");
 		return count;
 	}
 

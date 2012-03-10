@@ -75,6 +75,7 @@ public class AuthSQL extends Auth {
 			plugin.getStrkMngr().getRecord(ipAddress).clearStrikes(player.getPlayerName());
 
 			conn.commit();
+			player.setLoginTime(currentTime);
 			response = "login.success";
 			return true;
 		} catch (SQLException e) {

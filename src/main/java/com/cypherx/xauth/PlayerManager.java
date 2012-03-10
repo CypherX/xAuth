@@ -231,7 +231,7 @@ public class PlayerManager {
 			return false;
 
 		Timestamp expireTime = new Timestamp(loginTime.getTime() + (godmodeLength * 1000));
-		return expireTime.compareTo(new Timestamp(System.currentTimeMillis())) < 0;
+		return expireTime.compareTo(new Timestamp(System.currentTimeMillis())) > 0;
 	}
 
 	public void reload() {
