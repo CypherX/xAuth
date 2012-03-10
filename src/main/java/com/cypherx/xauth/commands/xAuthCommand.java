@@ -193,7 +193,7 @@ public class xAuthCommand implements CommandExecutor {
 
 			boolean success = plugin.getLocMngr().setLocation(player.getLocation(), global);
 			if (success)
-				response = "admin.locaton.set.success." + (global ? "global" : "regular");
+				response = "admin.location.set.success." + (global ? "global" : "regular");
 			else
 				response = "admin.location.set.error.general";
 		} else {
