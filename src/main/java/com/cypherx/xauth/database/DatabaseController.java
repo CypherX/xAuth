@@ -52,7 +52,7 @@ public class DatabaseController {
 			activeTables.add(Table.LOCATION);
 
 		// Activate lockout table only if lockouts are enabled
-		if (plugin.getConfig().getBoolean("strikes.lockout.enabled"))
+		if (plugin.getConfig().getInt("strikes.lockout-length") > 0)
 			activeTables.add(Table.LOCKOUT);
 	}
 
