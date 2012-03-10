@@ -4,8 +4,8 @@ main:
 mysql:
     host: localhost
     port: 3306
-    user: xauth
-    password: password
+    user: root
+    password: 
     database: xauth
     tables:
         account: accounts
@@ -58,6 +58,7 @@ guest:
         entity:
             damage: true
             target: true
+
 session:
     length: 3600
     verifyip: true
@@ -65,9 +66,7 @@ session:
 
 strikes:
     amount: 5
-    lockout:
-        enabled: true
-        length: 3600
+    lockout-length: 3600
 
 filter:
     min-length: 2

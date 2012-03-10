@@ -58,7 +58,7 @@ public class StrikeManager {
 	}
 
 	public boolean isLockedOut(String ipAddress, String playerName) {
-		if (!plugin.getConfig().getBoolean("strikes.lockout.enabled"))
+		if (plugin.getConfig().getInt("strikes.lockout-length") < 1)
 			return false;
 
 		Connection conn = plugin.getDbCtrl().getConnection();
@@ -76,10 +76,10 @@ public class StrikeManager {
 				return false;
 
 			Timestamp lockoutTime = rs.getTimestamp("time");
-			Timestamp expireTime = new Timestamp(lockoutTime.getTime() + (plugin.getConfig().getInt("strikes.lockout.length") * 1000));
+			Timestamp expireTime = new Timestamp(lockoutTime.getTime() + (plugin.getConfig().getInt("strikes.lockout-length") * 1000));
 			return expireTime.compareTo(new Timestamp(System.currentTimeMillis())) > 0;
 		} catch (SQLException e) {
-			xAuthLog.severe(String.format("Failed to lookup lockout time for player: %s (%s)", playerName, ipAddress), e);
+			xAuthLog.severe(String.format("Failed to load lockout time for player: %s (%s)", playerName, ipAddress), e);
 			return false;
 		} finally {
 			plugin.getDbCtrl().close(conn, ps, rs);
