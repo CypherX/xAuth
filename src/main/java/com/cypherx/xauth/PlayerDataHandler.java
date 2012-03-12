@@ -27,7 +27,9 @@ public class PlayerDataHandler {
 
 		String strItems = buildString(pInv.getContents());
 		String strArmor = buildString(pInv.getArmorContents());
-		String strLoc = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
+		String strLoc = null;
+		if (loc != null)
+			strLoc = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
 
 		xp.setInventory(pInv);
 		xp.setLocation(loc);
