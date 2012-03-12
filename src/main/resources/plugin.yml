@@ -2,11 +2,10 @@ name: xAuth
 version: 2.0-dev
 description: Offline-mode Authentication
 author: CypherX
-#website: http://forums.bukkit.org/threads/MyPlugin.31337/
+website: https://github.com/CypherX/xAuth
 
 main: com.cypherx.xauth.xAuth
 database: false
-#depend: [NewFire, FlameWire]
 
 commands:
   register:
@@ -31,25 +30,33 @@ commands:
            /<command> changepw <player> <new password>
            /<command> logout <player>
            /<command> unregister <player>
-           /<command> strike list|clear [ip]
            /<command> location set|remove [global]
            /<command> reload
 
 permissions:
-#  inferno.*:
-#    description: Gives access to all Inferno commands
-#    children:
-#      inferno.flagrate: true
-#      inferno.burningdeaths: true
-#      inferno.burningdeaths.others: true
   xauth.register:
     description: Allows players/groups to register when new registrations are disabled.
     default: true
-#  inferno.burningdeaths:
-#    description: Allows you to see how many times you have burned to death
-#    default: true
-#  inferno.burningdeaths.others:
-#    description: Allows you to see how many times others have burned to death
-#    default: op
-#    children:
-#      inferno.burningdeaths: true
+  xauth.admin.*:
+    description: Grants access to all xAuth admin commands
+    children:
+        xauth.admin.register: true
+        xauth.admin.changepw: true
+        xauth.admin.logout: true
+        xauth.admin.unregister: true
+        xauth.admin.location: true
+  xauth.admin.register:
+    description: Allows you to register other players
+    default: op
+  xauth.admin.changepw:
+    description: Allows changing of other players passwords
+    default: op
+  xauth.admin.logout:
+    description: Allows you to end a players session
+    default: op
+  xauth.admin.unregister:
+    description: Remove a players registration
+    default: op
+  xauth.admin.location:
+    description: Set/remove the current world or global teleport location
+    default: op
