@@ -123,7 +123,8 @@ public class PlayerDataHandler {
 					int id = Integer.parseInt(enchantSplit[0]);
 					int level = Integer.parseInt(enchantSplit[1]);
 					Enchantment e = new EnchantmentWrapper(id);
-					items[i].addEnchantment(e, level);
+					//items[i].addEnchantment(e, level);
+					items[i].addUnsafeEnchantment(e, level);
 				}
 			}
 		}
