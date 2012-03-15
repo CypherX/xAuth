@@ -13,7 +13,6 @@ import com.avaje.ebean.validation.factory.EmailValidatorFactory;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer;
-import com.cypherx.xauth.database.Table;
 import com.cypherx.xauth.xAuthPlayer.Status;
 
 public class AuthSQL extends Auth {
@@ -50,7 +49,7 @@ public class AuthSQL extends Auth {
 		String ipAddress = player.getIPAddress();
 
 		try {
-			conn.setAutoCommit(false);
+			//conn.setAutoCommit(false);
 			String sql = String.format("UPDATE `%s` SET `lastlogindate` = ?, `lastloginip` = ? WHERE `id` = ?",
 					plugin.getConfig().getString("mysql.tables.account"));
 			ps = conn.prepareStatement(sql);
@@ -58,10 +57,9 @@ public class AuthSQL extends Auth {
 			ps.setString(2, ipAddress);
 			ps.setInt(3, player.getAccountId());
 			ps.executeUpdate();
-			ps.close();
 
 			// only insert session if the table is active (session.length > 0)
-			if (plugin.getDbCtrl().isTableActive(Table.SESSION)) {
+			/*if (plugin.getDbCtrl().isTableActive(Table.SESSION)) {
 				sql = String.format("INSERT INTO `%s` VALUES (?, ?, ?)",
 						plugin.getConfig().getString("mysql.tables.session"));
 				ps = conn.prepareStatement(sql);
@@ -69,12 +67,12 @@ public class AuthSQL extends Auth {
 				ps.setString(2, ipAddress);
 				ps.setTimestamp(3, currentTime);
 				ps.executeUpdate();
-			}
+			}*/
 
 			// clear strikes
 			plugin.getStrkMngr().getRecord(ipAddress).clearStrikes(player.getPlayerName());
 
-			conn.commit();
+			//conn.commit();
 			player.setLoginTime(currentTime);
 			response = "login.success";
 			return true;

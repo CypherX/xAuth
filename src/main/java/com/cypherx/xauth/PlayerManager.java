@@ -257,6 +257,27 @@ public class PlayerManager {
 		}
 	}
 
+	public boolean createSession(int accountId, String ipAddress) {
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			String sql = String.format("INSERT INTO `%s` VALUES (?, ?, ?)",
+					plugin.getConfig().getString("mysql.tables.session"));
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, accountId);
+			ps.setString(2, ipAddress);
+			ps.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+			ps.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			xAuthLog.severe("Something went wrong while inserting session for account: " + accountId, e);
+			return false;
+		} finally {
+			plugin.getDbCtrl().close(conn, ps);
+		}
+	}
+
 	public boolean deleteSession(int accountId) {
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;

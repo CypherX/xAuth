@@ -9,6 +9,7 @@ import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.auth.Auth;
+import com.cypherx.xauth.database.Table;
 import com.cypherx.xauth.xAuthPlayer.Status;
 import com.martiansoftware.jsap.CommandLineTokenizer;
 
@@ -42,6 +43,8 @@ public class LoginCommand implements CommandExecutor {
 
 			if (success) {
 				plugin.getPlyrMngr().unprotect(p);
+				if (plugin.getDbCtrl().isTableActive(Table.SESSION))
+					plugin.getPlyrMngr().createSession(p.getAccountId(), p.getIPAddress());
 				p.setStatus(Status.Authenticated);
 				plugin.getAuthClass(p).online(p.getPlayerName());
 				xAuthLog.info(playerName + " has logged in");

@@ -42,7 +42,7 @@ public class StrikeManager {
 			PreparedStatement ps = null;
 
 			try {
-				String sql = String.format("INSERT INTO `%s` VALUES (?, ?, ?)",
+				String sql = String.format("INSERT INTO `%s` (`ipaddress`, `playername`, `time`) VALUES (?, ?, ?)",
 						plugin.getConfig().getString("mysql.tables.lockout"));
 				ps = conn.prepareStatement(sql);
 				ps.setString(1, ipAddress);
