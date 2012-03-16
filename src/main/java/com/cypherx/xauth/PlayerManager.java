@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -105,6 +106,9 @@ public class PlayerManager {
 	}
 
 	public boolean mustRegister(Player player) {
+		if (plugin.getConfig().getBoolean("authurl.enabled"))
+			return plugin.getConfig().getBoolean("authurl.registration");
+		
 		return plugin.getConfig().getBoolean("registration.forced") || xPermissions.has(player, "xauth.register");
 	}
 
@@ -238,6 +242,58 @@ public class PlayerManager {
 		players.clear();
 	}
 
+	public boolean doLogin(xAuthPlayer xp) {
+		int accountId = xp.getAccountId();
+		String ipAddress = xp.getIPAddress();
+		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+
+		try {
+			// create account if one does not exist (for AuthURL only)
+			if (plugin.getConfig().getBoolean("authurl.enabled") && accountId < 1) {
+				accountId = createAccount(xp.getPlayerName(), "authURL", null, ipAddress);
+				xp.setAccountId(accountId);
+				xp.setStatus(Status.Registered);
+			}
+
+			// insert session if session.length > 0
+			if (plugin.getDbCtrl().isTableActive(Table.SESSION))
+				plugin.getPlyrMngr().createSession(accountId, ipAddress);
+
+			// clear strikes
+			plugin.getStrkMngr().getRecord(ipAddress).clearStrikes(xp.getPlayerName());
+
+			unprotect(xp);
+			xp.setLoginTime(currentTime);
+			xp.setStatus(Status.Authenticated);
+			return true;
+		} catch (SQLException e) {
+			xAuthLog.severe("Something went wrong while logging in player: " + xp.getPlayerName(), e);
+			return false;
+		}
+	}
+
+	public int createAccount(String user, String pass, String email, String ipaddress) throws SQLException {
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			String sql = String.format("INSERT INTO `%s` (`playername`, `password`, `email`, `registerdate`, `registerip`) VALUES (?, ?, ?, ?, ?)",
+					plugin.getConfig().getString("mysql.tables.account"));
+			ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, user);
+			ps.setString(2, plugin.getPwdHndlr().hash(pass));
+			ps.setString(3, email);
+			ps.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+			ps.setString(5, ipaddress);
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			return rs.next() ? rs.getInt(1) : -1;
+		} finally {
+			plugin.getDbCtrl().close(conn, ps, rs);
+		}
+	}
+
 	public boolean deleteAccount(int accountId) {
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
@@ -257,7 +313,7 @@ public class PlayerManager {
 		}
 	}
 
-	public boolean createSession(int accountId, String ipAddress) {
+	public boolean createSession(int accountId, String ipAddress) throws SQLException {
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
 
@@ -270,9 +326,6 @@ public class PlayerManager {
 			ps.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
 			ps.executeUpdate();
 			return true;
-		} catch (SQLException e) {
-			xAuthLog.severe("Something went wrong while inserting session for account: " + accountId, e);
-			return false;
 		} finally {
 			plugin.getDbCtrl().close(conn, ps);
 		}

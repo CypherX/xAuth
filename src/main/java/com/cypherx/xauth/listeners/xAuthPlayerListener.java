@@ -58,7 +58,7 @@ public class xAuthPlayerListener implements Listener {
 		xAuthPlayer xp = plyrMngr.getPlayer(p, true);
 		String node = "";
 
-		if (xp.isRegistered()) {
+		if (xp.isRegistered() || plugin.getConfig().getBoolean("authurl.enabled")) {
 			if (plyrMngr.checkSession(xp)) {
 				xp.setStatus(Status.Authenticated);
 				plugin.getAuthClass(xp).online(p.getName());

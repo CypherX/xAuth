@@ -120,8 +120,6 @@ public class xAuth extends JavaPlugin {
 
 	public Auth getAuthClass(xAuthPlayer p){
 		if(this.getConfig().getBoolean("authurl.enabled"))
-			/*return new AuthURL(getConfig().getString("authurl.url"), p.getIPAddress(), getConfig().getBoolean("authurl.registration"),
-					getConfig().getBoolean("authurl.status"), getConfig().getBoolean("authurl.groups"));*/
 			return new AuthURL(this, p.getIPAddress());
 		else
 			return new AuthSQL(this, p);

@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +14,6 @@ import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthPlayer.Status;
 
 public class AuthSQL extends Auth {
-	private final xAuth plugin;
 	private final xAuthPlayer player;
 
 	public AuthSQL(final xAuth plugin, final xAuthPlayer player) {
@@ -43,13 +40,14 @@ public class AuthSQL extends Auth {
 			return false;
 		}
 
-		Connection conn = plugin.getDbCtrl().getConnection();
+		return true;
+
+		/*Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
 		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 		String ipAddress = player.getIPAddress();
 
 		try {
-			//conn.setAutoCommit(false);
 			String sql = String.format("UPDATE `%s` SET `lastlogindate` = ?, `lastloginip` = ? WHERE `id` = ?",
 					plugin.getConfig().getString("mysql.tables.account"));
 			ps = conn.prepareStatement(sql);
@@ -58,34 +56,19 @@ public class AuthSQL extends Auth {
 			ps.setInt(3, player.getAccountId());
 			ps.executeUpdate();
 
-			// only insert session if the table is active (session.length > 0)
-			/*if (plugin.getDbCtrl().isTableActive(Table.SESSION)) {
-				sql = String.format("INSERT INTO `%s` VALUES (?, ?, ?)",
-						plugin.getConfig().getString("mysql.tables.session"));
-				ps = conn.prepareStatement(sql);
-				ps.setInt(1, player.getAccountId());
-				ps.setString(2, ipAddress);
-				ps.setTimestamp(3, currentTime);
-				ps.executeUpdate();
-			}*/
-
 			// clear strikes
 			plugin.getStrkMngr().getRecord(ipAddress).clearStrikes(player.getPlayerName());
 
-			//conn.commit();
 			player.setLoginTime(currentTime);
 			response = "login.success";
 			return true;
 		} catch (SQLException e) {
 			xAuthLog.severe("Failed to complete log in process for player: " + user, e);
-			try {
-				conn.rollback();
-			} catch (SQLException ex) {}
 			response = "login.error.general";
 			return false;
 		} finally {
 			plugin.getDbCtrl().close(conn, ps);
-		}
+		}*/
 	}
 
 	public boolean register(String user, String pass, String email) {
@@ -119,34 +102,19 @@ public class AuthSQL extends Auth {
 	}
 
 	private boolean execRegQuery(String user, String pass, String email, boolean admin) {
-		Connection conn = plugin.getDbCtrl().getConnection();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
 		try {
-			String sql = String.format("INSERT INTO `%s` (`playername`, `password`, `email`, `registerdate`, `registerip`) VALUES (?, ?, ?, ?, ?)",
-					plugin.getConfig().getString("mysql.tables.account"));
-			ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, user);
-			ps.setString(2, plugin.getPwdHndlr().hash(pass));
-			ps.setString(3, email);
-			ps.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
-			ps.setString(5, player.getIPAddress());
-			ps.executeUpdate();
-			rs = ps.getGeneratedKeys();
-			if (rs.next()) {
-				player.setAccountId(rs.getInt(1));
-				response = admin ? "admin.register.success" : "register.success";
+			int accId = plugin.getPlyrMngr().createAccount(user, pass, email, player.getIPAddress());
+			if (accId > 0) {
+				player.setAccountId(accId);
 				player.setStatus(Status.Registered);
+				response = admin ? "admin.register.success" : "register.success";
 				return true;
 			} else
 				throw new SQLException();
 		} catch (SQLException e) {
-			xAuthLog.severe("Failed to create account for player: " + user, e);
+			xAuthLog.severe("Something went wrong while creating account for player: " + user, e);
 			response = admin ? "admin.register.error.general" : "register.error.general";
 			return false;
-		} finally {
-			plugin.getDbCtrl().close(conn, ps, rs);
 		}
 	}
 

@@ -20,7 +20,10 @@
 
 package com.cypherx.xauth.auth;
 
+import com.cypherx.xauth.xAuth;
+
 public abstract class Auth {
+	protected xAuth plugin;
 	protected String response = null;
 	protected String group = null;
  

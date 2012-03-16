@@ -30,6 +30,7 @@ import java.net.URLEncoder;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 
+
 /**
  * This class is made to interact with authURL scripts on servers.  It is backwards compatible with the original
  * version that just supported login authentication, but now has more features.
@@ -51,7 +52,7 @@ public class AuthURL extends Auth {
 	private boolean supportsOnlineOffline;
 	private boolean supportsPermissionsGroup;*/
 
-	private final xAuth plugin;
+	//private final xAuth plugin;
 	private String ipAddress = null;
 
 	//private String response = null;
