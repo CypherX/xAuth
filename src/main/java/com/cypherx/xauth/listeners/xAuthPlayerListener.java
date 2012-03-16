@@ -85,11 +85,8 @@ public class xAuthPlayerListener implements Listener {
 		plugin.getAuthClass(p).offline(event.getPlayer().getName());
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onPlayerChat(PlayerChatEvent event) {
-		if (event.isCancelled())
-			return;
-
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
 		if (plyrMngr.isRestricted(p, event)) {
 			plyrMngr.sendNotice(p);
@@ -97,11 +94,8 @@ public class xAuthPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-		if (event.isCancelled())
-			return;
-
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer().getName());
 		if (plyrMngr.isRestricted(p, event)) {
 			String command = event.getMessage().split(" ")[0].replaceFirst("/", "");
@@ -126,11 +120,8 @@ public class xAuthPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		if (event.isCancelled())
-			return;
-
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer().getName());
 		if (plyrMngr.isRestricted(p, event)) {
 			Action action = event.getAction();
@@ -172,11 +163,8 @@ public class xAuthPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onPlayerMove(PlayerMoveEvent event) {
-		if (event.isCancelled())
-			return;
-
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
 		if (plyrMngr.isRestricted(p, event)) {
 			event.setTo(plugin.getDbCtrl().isTableActive(Table.LOCATION) ?
@@ -185,11 +173,8 @@ public class xAuthPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
-		if (event.isCancelled())
-			return;
-
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
 		if (plyrMngr.isRestricted(p, event))
 			event.setCancelled(true);

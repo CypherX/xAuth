@@ -23,11 +23,8 @@ public class xAuthEntityListener implements Listener {
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onEntityDamage(EntityDamageEvent event) {
-		if (event.isCancelled())
-			return;
-
 		Entity entity = event.getEntity();
 		if (entity instanceof Player && ((Player)entity).isOnline()) { // player taking damage
 			xAuthPlayer xp = plyrMngr.getPlayer(((Player)entity).getName());
@@ -46,11 +43,8 @@ public class xAuthEntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onEntityTarget(EntityTargetEvent event) {
-		if (event.isCancelled())
-			return;
-
 		Entity target = event.getTarget();
 		if (target instanceof Player) {
 			xAuthPlayer xp = plyrMngr.getPlayer(((Player) target).getName());
@@ -59,11 +53,8 @@ public class xAuthEntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onFoodLevelChange(FoodLevelChangeEvent event) {
-		if (event.isCancelled())
-			return;
-
 		Entity entity = event.getEntity();
 		if (entity instanceof Player) {
 			xAuthPlayer xp = plyrMngr.getPlayer(((Player) entity).getName());

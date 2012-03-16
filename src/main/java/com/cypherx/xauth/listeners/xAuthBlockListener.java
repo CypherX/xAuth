@@ -19,11 +19,8 @@ public class xAuthBlockListener implements Listener {
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event) {
-		if (event.isCancelled())
-			return;
-
 		xAuthPlayer xp = plyrMngr.getPlayer(event.getPlayer());
 		if (plyrMngr.isRestricted(xp, event)) {
 			plyrMngr.sendNotice(xp);
@@ -31,11 +28,8 @@ public class xAuthBlockListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent event) {
-		if (event.isCancelled())
-			return;
-
 		xAuthPlayer xp = plyrMngr.getPlayer(event.getPlayer());
 		if (plyrMngr.isRestricted(xp, event)) {
 			plyrMngr.sendNotice(xp);
