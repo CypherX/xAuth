@@ -8,7 +8,7 @@ join:
 
 register:
     usage: '{RED}Correct Usage: /register <password> [email]'
-    success: '{BRIGHTGREEN}You have successfully registered! You may now log in.'
+    success: '{BRIGHTGREEN}You have successfully registered!{NEWLINE}{BRIGHTGREEN}You may now log in using /login <password>'
     error:
         disabled: '{RED}Registrations are currently disabled!'
         registered: '{RED}You are already registered!'

@@ -41,34 +41,6 @@ public class AuthSQL extends Auth {
 		}
 
 		return true;
-
-		/*Connection conn = plugin.getDbCtrl().getConnection();
-		PreparedStatement ps = null;
-		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-		String ipAddress = player.getIPAddress();
-
-		try {
-			String sql = String.format("UPDATE `%s` SET `lastlogindate` = ?, `lastloginip` = ? WHERE `id` = ?",
-					plugin.getConfig().getString("mysql.tables.account"));
-			ps = conn.prepareStatement(sql);
-			ps.setTimestamp(1, currentTime);
-			ps.setString(2, ipAddress);
-			ps.setInt(3, player.getAccountId());
-			ps.executeUpdate();
-
-			// clear strikes
-			plugin.getStrkMngr().getRecord(ipAddress).clearStrikes(player.getPlayerName());
-
-			player.setLoginTime(currentTime);
-			response = "login.success";
-			return true;
-		} catch (SQLException e) {
-			xAuthLog.severe("Failed to complete log in process for player: " + user, e);
-			response = "login.error.general";
-			return false;
-		} finally {
-			plugin.getDbCtrl().close(conn, ps);
-		}*/
 	}
 
 	public boolean register(String user, String pass, String email) {

@@ -94,6 +94,7 @@ public class MessageHandler {
 			message = message.replace("{TARGET}", targetName);
 
 		// TODO other replacement vars
+		message = message.replace("{PWMINLENGTH}", String.valueOf(plugin.getConfig().getInt("password.min-length")));
 
 		// newline
 		message = message.replace("{NEWLINE}", "\n");

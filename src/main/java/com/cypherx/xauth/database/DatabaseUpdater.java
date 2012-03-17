@@ -141,7 +141,6 @@ public class DatabaseUpdater {
 			xAuthLog.severe("Failed to load update files for table: " + tblId, e);
 		}
 
-		//Collections.sort(updateFiles); // idk if necessary
 		return updateFiles;
 	}
 

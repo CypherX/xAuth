@@ -1,11 +1,10 @@
 name: xAuth
-version: 2.0-dev
+version: 2.0
 description: Offline-mode Authentication
 author: CypherX
 website: https://github.com/CypherX/xAuth
 
 main: com.cypherx.xauth.xAuth
-database: false
 
 commands:
   register:
@@ -31,7 +30,6 @@ commands:
            /<command> logout <player>
            /<command> unregister <player>
            /<command> location set|remove [global]
-           /<command> reload
 
 permissions:
   xauth.register:

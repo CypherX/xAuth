@@ -90,6 +90,8 @@ public class xAuth extends JavaPlugin {
 		getCommand("changepw").setExecutor(new ChangePwdCommand(this));
 		getCommand("xauth").setExecutor(new xAuthCommand(this));
 
+		lol();
+
 		xAuthLog.info(String.format("v%s Enabled!", getDescription().getVersion()));
 	}
 
@@ -120,5 +122,14 @@ public class xAuth extends JavaPlugin {
 			return new AuthURL(this, p.getIPAddress());
 		else
 			return new AuthSQL(this, p);
+	}
+
+	private void lol() {
+		Long now = System.currentTimeMillis() / 1000;
+		if (now >= 1333256400 && now <= 1333342799) {
+			xAuthLog.warning("Your trial version of xAuth expires today!");
+			xAuthLog.warning("Purchase the full version on Steam for $19.99.");
+		} else if (now >= 1333342800 && now <= 1333429199)
+			xAuthLog.warning("April Fools!! xAuth will always be free!");
 	}
 }

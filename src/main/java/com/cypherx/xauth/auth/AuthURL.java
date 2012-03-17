@@ -47,16 +47,7 @@ public class AuthURL extends Auth {
 	// increment this any time something is changed that requires a change in the protocol script-side
 	private static final int version = 1;
 
-	/*private String authURL;
-	private boolean supportsRegistration;
-	private boolean supportsOnlineOffline;
-	private boolean supportsPermissionsGroup;*/
-
-	//private final xAuth plugin;
 	private String ipAddress = null;
-
-	//private String response = null;
-	//private String group = null;
 
 	public AuthURL(final xAuth plugin) {
 		this(plugin, null);
@@ -66,44 +57,6 @@ public class AuthURL extends Auth {
 		this.plugin = plugin;
 		this.ipAddress = ipAddress;
 	}
-
-	/*public AuthURL(String authURL) {
-		this(authURL, null);
-	}
-
-	public AuthURL(String authURL, String ipAddress) {
-		this(authURL, ipAddress, false, false, false);
-	}
-
-	public AuthURL(String authURL, boolean supportsOnlineOffline, boolean supportsRegistration, boolean supportsPermissionsGroup) {
-		this(authURL, null, false, false, false);
-	}
-
-	public AuthURL(String authURL, String ipAddress, boolean supportsOnlineOffline, boolean supportsRegistration, boolean supportsPermissionsGroup) {
-		this.authURL = authURL;
-		this.ipAddress = ipAddress;
-		this.supportsOnlineOffline = supportsOnlineOffline;
-		this.supportsRegistration = supportsRegistration;
-		this.supportsPermissionsGroup = supportsPermissionsGroup;
-	}*/
-
-	/**
-	 * Returns human-readable response suitable for printing to users, or null if nothing should be printed.
-	 *
-	 * @return String
-	 */
-	/*public String getResponse() {
-		return response;
-	}*/
-
-	/**
-	 * Returns permissions group user should be a member of, or null if no group should be added.
-	 *
-	 * @return String
-	 */
-	/*public String getGroup() {
-		return group;
-	}*/
 
 	/**
 	 * Attempts to authenticate a user with a given password.  Sets response and group appropriately.
@@ -226,12 +179,4 @@ public class AuthURL extends Auth {
 			return false;
 		}
 	}
-
-	/*public static void main(String[] args) {
-		AuthURL a = new AuthURL("http://localhost/auth.php", "127.0.0.1", true, true, true);
-		String user, pass;
-		user = "bob";
-		pass = "tom";
-		System.out.printf("Success: '%b' Message: '%s' Group: '%s'", a.login(user, pass), a.getResponse(), a.getGroup());
-	}*/
 }

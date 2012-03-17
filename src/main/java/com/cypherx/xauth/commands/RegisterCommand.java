@@ -40,11 +40,8 @@ public class RegisterCommand implements CommandExecutor {
 			if (response != null)
 				plugin.getMsgHndlr().sendMessage(response, p.getPlayer());
 
-			if (success) {
-				//p.setStatus(Status.Registered);
+			if (success)
 				xAuthLog.info(playerName + " has registered");
-				//plugin.getMsgCtrl().sendMessage("join.login", p.getPlayer());
-			}
 
 			return true;
 		}
