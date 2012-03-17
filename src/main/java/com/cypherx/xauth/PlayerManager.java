@@ -27,7 +27,7 @@ public class PlayerManager {
 	}
 
 	public xAuthPlayer getPlayer(Player player) {
-		return getPlayer(player.getName(), false);
+		return getPlayer(player, false);
 	}
 
 	public xAuthPlayer getPlayer(Player player, boolean reload) {
@@ -45,9 +45,6 @@ public class PlayerManager {
 			return players.get(lowPlayerName);
 
 		xAuthPlayer player = loadPlayer(playerName);
-
-		//if (!plugin.isSafeMode())
-			//player = loadPlayer(playerName);
 
 		if (player == null)
 			player = new xAuthPlayer(playerName);

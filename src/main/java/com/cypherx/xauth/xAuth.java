@@ -22,7 +22,6 @@ public class xAuth extends JavaPlugin {
 	private PasswordHandler pwdHndlr;
 	private LocationManager locMngr;
 	private StrikeManager strkMngr;
-	//private boolean safeMode = false;
 
 	public void onDisable() {
 		for (Player p : getServer().getOnlinePlayers()) {
@@ -59,10 +58,8 @@ public class xAuth extends JavaPlugin {
 		if (dbCtrl.isConnectable()) { // Able to connect to MySQL server, proceed normally
 			xAuthLog.info("Successfully established connection to MySQL server");
 			dbCtrl.runUpdater();			
-		} else/* if (getConfig().getBoolean("main.use-safemode")) */{ // Failed to connect to MySQL server, disable plugin
-			//xAuthLog.warning("MySQL server connection not found, safe-mode enabled");
+		} else { // Failed to connect to MySQL server, disable plugin
 			xAuthLog.severe("Failed to establish MySQL server connection!");
-			//safeMode = true;
 
 			// disable (for now, may change in the future)
 			getServer().getPluginManager().disablePlugin(this);
@@ -119,11 +116,9 @@ public class xAuth extends JavaPlugin {
 	public StrikeManager getStrkMngr() { return strkMngr; }
 
 	public Auth getAuthClass(xAuthPlayer p){
-		if(this.getConfig().getBoolean("authurl.enabled"))
+		if (this.getConfig().getBoolean("authurl.enabled"))
 			return new AuthURL(this, p.getIPAddress());
 		else
 			return new AuthSQL(this, p);
 	}
-
-	//public boolean isSafeMode() { return safeMode; }
 }

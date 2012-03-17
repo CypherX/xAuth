@@ -40,6 +40,9 @@ public class xAuthPlayerListener implements Listener {
 			return;
 
 		Player p = event.getPlayer();
+		if (p.isOnline())		
+			plugin.getPlyrMngr().getPlayer(p, true);
+
 		String ipAddress = event.getKickMessage();
 		if (Utils.isIPAddress(ipAddress))
 			if (plugin.getStrkMngr().isLockedOut(ipAddress, p.getName()))

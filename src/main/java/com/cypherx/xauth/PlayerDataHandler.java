@@ -58,7 +58,6 @@ public class PlayerDataHandler {
 		pInv.setLeggings(null);
 		pInv.setBoots(null);
 		p.teleport(plugin.getLocMngr().getLocation(p.getWorld()));
-		p.saveData();
 	}
 
 	private String buildString(ItemStack[] items) {
