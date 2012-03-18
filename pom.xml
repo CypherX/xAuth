@@ -73,6 +73,18 @@
           <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
+      <plugin>
+      	<groupId>org.apache.maven.plugins</groupId>
+      	<artifactId>maven-jar-plugin</artifactId>
+      	<version>2.4</version>
+      	<configuration>
+		  <archive>
+		    <manifestEntries>
+		      <Class-Path>../lib/h2-1.3.164.jar</Class-Path>
+		    </manifestEntries>
+		  </archive>
+		</configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

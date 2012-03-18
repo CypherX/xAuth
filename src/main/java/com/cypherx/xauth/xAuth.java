@@ -54,12 +54,12 @@ public class xAuth extends JavaPlugin {
 		// Initialize database controller
 		dbCtrl = new DatabaseController(this);
 
-		// Test connection to MySQL server
-		if (dbCtrl.isConnectable()) { // Able to connect to MySQL server, proceed normally
-			xAuthLog.info("Successfully established connection to MySQL server");
+		// Test connection to database
+		if (dbCtrl.isConnectable()) { // Able to connect to database, proceed normally
+			xAuthLog.info("Successfully established connection to " + dbCtrl.getDBMS() + " database");
 			dbCtrl.runUpdater();			
-		} else { // Failed to connect to MySQL server, disable plugin
-			xAuthLog.severe("Failed to establish MySQL server connection!");
+		} else { // Failed to connect to database, disable plugin
+			xAuthLog.severe("Failed to establish " + dbCtrl.getDBMS() + " database connection!");
 
 			// disable (for now, may change in the future)
 			getServer().getPluginManager().disablePlugin(this);

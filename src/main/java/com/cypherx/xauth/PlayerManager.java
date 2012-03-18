@@ -60,7 +60,7 @@ public class PlayerManager {
 
 		try {
 			String sql = String.format("SELECT `id` FROM `%s` WHERE `playername` = ?",
-					plugin.getConfig().getString("mysql.tables.account"));
+					plugin.getDbCtrl().getTable(Table.ACCOUNT));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, playerName);
 			rs = ps.executeQuery();
@@ -119,7 +119,7 @@ public class PlayerManager {
 
 		try {
 			String sql = String.format("SELECT `ipaddress`, `logintime` FROM `%s` WHERE `accountid` = ?",
-					plugin.getConfig().getString("mysql.tables.session"));
+					plugin.getDbCtrl().getTable(Table.SESSION));
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, player.getAccountId());
 			rs = ps.executeQuery();
@@ -276,7 +276,7 @@ public class PlayerManager {
 
 		try {
 			String sql = String.format("INSERT INTO `%s` (`playername`, `password`, `email`, `registerdate`, `registerip`) VALUES (?, ?, ?, ?, ?)",
-					plugin.getConfig().getString("mysql.tables.account"));
+					plugin.getDbCtrl().getTable(Table.ACCOUNT));
 			ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, user);
 			ps.setString(2, plugin.getPwdHndlr().hash(pass));
@@ -297,7 +297,7 @@ public class PlayerManager {
 
 		try {
 			String sql = String.format("DELETE FROM `%s` WHERE `id` = ?",
-					plugin.getConfig().getString("mysql.tables.account"));
+					plugin.getDbCtrl().getTable(Table.ACCOUNT));
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, accountId);
 			ps.executeUpdate();
@@ -316,7 +316,7 @@ public class PlayerManager {
 
 		try {
 			String sql = String.format("INSERT INTO `%s` VALUES (?, ?, ?)",
-					plugin.getConfig().getString("mysql.tables.session"));
+					plugin.getDbCtrl().getTable(Table.SESSION));
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, accountId);
 			ps.setString(2, ipAddress);
@@ -334,7 +334,7 @@ public class PlayerManager {
 
 		try {
 			String sql = String.format("DELETE FROM `%s` WHERE `accountid` = ?",
-					plugin.getConfig().getString("mysql.tables.session"));
+					plugin.getDbCtrl().getTable(Table.SESSION));
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, accountId);
 			ps.executeUpdate();

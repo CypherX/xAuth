@@ -2,6 +2,7 @@ main:
     auto-disable: true
 
 mysql:
+    enabled: false
     host: localhost
     port: 3306
     user: user

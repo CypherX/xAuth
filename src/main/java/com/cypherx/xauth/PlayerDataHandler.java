@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.cypherx.xauth.database.Table;
+
 public class PlayerDataHandler {
 	private final xAuth plugin;
 
@@ -38,13 +40,14 @@ public class PlayerDataHandler {
 		PreparedStatement ps = null;
 		try {
 			// Store player inventory and location in database.
-			String sql = String.format("INSERT IGNORE INTO `%s` VALUES (?, ?, ?, ?)",
-					plugin.getConfig().getString("mysql.tables.playerdata"));
+			String sql = String.format("INSERT INTO `%s` SELECT ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `%s` WHERE `playername` = ?)",
+					plugin.getDbCtrl().getTable(Table.PLAYERDATA), plugin.getDbCtrl().getTable(Table.PLAYERDATA));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, p.getName());
 			ps.setString(2, strItems);
 			ps.setString(3, strArmor);
 			ps.setString(4, strLoc);
+			ps.setString(5, p.getName());
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			xAuthLog.severe("Failed to insert player data into database!", e);
@@ -143,7 +146,7 @@ public class PlayerDataHandler {
 
 		try {
 			String sql = String.format("SELECT `items`, `armor`, `location` FROM `%s` WHERE `playername` = ?",
-					plugin.getConfig().getString("mysql.tables.playerdata"));
+					plugin.getDbCtrl().getTable(Table.PLAYERDATA));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, p.getName());
 			rs = ps.executeQuery();
@@ -203,7 +206,7 @@ public class PlayerDataHandler {
 		conn = plugin.getDbCtrl().getConnection();
 		try {
 			String sql = String.format("DELETE FROM `%s` WHERE `playername` = ?",
-					plugin.getConfig().getString("mysql.tables.playerdata"));
+					plugin.getDbCtrl().getTable(Table.PLAYERDATA));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, p.getName());
 			ps.executeUpdate();

@@ -1,5 +1,6 @@
 package com.cypherx.xauth.database;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +17,7 @@ public class DatabaseController {
 	private final xAuth plugin;
 	private ConnectionPool connPool;
 	private List<Table> activeTables = new ArrayList<Table>();
+	private DBMS dbms = DBMS.H2;
 
 	public DatabaseController(final xAuth plugin) {
 		this.plugin = plugin;
@@ -24,19 +26,30 @@ public class DatabaseController {
 
 	private void dbInit() {
 		// Initialize connection pool
-		ConfigurationSection cs = plugin.getConfig().getConfigurationSection("mysql");
-		String host = cs.getString("host");
-		int port = cs.getInt("port");
-		String db = cs.getString("database");
-		String user = cs.getString("user");
-		String pass = cs.getString("password");
+		String driver, url, user, pass;
+		
+		if (plugin.getConfig().getBoolean("mysql.enabled")) { // MySQL
+			dbms = DBMS.MySQL;
+			ConfigurationSection cs = plugin.getConfig().getConfigurationSection("mysql");
+			String host = cs.getString("host");
+			int port = cs.getInt("port");
+			String db = cs.getString("database");
 
-		String url = String.format("jdbc:mysql://%s:%d/%s?zeroDateTimeBehavior=convertToNull", host, port, db);
+			driver = "com.mysql.jdbc.Driver";
+			url = "jdbc:mysql://" + host + ":" + port + "/" + db + "?zeroDateTimeBehavior=convertToNull";
+			user = cs.getString("user");
+			pass = cs.getString("password");
+		} else { // H2
+			driver = "org.h2.Driver";
+			url = "jdbc:h2:" + plugin.getDataFolder() + File.separator + "xAuth;MODE=MySQL";
+			user = "sa";
+			pass = "";
+		}
 
 		try {
-			connPool = new ConnectionPool(url, user, pass);
+			connPool = new ConnectionPool(driver, url, user, pass);
 		} catch (ClassNotFoundException e) {
-			xAuthLog.severe("Failed to create instance of MySQL JDBC Driver!", e);
+			xAuthLog.severe("Failed to create instance of " + getDBMS() + " JDBC Driver!", e);
 		}
 
 		// Register tables
@@ -133,9 +146,18 @@ public class DatabaseController {
 		dbUpdater.runUpdate();
 	}
 
-	public boolean isTableActive(Table table) {
-		return activeTables.contains(table);
+	public boolean isTableActive(Table tbl) {
+		return activeTables.contains(tbl);
+	}
+
+	public String getTable(Table tbl) {
+		if (dbms == DBMS.H2)
+			return tbl.getName();
+
+		return plugin.getConfig().getString("mysql.tables." + tbl.toString().toLowerCase());
 	}
 
 	public List<Table> getActiveTables() { return activeTables; }
+	public String getDBMS() { return dbms.toString(); }
+	private enum DBMS { H2, MySQL }
 }

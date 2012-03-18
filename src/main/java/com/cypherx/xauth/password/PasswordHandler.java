@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
+import com.cypherx.xauth.database.Table;
 
 public class PasswordHandler {
 	private final xAuth plugin;
@@ -29,7 +30,7 @@ public class PasswordHandler {
 
 		try {
 			String sql = String.format("SELECT `password`, `pwtype` FROM `%s` WHERE `id` = ?",
-					plugin.getConfig().getString("mysql.tables.account"));
+					plugin.getDbCtrl().getTable(Table.ACCOUNT));
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, accountId);
 			rs = ps.executeQuery();
@@ -63,7 +64,7 @@ public class PasswordHandler {
 
 			try {
 				String sql = String.format("UPDATE `%s` SET `password` = ?, `pwtype` = ? WHERE `id` = ?",
-						plugin.getConfig().getString("mysql.tables.account"));
+						plugin.getDbCtrl().getTable(Table.ACCOUNT));
 				ps = conn.prepareStatement(sql);
 				ps.setString(1, newHash);
 				ps.setInt(2, 0);

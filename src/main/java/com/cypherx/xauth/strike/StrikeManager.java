@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
+import com.cypherx.xauth.database.Table;
 
 public class StrikeManager {
 	private final xAuth plugin;
@@ -43,7 +44,7 @@ public class StrikeManager {
 
 			try {
 				String sql = String.format("INSERT INTO `%s` (`ipaddress`, `playername`, `time`) VALUES (?, ?, ?)",
-						plugin.getConfig().getString("mysql.tables.lockout"));
+						plugin.getDbCtrl().getTable(Table.LOCKOUT));
 				ps = conn.prepareStatement(sql);
 				ps.setString(1, ipAddress);
 				ps.setString(2, playerName);
@@ -67,7 +68,7 @@ public class StrikeManager {
 
 		try {
 			String sql = String.format("SELECT `time` FROM `%s` WHERE `ipaddress` = ? AND `playername` = ?",
-					plugin.getConfig().getString("mysql.tables.lockout"));
+					plugin.getDbCtrl().getTable(Table.LOCKOUT));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, ipAddress);
 			ps.setString(2, playerName);

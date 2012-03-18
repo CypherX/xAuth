@@ -15,8 +15,8 @@ public class ConnectionPool {
 	private Vector<Connection> busyConnections = new Vector<Connection>();
 	private Lock lock = new ReentrantLock();
 
-	public ConnectionPool(String url, String user, String password) throws ClassNotFoundException {
-		Class.forName("com.mysql.jdbc.Driver");
+	public ConnectionPool(String driver, String url, String user, String password) throws ClassNotFoundException {
+		Class.forName(driver);
 		this.url = url;
 		this.user = user;
 		this.password = password;
@@ -28,7 +28,7 @@ public class ConnectionPool {
 			if (!idleConnections.isEmpty()) {
 				Connection conn = idleConnections.firstElement();
 				idleConnections.removeElementAt(0);
-				if (conn.isValid(1)) {
+				if (!conn.isClosed()) {
 					busyConnections.add(conn);
 					return conn;
 				} else {
@@ -41,7 +41,7 @@ public class ConnectionPool {
 				throw new SQLException("Connection pool is full");
 	
 			Connection conn = DriverManager.getConnection(url, user, password);
-			if (conn.isValid(1)) {
+			if (!conn.isClosed()) {
 				busyConnections.add(conn);
 				return conn;
 			} else {

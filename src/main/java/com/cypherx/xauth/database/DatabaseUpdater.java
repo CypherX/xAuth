@@ -56,7 +56,8 @@ public class DatabaseUpdater {
 	public void runUpdate() {
 		for (Table tbl : dbCon.getActiveTables()) {
 			String tblId = tbl.toString().toLowerCase();
-			String tblName = plugin.getConfig().getString("mysql.tables." + tblId);
+			//String tblName = plugin.getConfig().getString("mysql.tables." + tblId);
+			String tblName = dbCon.getTable(tbl);
 			List<String> updateFiles = loadUpdateFiles(tblId);
 
 			// -1 = not created, 0 = default table, 1+ = updated
@@ -125,7 +126,7 @@ public class DatabaseUpdater {
 
 	private List<String> loadUpdateFiles(String tblId) {
 		List<String> updateFiles = new ArrayList<String>();
-		String updatePath = "sql/" + tblId + "/updates";
+		String updatePath = "sql/"  + tblId + "/updates/" + dbCon.getDBMS().toLowerCase();
 
 		try {
 			JarFile jar = new JarFile(plugin.getJar());
@@ -157,7 +158,7 @@ public class DatabaseUpdater {
 		String sql = Utils.streamToString(plugin.getResource(path));
 		sql = sql.replace("{TABLE}", tblName);
 		sql = sql.replace("{TABLE_ACCOUNT}",
-				plugin.getConfig().getString("mysql.tables.account")); // foreign key in session table
+				plugin.getDbCtrl().getTable(Table.ACCOUNT)); // foreign key in session table
 		return sql;
 	}
 

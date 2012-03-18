@@ -11,6 +11,7 @@ import com.avaje.ebean.validation.factory.EmailValidatorFactory;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer;
+import com.cypherx.xauth.database.Table;
 import com.cypherx.xauth.xAuthPlayer.Status;
 
 public class AuthSQL extends Auth {
@@ -123,7 +124,7 @@ public class AuthSQL extends Auth {
 
 		try {
 			String sql = String.format("UPDATE `%s` SET `password` = ? WHERE `id` = ?",
-					plugin.getConfig().getString("mysql.tables.account"));
+					plugin.getDbCtrl().getTable(Table.ACCOUNT));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, plugin.getPwdHndlr().hash(newPass));
 			ps.setInt(2, player.getAccountId());
@@ -159,7 +160,7 @@ public class AuthSQL extends Auth {
 
 		try {
 			String sql = String.format("SELECT `active` FROM `%s` WHERE `id` = ?",
-					plugin.getConfig().getString("mysql.tables.account"));
+					plugin.getDbCtrl().getTable(Table.ACCOUNT));
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, id);
 			rs = ps.executeQuery();
@@ -187,7 +188,7 @@ public class AuthSQL extends Auth {
 
 		try {
 			String sql = String.format("SELECT COUNT(`id`) FROM `%s` WHERE `registerip` = ?",
-					plugin.getConfig().getString("mysql.tables.account"));
+					plugin.getDbCtrl().getTable(Table.ACCOUNT));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, ipaddress);
 			rs = ps.executeQuery();

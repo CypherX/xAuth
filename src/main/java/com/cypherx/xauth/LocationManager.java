@@ -12,6 +12,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import com.cypherx.xauth.database.Table;
+
 public class LocationManager {
 	private final xAuth plugin;
 	private Map<UUID, Location> locations = new HashMap<UUID, Location>();
@@ -29,7 +31,7 @@ public class LocationManager {
 
 		try {
 			String sql = String.format("SELECT * FROM `%s`",
-					plugin.getConfig().getString("mysql.tables.location"));
+					plugin.getDbCtrl().getTable(Table.LOCATION));
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 
@@ -66,7 +68,7 @@ public class LocationManager {
 
 		try {
 			String sql = String.format("INSERT INTO `%s` VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `uid` = VALUES(`uid`), `x` = VALUES(`x`), `y` = VALUES(`y`), `z` = VALUES(`z`), `yaw` = VALUES(`yaw`), `pitch` = VALUES(`pitch`), `global` = VALUES(`global`)",
-					plugin.getConfig().getString("mysql.tables.location"));
+					plugin.getDbCtrl().getTable(Table.LOCATION));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, uid.toString());
 			ps.setDouble(2, loc.getX());
@@ -99,7 +101,7 @@ public class LocationManager {
 
 		try {
 			String sql = String.format("DELETE FROM `%s` WHERE `uid` = ?",
-					plugin.getConfig().getString("mysql.tables.location"));
+					plugin.getDbCtrl().getTable(Table.LOCATION));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, uid.toString());
 			ps.executeUpdate();
