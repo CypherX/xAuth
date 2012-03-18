@@ -55,16 +55,16 @@ public class xAuth extends JavaPlugin {
 		dbCtrl = new DatabaseController(this);
 
 		// Test connection to database
-		if (dbCtrl.isConnectable()) { // Able to connect to database, proceed normally
-			xAuthLog.info("Successfully established connection to " + dbCtrl.getDBMS() + " database");
-			dbCtrl.runUpdater();			
-		} else { // Failed to connect to database, disable plugin
+		if (!dbCtrl.isConnectable()) {
 			xAuthLog.severe("Failed to establish " + dbCtrl.getDBMS() + " database connection!");
 
 			// disable (for now, may change in the future)
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
+
+		xAuthLog.info("Successfully established connection to " + dbCtrl.getDBMS() + " database");
+		dbCtrl.runUpdater();
 
 		// Initialize ALL THE CLASSES
 		plyrMngr 	= new PlayerManager(this);

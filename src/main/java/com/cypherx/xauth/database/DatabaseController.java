@@ -41,7 +41,7 @@ public class DatabaseController {
 			pass = cs.getString("password");
 		} else { // H2
 			driver = "org.h2.Driver";
-			url = "jdbc:h2:" + plugin.getDataFolder() + File.separator + "xAuth;MODE=MySQL";
+			url = "jdbc:h2:" + plugin.getDataFolder() + File.separator + "xAuth;MODE=MySQL;IGNORECASE=TRUE";
 			user = "sa";
 			pass = "";
 		}
