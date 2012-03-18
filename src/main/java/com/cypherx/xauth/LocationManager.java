@@ -67,8 +67,14 @@ public class LocationManager {
 		PreparedStatement ps = null;
 
 		try {
-			String sql = String.format("INSERT INTO `%s` VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `uid` = VALUES(`uid`), `x` = VALUES(`x`), `y` = VALUES(`y`), `z` = VALUES(`z`), `yaw` = VALUES(`yaw`), `pitch` = VALUES(`pitch`), `global` = VALUES(`global`)",
-					plugin.getDbCtrl().getTable(Table.LOCATION));
+			String sql;
+			if (plugin.getDbCtrl().isMySQL())
+				sql = String.format("INSERT INTO `%s` VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `uid` = VALUES(`uid`), `x` = VALUES(`x`), `y` = VALUES(`y`), `z` = VALUES(`z`), `yaw` = VALUES(`yaw`), `pitch` = VALUES(`pitch`), `global` = VALUES(`global`)",
+						plugin.getDbCtrl().getTable(Table.LOCATION));
+			else
+				sql = String.format("MERGE INTO `%s` VALUES (?, ?, ?, ?, ?, ?, ?)",
+						plugin.getDbCtrl().getTable(Table.LOCATION));
+
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, uid.toString());
 			ps.setDouble(2, loc.getX());

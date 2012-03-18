@@ -159,5 +159,6 @@ public class DatabaseController {
 
 	public List<Table> getActiveTables() { return activeTables; }
 	public String getDBMS() { return dbms.toString(); }
+	public boolean isMySQL() { return dbms == DBMS.MySQL; }
 	private enum DBMS { H2, MySQL }
 }

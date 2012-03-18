@@ -40,8 +40,14 @@ public class PlayerDataHandler {
 		PreparedStatement ps = null;
 		try {
 			// Store player inventory and location in database.
-			String sql = String.format("INSERT INTO `%s` SELECT ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `%s` WHERE `playername` = ?)",
-					plugin.getDbCtrl().getTable(Table.PLAYERDATA), plugin.getDbCtrl().getTable(Table.PLAYERDATA));
+			String sql;
+			if (plugin.getDbCtrl().isMySQL())
+				sql = String.format("INSERT IGNORE INTO `%s` VALUES (?, ?, ?, ?)",
+						plugin.getDbCtrl().getTable(Table.PLAYERDATA));
+			else
+				sql = String.format("INSERT INTO `%s` SELECT ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `%s` WHERE `playername` = ?)",
+						plugin.getDbCtrl().getTable(Table.PLAYERDATA), plugin.getDbCtrl().getTable(Table.PLAYERDATA));
+
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, p.getName());
 			ps.setString(2, strItems);
