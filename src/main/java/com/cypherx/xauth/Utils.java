@@ -52,7 +52,7 @@ public class Utils {
 			while ((count = input.read(data)) != -1)
 				output.write(data, 0, count);
 		} catch (IOException e) {
-			xAuthLog.severe("Failed to download file: " + file, e);
+			xAuthLog.severe("Failed to download file: " + file.getName(), e);
 		} finally {
 			try {
 				if (input != null)
