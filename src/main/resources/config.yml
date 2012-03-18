@@ -1,5 +1,6 @@
 main:
     auto-disable: true
+    download-library: true
 
 mysql:
     enabled: false

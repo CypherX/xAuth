@@ -1,12 +1,16 @@
 package com.cypherx.xauth;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +35,35 @@ public class Utils {
 		    return writer.toString();
 		} else     
 		    return "";
+	}
+
+	public static void downloadFile(File file, String location) {
+		BufferedInputStream input = null;
+		FileOutputStream output = null;
+
+		try {
+			URL url = new URL(location);
+			input = new BufferedInputStream(url.openStream());
+			output = new FileOutputStream(file);
+
+			byte data[] = new byte[1024];
+			int count;
+
+			while ((count = input.read(data)) != -1)
+				output.write(data, 0, count);
+		} catch (IOException e) {
+			xAuthLog.severe("Failed to download file: " + file, e);
+		} finally {
+			try {
+				if (input != null)
+					input.close();
+			} catch (IOException e) {}
+
+			try {
+				if (output != null)
+					output.close();
+			} catch (IOException e) {}
+		}
 	}
 
 	public static boolean isIPAddress(String ipAddress) {
