@@ -53,7 +53,8 @@ public class PlayerDataHandler {
 			ps.setString(2, strItems);
 			ps.setString(3, strArmor);
 			ps.setString(4, strLoc);
-			ps.setString(5, p.getName());
+			if (!plugin.getDbCtrl().isMySQL())
+				ps.setString(5, p.getName());
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			xAuthLog.severe("Failed to insert player data into database!", e);
