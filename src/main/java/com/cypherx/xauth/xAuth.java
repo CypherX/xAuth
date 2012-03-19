@@ -163,6 +163,13 @@ public class xAuth extends JavaPlugin {
 		else
 			return new AuthSQL(this, p);
 	}
+	
+	public boolean isAuthURL(){
+		if (this.getConfig().getBoolean("authurl.enabled"))
+			return true;
+		else
+			return false;
+	}
 
 	private void lol() {
 		Long now = System.currentTimeMillis() / 1000;
