@@ -155,17 +155,14 @@ public class xAuth extends JavaPlugin {
 	public StrikeManager getStrkMngr() { return strkMngr; }
 
 	public Auth getAuthClass(xAuthPlayer p){
-		if (this.getConfig().getBoolean("authurl.enabled"))
+		if (isAuthURL())
 			return new AuthURL(this, p.getIPAddress());
 		else
 			return new AuthSQL(this, p);
 	}
 	
 	public boolean isAuthURL(){
-		if (this.getConfig().getBoolean("authurl.enabled"))
-			return true;
-		else
-			return false;
+		return this.getConfig().getBoolean("authurl.enabled");
 	}
 
 	private void lol() {
