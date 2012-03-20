@@ -50,7 +50,7 @@ public class xAuth extends JavaPlugin {
 		}
 
 		File h2File = new File("lib", "h2-" + h2Version + ".jar");
-		if (!h2File.exists()) {
+		if (!h2File.exists() && getConfig().getBoolean("main.download-library")) {
 			xAuthLog.info("Downloading required H2 library..");
 			downloadLib(h2File);
 			xAuthLog.info("Download complete, reloading xAuth");
@@ -121,9 +121,6 @@ public class xAuth extends JavaPlugin {
 	}
 
 	private void downloadLib(File h2File) {
-		if (!getConfig().getBoolean("main.download-library"))
-			return;
-
 		File dir = new File("lib");
 		if (!dir.exists())
 			dir.mkdir();		
