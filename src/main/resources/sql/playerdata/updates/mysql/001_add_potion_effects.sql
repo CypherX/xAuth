@@ -1,0 +1,1 @@
+ALTER TABLE `{TABLE}` ADD COLUMN `potioneffects` TEXT NULL;

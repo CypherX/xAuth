@@ -1,11 +1,13 @@
 package com.cypherx.xauth;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
 
 public class xAuthPlayer {
 	private String playerName;
@@ -13,6 +15,7 @@ public class xAuthPlayer {
 	private Status status = Status.Guest;
 	private PlayerInventory inventory;
 	private Location location;
+	private Collection<PotionEffect> potEffects;
 	private Timestamp lastNotifyTime;
 	private Timestamp loginTime;
 	private boolean creativeMode;
@@ -39,6 +42,8 @@ public class xAuthPlayer {
 	public void setInventory(PlayerInventory inventory) { this.inventory = inventory; }
 	public Location getLocation() { return location; }
 	public void setLocation(Location location) { this.location = location; }
+	public Collection<PotionEffect> getPotEffects() { return potEffects; }
+	public void setPotEffects(Collection<PotionEffect> potEffects) { this.potEffects = potEffects; }
 	public Timestamp getLastNotifyTime() { return lastNotifyTime; }
 	public void setLastNotifyTime(Timestamp lastNotifyTime) { this.lastNotifyTime = lastNotifyTime; }
 	public Timestamp getLoginTime() { return loginTime; }

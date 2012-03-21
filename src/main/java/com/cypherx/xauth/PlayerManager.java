@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.potion.PotionEffect;
 
 import com.cypherx.xauth.database.Table;
 import com.cypherx.xauth.plugins.xPermissions;
@@ -170,6 +171,7 @@ public class PlayerManager {
 
 	public void unprotect(xAuthPlayer xp) {
 		Player p = xp.getPlayer();
+		clearPotionEffects(p);
 		plugin.getPlyrDtHndlr().restoreData(xp, p);
 
 		if (xp.isCreativeMode())
@@ -345,5 +347,10 @@ public class PlayerManager {
 		} finally {
 			plugin.getDbCtrl().close(conn, ps);
 		}
+	}
+
+	public void clearPotionEffects(Player p) {
+		for (PotionEffect effect : p.getActivePotionEffects())
+			p.addPotionEffect(new PotionEffect(effect.getType(), 0, 0), true);
 	}
 }

@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -13,6 +15,8 @@ import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.cypherx.xauth.database.Table;
 
@@ -27,25 +31,27 @@ public class PlayerDataHandler {
 		PlayerInventory pInv = p.getInventory();
 		Location loc = p.getHealth() > 0 ? p.getLocation() : null;
 
-		String strItems = buildString(pInv.getContents());
-		String strArmor = buildString(pInv.getArmorContents());
+		String strItems = buildItemString(pInv.getContents());
+		String strArmor = buildItemString(pInv.getArmorContents());
 		String strLoc = null;
 		if (loc != null)
 			strLoc = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
+		String strPotFx = buildPotFxString(p.getActivePotionEffects());
 
 		xp.setInventory(pInv);
 		xp.setLocation(loc);
+		xp.setPotEffects(p.getActivePotionEffects().size() > 0 ? p.getActivePotionEffects() : null);
 
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
 		try {
-			// Store player inventory and location in database.
+			// Store player inventory, location, and potion effects in database.
 			String sql;
 			if (plugin.getDbCtrl().isMySQL())
-				sql = String.format("INSERT IGNORE INTO `%s` VALUES (?, ?, ?, ?)",
+				sql = String.format("INSERT IGNORE INTO `%s` VALUES (?, ?, ?, ?, ?)",
 						plugin.getDbCtrl().getTable(Table.PLAYERDATA));
 			else
-				sql = String.format("INSERT INTO `%s` SELECT ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `%s` WHERE `playername` = ?)",
+				sql = String.format("INSERT INTO `%s` SELECT ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `%s` WHERE `playername` = ?)",
 						plugin.getDbCtrl().getTable(Table.PLAYERDATA), plugin.getDbCtrl().getTable(Table.PLAYERDATA));
 
 			ps = conn.prepareStatement(sql);
@@ -53,8 +59,9 @@ public class PlayerDataHandler {
 			ps.setString(2, strItems);
 			ps.setString(3, strArmor);
 			ps.setString(4, strLoc);
+			ps.setString(5, strPotFx);
 			if (!plugin.getDbCtrl().isMySQL())
-				ps.setString(5, p.getName());
+				ps.setString(6, p.getName());
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			xAuthLog.severe("Failed to insert player data into database!", e);
@@ -62,21 +69,26 @@ public class PlayerDataHandler {
 			plugin.getDbCtrl().close(conn, ps);
 		}
 
+		// clear inventory/armor
 		pInv.clear();
 		pInv.setHelmet(null);
 		pInv.setChestplate(null);
 		pInv.setLeggings(null);
 		pInv.setBoots(null);
+
+		// hide location
 		p.teleport(plugin.getLocMngr().getLocation(p.getWorld()));
+
+		// clear potion effects
+		plugin.getPlyrMngr().clearPotionEffects(p);
 	}
 
-	private String buildString(ItemStack[] items) {
+	private String buildItemString(ItemStack[] items) {
 		StringBuilder sbItems = new StringBuilder();
 		StringBuilder sbAmount = new StringBuilder();
 		StringBuilder sbDurability = new StringBuilder();
 		StringBuilder sbEnchants = new StringBuilder();
 
-		// I despise this whole thing but can't think of anything better.
 		for (ItemStack item : items) {
 			int itemId = 0;
 			int amount = 0;
@@ -95,22 +107,42 @@ public class PlayerDataHandler {
 						int level = enchants.get(enchant);
 						sbEnchants.append(id + ":" + level + "-");				
 					}
+
 					sbEnchants.deleteCharAt(sbEnchants.lastIndexOf("-"));
 				}
 			}
 
-			sbItems.append(itemId + ",");
-			sbAmount.append(amount + ",");
-			sbDurability.append(durability + ",");
+			sbItems.append(itemId).append(",");
+			sbAmount.append(amount).append(",");
+			sbDurability.append(durability).append(",");
 			sbEnchants.append(",");
 		}
 
-		// I despise this even more.
 		sbItems.deleteCharAt(sbItems.lastIndexOf(","));
 		sbAmount.deleteCharAt(sbAmount.lastIndexOf(","));
 		sbDurability.deleteCharAt(sbDurability.lastIndexOf(","));
 		sbEnchants.deleteCharAt(sbEnchants.lastIndexOf(","));
-		return sbItems + ";" + sbAmount + ";" + sbDurability + ";" + sbEnchants;
+		return sbItems.append(";").append(sbAmount).append(";").append(sbDurability).append(";").append(sbEnchants).toString();
+	}
+
+	private String buildPotFxString(Collection<PotionEffect> effects) {
+		if (effects.size() < 1)
+			return null;
+
+		StringBuilder sbType = new StringBuilder();
+		StringBuilder sbDur = new StringBuilder();
+		StringBuilder sbAmp = new StringBuilder();
+
+		for (PotionEffect effect : effects) {
+			sbType.append(effect.getType().getId()).append(",");
+			sbDur.append(effect.getDuration()).append(",");
+			sbAmp.append(effect.getAmplifier()).append(",");
+		}
+
+		sbType.deleteCharAt(sbType.lastIndexOf(","));
+		sbDur.deleteCharAt(sbDur.lastIndexOf(","));
+		sbAmp.deleteCharAt(sbAmp.lastIndexOf(","));
+		return sbType.append(";").append(sbDur).append(";").append(sbAmp).toString();
 	}
 
 	private ItemStack[] buildItemStack(String str) {
@@ -140,10 +172,28 @@ public class PlayerDataHandler {
 		return items;
 	}
 
+	private Collection<PotionEffect> buildPotFx(String str) {
+		String[] effectSplit = str.split(";");
+		String[] type = effectSplit[0].split(",");
+		String[] duration = effectSplit[1].split(",");
+		String[] amplifier = effectSplit[2].split(",");
+		Collection<PotionEffect> effects = new ArrayList<PotionEffect>();
+
+		for (int i = 0; i < type.length; i++) {
+			PotionEffectType potFxType = PotionEffectType.getById(Integer.parseInt(type[i]));
+			int potFxDur = Integer.parseInt(duration[i]);
+			int potFxAmp = Integer.parseInt(amplifier[i]);
+			effects.add(new PotionEffect(potFxType, potFxDur, potFxAmp));
+		}
+
+		return effects;
+	}
+
 	public void restoreData(xAuthPlayer xp, Player p) {
 		ItemStack[] items = null;
 		ItemStack[] armor = null;
 		Location loc = null;
+		Collection<PotionEffect> potFx = null;
 
 		PlayerInventory pInv = p.getInventory();
 		PlayerInventory xpInv = xp.getInventory();
@@ -152,7 +202,7 @@ public class PlayerDataHandler {
 		ResultSet rs = null;
 
 		try {
-			String sql = String.format("SELECT `items`, `armor`, `location` FROM `%s` WHERE `playername` = ?",
+			String sql = String.format("SELECT `items`, `armor`, `location`, `potioneffects` FROM `%s` WHERE `playername` = ?",
 					plugin.getDbCtrl().getTable(Table.PLAYERDATA));
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, p.getName());
@@ -160,7 +210,7 @@ public class PlayerDataHandler {
 
 			if (rs.next()) {
 				items = buildItemStack(rs.getString("items"));
-				armor = buildItemStack(rs.getString("armor"));				
+				armor = buildItemStack(rs.getString("armor"));
 
 				String rsLoc = rs.getString("location");
 				if (rsLoc != null) {
@@ -168,6 +218,10 @@ public class PlayerDataHandler {
 					loc = new Location(Bukkit.getWorld(locSplit[0]), Double.parseDouble(locSplit[1]), Double.parseDouble(locSplit[2]),
 							Double.parseDouble(locSplit[3]), Float.parseFloat(locSplit[4]), Float.parseFloat(locSplit[5]));
 				}
+
+				String rsPotFx = rs.getString("potioneffects");
+				if (rsPotFx != null)
+					potFx = buildPotFx(rsPotFx);
 			}
 		} catch (SQLException e) {
 			xAuthLog.severe("Failed to load playerdata from database for player: " + p.getName(), e);
@@ -199,16 +253,25 @@ public class PlayerDataHandler {
 
 		xp.setInventory(null);
 
-		if (loc != null) {
+		if (loc != null)
 			p.teleport(loc);
-		} else {
+		else {
 			loc = xp.getLocation();
 			if (loc != null)
 				p.teleport(loc);
 		}
 
 		xp.setLocation(null);
-		p.saveData();
+
+		if (potFx != null) {
+			p.addPotionEffects(potFx);
+		} else {
+			potFx = xp.getPotEffects();
+			if (potFx != null)
+				p.addPotionEffects(potFx);
+		}
+
+		xp.setPotEffects(null);
 
 		conn = plugin.getDbCtrl().getConnection();
 		try {
