@@ -54,7 +54,7 @@ misc:
     reloaded: '{RED}Server reloaded, you must log in.'
 
 admin:
-    permissions: 'You do not have permission to use this command!'
+    permission: 'You do not have permission to use this command!'
     register:
         usage: '{RED}Correct Usage: /xauth register <player> <password> [email]'
         success: '{BRIGHTGREEN}Account successfully created for: {WHITE}{TARGET}'
