@@ -1,7 +1,9 @@
 package com.cypherx.xauth.listeners;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -61,7 +63,7 @@ public class xAuthPlayerListener implements Listener {
 		xAuthPlayer xp = plyrMngr.getPlayer(p, true);
 		String node = "";
 
-		if (xp.isRegistered() || plugin.getConfig().getBoolean("authurl.enabled")) {
+		if (xp.isRegistered() || plugin.isAuthURL()) {
 			if (plyrMngr.checkSession(xp)) {
 				xp.setStatus(Status.Authenticated);
 				plugin.getAuthClass(xp).online(p.getName());
@@ -170,10 +172,27 @@ public class xAuthPlayerListener implements Listener {
 	public void onPlayerMove(PlayerMoveEvent event) {
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
 		if (plyrMngr.isRestricted(p, event)) {
+			World w = p.getPlayer().getWorld();
+			Location loc = plugin.getDbCtrl().isTableActive(Table.LOCATION) ? 
+					plugin.getLocMngr().getLocation(w) : p.getLocation();
+
+			Location testLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
+			while (w.getBlockAt(testLoc).isEmpty() || w.getBlockAt(testLoc).isLiquid())
+				testLoc.setY((int)testLoc.getY() - 1);
+			loc.setY(testLoc.getY() + 1);
+
+			event.setTo(loc);
+			//event.setFrom(loc);
+			plyrMngr.sendNotice(p);
+		}
+
+		// Old code
+		/*xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
+		if (plyrMngr.isRestricted(p, event)) {
 			event.setTo(plugin.getDbCtrl().isTableActive(Table.LOCATION) ?
 					plugin.getLocMngr().getLocation(event.getPlayer().getWorld()) : p.getLocation());
 			plyrMngr.sendNotice(p);
-		}
+		}*/
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
