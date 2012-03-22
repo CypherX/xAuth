@@ -1,21 +1,15 @@
 package com.cypherx.xauth;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.potion.PotionEffect;
 
 public class xAuthPlayer {
 	private String playerName;
 	private int accountId = 0;
 	private Status status = Status.Guest;
-	private PlayerInventory inventory;
-	private Location location;
-	private Collection<PotionEffect> potEffects;
+	private PlayerData playerData;
 	private Timestamp lastNotifyTime;
 	private Timestamp loginTime;
 	private boolean creativeMode;
@@ -38,12 +32,8 @@ public class xAuthPlayer {
 	public void setAccountId(int accountId) { this.accountId = accountId; }
 	public Status getStatus() { return status; }
 	public void setStatus(Status status) { this.status = status; }
-	public PlayerInventory getInventory() { return inventory; }
-	public void setInventory(PlayerInventory inventory) { this.inventory = inventory; }
-	public Location getLocation() { return location; }
-	public void setLocation(Location location) { this.location = location; }
-	public Collection<PotionEffect> getPotEffects() { return potEffects; }
-	public void setPotEffects(Collection<PotionEffect> potEffects) { this.potEffects = potEffects; }
+	public PlayerData getPlayerData() { return playerData; }
+	public void setPlayerData(PlayerData playerData) { this.playerData = playerData; }
 	public Timestamp getLastNotifyTime() { return lastNotifyTime; }
 	public void setLastNotifyTime(Timestamp lastNotifyTime) { this.lastNotifyTime = lastNotifyTime; }
 	public Timestamp getLoginTime() { return loginTime; }

@@ -174,7 +174,7 @@ public class xAuthPlayerListener implements Listener {
 		if (plyrMngr.isRestricted(p, event)) {
 			World w = p.getPlayer().getWorld();
 			Location loc = plugin.getDbCtrl().isTableActive(Table.LOCATION) ? 
-					plugin.getLocMngr().getLocation(w) : p.getLocation();
+					plugin.getLocMngr().getLocation(w) : p.getPlayerData().getLocation();
 
 			Location testLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
 			while (w.getBlockAt(testLoc).isEmpty() || w.getBlockAt(testLoc).isLiquid())

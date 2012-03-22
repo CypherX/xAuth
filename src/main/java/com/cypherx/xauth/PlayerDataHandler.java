@@ -29,18 +29,16 @@ public class PlayerDataHandler {
 
 	public void storeData(xAuthPlayer xp, Player p) {
 		PlayerInventory pInv = p.getInventory();
-		Location loc = p.getHealth() > 0 ? p.getLocation() : null;
+		ItemStack[] items = pInv.getContents();
+		ItemStack[] armor = pInv.getArmorContents();
+		Location loc = p.getLocation();
+		Collection<PotionEffect> potEffects = p.getActivePotionEffects();
 
-		String strItems = buildItemString(pInv.getContents());
-		String strArmor = buildItemString(pInv.getArmorContents());
-		String strLoc = null;
-		if (loc != null)
-			strLoc = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
-		String strPotFx = buildPotFxString(p.getActivePotionEffects());
-
-		xp.setInventory(pInv);
-		xp.setLocation(loc);
-		xp.setPotEffects(p.getActivePotionEffects().size() > 0 ? p.getActivePotionEffects() : null);
+		String strItems = buildItemString(items);
+		String strArmor = buildItemString(armor);
+		String strLoc = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
+		String strPotFx = buildPotFxString(potEffects);
+		xp.setPlayerData(new PlayerData(items, armor, loc, potEffects));
 
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
@@ -196,40 +194,48 @@ public class PlayerDataHandler {
 		Location loc = null;
 		Collection<PotionEffect> potFx = null;
 
-		PlayerInventory pInv = p.getInventory();
-		PlayerInventory xpInv = xp.getInventory();
-		Connection conn = plugin.getDbCtrl().getConnection();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		// Use cached copy of player data, if it exists
+		PlayerData playerData = xp.getPlayerData();
+		if (playerData != null) {
+			items = playerData.getItems();
+			armor = playerData.getArmor();
+			loc = playerData.getLocation();
+			potFx = playerData.getPotionEffects();
+		} else {
+			Connection conn = plugin.getDbCtrl().getConnection();
+			PreparedStatement ps = null;
+			ResultSet rs = null;
 
-		try {
-			String sql = String.format("SELECT `items`, `armor`, `location`, `potioneffects` FROM `%s` WHERE `playername` = ?",
-					plugin.getDbCtrl().getTable(Table.PLAYERDATA));
-			ps = conn.prepareStatement(sql);
-			ps.setString(1, p.getName());
-			rs = ps.executeQuery();
+			try {
+				String sql = String.format("SELECT `items`, `armor`, `location`, `potioneffects` FROM `%s` WHERE `playername` = ?",
+						plugin.getDbCtrl().getTable(Table.PLAYERDATA));
+				ps = conn.prepareStatement(sql);
+				ps.setString(1, p.getName());
+				rs = ps.executeQuery();
 
-			if (rs.next()) {
-				items = buildItemStack(rs.getString("items"));
-				armor = buildItemStack(rs.getString("armor"));
+				if (rs.next()) {
+					items = buildItemStack(rs.getString("items"));
+					armor = buildItemStack(rs.getString("armor"));
 
-				String rsLoc = rs.getString("location");
-				if (rsLoc != null) {
-					String[] locSplit = rsLoc.split(":");
-					loc = new Location(Bukkit.getWorld(locSplit[0]), Double.parseDouble(locSplit[1]), Double.parseDouble(locSplit[2]),
-							Double.parseDouble(locSplit[3]), Float.parseFloat(locSplit[4]), Float.parseFloat(locSplit[5]));
+					String rsLoc = rs.getString("location");
+					if (rsLoc != null) {
+						String[] locSplit = rsLoc.split(":");
+						loc = new Location(Bukkit.getWorld(locSplit[0]), Double.parseDouble(locSplit[1]), Double.parseDouble(locSplit[2]),
+								Double.parseDouble(locSplit[3]), Float.parseFloat(locSplit[4]), Float.parseFloat(locSplit[5]));
+					}
+
+					String rsPotFx = rs.getString("potioneffects");
+					if (rsPotFx != null)
+						potFx = buildPotFx(rsPotFx);
 				}
-
-				String rsPotFx = rs.getString("potioneffects");
-				if (rsPotFx != null)
-					potFx = buildPotFx(rsPotFx);
+			} catch (SQLException e) {
+				xAuthLog.severe("Failed to load playerdata from database for player: " + p.getName(), e);
+			} finally {
+				plugin.getDbCtrl().close(conn, ps, rs);
 			}
-		} catch (SQLException e) {
-			xAuthLog.severe("Failed to load playerdata from database for player: " + p.getName(), e);
-		} finally {
-			plugin.getDbCtrl().close(conn, ps, rs);
 		}
 
+		PlayerInventory pInv = p.getInventory();
 		if (items != null) {
 			// Fix for inventory extension plugins
 			if (pInv.getSize() > items.length) {
@@ -242,39 +248,20 @@ public class PlayerDataHandler {
 			//End Fix for inventory extension plugins
 
 			pInv.setContents(items);
-		} else
-			if (xpInv != null)
-				pInv.setContents(xpInv.getContents());
+		}
 
 		if (armor != null)
 			pInv.setArmorContents(armor);
-		else 		
-			if (xpInv != null)
-				pInv.setArmorContents(xpInv.getArmorContents());
 
-		xp.setInventory(null);
-
-		if (loc != null)
+		if (loc != null && p.getHealth() > 0)
 			p.teleport(loc);
-		else {
-			loc = xp.getLocation();
-			if (loc != null)
-				p.teleport(loc);
-		}
 
-		xp.setLocation(null);
-
-		if (potFx != null) {
+		if (potFx != null)
 			p.addPotionEffects(potFx);
-		} else {
-			potFx = xp.getPotEffects();
-			if (potFx != null)
-				p.addPotionEffects(potFx);
-		}
 
-		xp.setPotEffects(null);
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
 
-		conn = plugin.getDbCtrl().getConnection();
 		try {
 			String sql = String.format("DELETE FROM `%s` WHERE `playername` = ?",
 					plugin.getDbCtrl().getTable(Table.PLAYERDATA));
