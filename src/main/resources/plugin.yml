@@ -31,6 +31,7 @@ commands:
            /<command> unregister <player>
            /<command> location set|remove [global]
            /<command> reload
+           /<command> activate <player>
 
 permissions:
   xauth.register:
@@ -45,6 +46,7 @@ permissions:
         xauth.admin.unregister: true
         xauth.admin.location: true
         xauth.admin.reload: true
+        xauth.admin.activate: true
   xauth.admin.register:
     description: Allows you to register other players
     default: op
@@ -62,4 +64,7 @@ permissions:
     default: op
   xauth.admin.reload:
     description: Allows you to reload the xAuth configuration and player cache.
+    default: op
+  xauth.admin.activate:
+    description: Allows you to activate a player's account.
     default: op

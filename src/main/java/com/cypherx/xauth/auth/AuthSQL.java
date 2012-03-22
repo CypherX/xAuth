@@ -36,7 +36,7 @@ public class AuthSQL extends Auth {
 
 			response = "login.error.password";
 			return false;
-		} else if (!isActive(player.getAccountId())) {
+		} else if (!plugin.getPlyrMngr().isActive(player.getAccountId())) {
 			response = "login.error.active";
 			return false;
 		}
@@ -148,32 +148,6 @@ public class AuthSQL extends Auth {
 	public boolean offline(String user) {
 		// nothing for AuthSQL
 		return true;
-	}
-
-	private boolean isActive(int id) {
-		if (!plugin.getConfig().getBoolean("registration.activation"))
-			return true;
-
-		Connection conn = plugin.getDbCtrl().getConnection();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			String sql = String.format("SELECT `active` FROM `%s` WHERE `id` = ?",
-					plugin.getDbCtrl().getTable(Table.ACCOUNT));
-			ps = conn.prepareStatement(sql);
-			ps.setInt(1, id);
-			rs = ps.executeQuery();
-			if (!rs.next())
-				return false;
-
-			return rs.getBoolean("active");
-		} catch (SQLException e) {
-			xAuthLog.severe("Failed to check active status of account: " + id, e);
-			return false;
-		} finally {
-			plugin.getDbCtrl().close(conn, ps, rs);
-		}
 	}
 
 	private boolean isWithinAccLimit(String ipaddress) {

@@ -40,6 +40,8 @@ public class xAuthCommand implements CommandExecutor {
 				return locationCommand(sender, args);
 			else if (subCommand.equals("reload"))
 				return reloadCommand(sender, args);
+			else if (subCommand.equals("activate"))
+				return activateCommand(sender, args);
 
 			return true;
 		}
@@ -233,6 +235,32 @@ public class xAuthCommand implements CommandExecutor {
 
 		plugin.reload();
 		plugin.getMsgHndlr().sendMessage("admin.reload", sender);
+		return true;
+	}
+
+	private boolean activateCommand(CommandSender sender, String[] args) {
+		if (!xPermissions.has(sender, "xauth.admin.activate")) {
+			plugin.getMsgHndlr().sendMessage("admin.permission", sender);
+			return true;
+		} else if (args.length < 2) {
+			plugin.getMsgHndlr().sendMessage("admin.activate.usage", sender);
+			return true;
+		}
+
+		String targetName = args[1];
+		xAuthPlayer xp = plugin.getPlyrMngr().getPlayer(targetName);
+
+		if (!xp.isRegistered()) {
+			plugin.getMsgHndlr().sendMessage("admin.activate.error.registered", sender);
+			return true;
+		} else if (plugin.getPlyrMngr().isActive(xp.getAccountId())) {
+			plugin.getMsgHndlr().sendMessage("admin.activate.error.active", sender);
+			return true;
+		}
+
+		boolean success = plugin.getPlyrMngr().activateAcc(xp.getAccountId());
+		plugin.getMsgHndlr().sendMessage(success ? "admin.activate.success" : "admin.activate.error.general", sender, targetName);
+
 		return true;
 	}
 }

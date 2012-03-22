@@ -244,6 +244,51 @@ public class PlayerManager {
 		return expireTime.compareTo(new Timestamp(System.currentTimeMillis())) > 0;
 	}
 
+	public boolean isActive(int id) {
+		if (!plugin.getConfig().getBoolean("registration.activation"))
+			return true;
+
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			String sql = String.format("SELECT `active` FROM `%s` WHERE `id` = ?",
+					plugin.getDbCtrl().getTable(Table.ACCOUNT));
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, id);
+			rs = ps.executeQuery();
+			if (!rs.next())
+				return false;
+
+			return rs.getBoolean("active");
+		} catch (SQLException e) {
+			xAuthLog.severe("Failed to check active status of account: " + id, e);
+			return false;
+		} finally {
+			plugin.getDbCtrl().close(conn, ps, rs);
+		}
+	}
+
+	public boolean activateAcc(int id) {
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			String sql = String.format("UPDATE `%s` SET `active` = 1 WHERE `id` = ?",
+					plugin.getDbCtrl().getTable(Table.ACCOUNT));
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, id);
+			ps.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			xAuthLog.severe("Failed to activate account: " + id, e);
+			return false;
+		} finally {
+			plugin.getDbCtrl().close(conn, ps);
+		}
+	}
+
 	public void reload() {
 		players.clear();
 	}

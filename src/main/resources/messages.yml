@@ -101,4 +101,11 @@ admin:
             success:
                 regular: '{BRIGHTGREEN}Teleport location for this world has been removed!'
                 global: '{BRIGHTGREEN}Global teleport location has been removed!'
-    reload: '{GREEN}xAuth reloaded.'
+    reload: '{BRIGHTGREEN}xAuth reloaded.'
+    activate:
+        usage: '{RED}Correct Usage: /xauth activate <player>'
+        error:
+            registered: '{RED}This player is not registered!'
+            active: '{RED}This player is already active!'
+            general: '{RED}Something went wrong while activating this player!'
+        success: '{BRIGHTGREEN}{TARGET} has been activated!'
