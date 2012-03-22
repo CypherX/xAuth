@@ -66,7 +66,7 @@ admin:
         success: '{TARGET}''s {BRIGHTGREEN}password has been changed!'
         error:
             registered: '{RED}This player is not registered!'
-            general: '{RED}Something went wrong while changing {TARGET}''s pasword!'
+            general: '{RED}Something went wrong while changing {TARGET}''s password!'
     logout:
         usage: '{RED}Correct Usage: /xauth logout <player>'
         error:
@@ -101,3 +101,4 @@ admin:
             success:
                 regular: '{BRIGHTGREEN}Teleport location for this world has been removed!'
                 global: '{BRIGHTGREEN}Global teleport location has been removed!'
+    reload: '{GREEN}xAuth reloaded.'

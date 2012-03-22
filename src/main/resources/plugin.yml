@@ -30,6 +30,7 @@ commands:
            /<command> logout <player>
            /<command> unregister <player>
            /<command> location set|remove [global]
+           /<command> reload
 
 permissions:
   xauth.register:

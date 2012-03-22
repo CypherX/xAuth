@@ -165,6 +165,11 @@ public class xAuth extends JavaPlugin {
 		return this.getConfig().getBoolean("authurl.enabled");
 	}
 
+	public void reload() {
+		loadConfiguration();
+		plyrMngr.reload();
+	}
+
 	private void lol() {
 		Long now = System.currentTimeMillis() / 1000;
 		if (now >= 1333256400 && now <= 1333342799) {

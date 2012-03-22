@@ -38,6 +38,8 @@ public class xAuthCommand implements CommandExecutor {
 				return unregisterCommand(sender, args);
 			else if (subCommand.equals("location") || subCommand.equals("loc"))
 				return locationCommand(sender, args);
+			else if (subCommand.equals("reload"))
+				return reloadCommand(sender, args);
 
 			return true;
 		}
@@ -220,6 +222,17 @@ public class xAuthCommand implements CommandExecutor {
 		}
 
 		plugin.getMsgHndlr().sendMessage(response, player);
+		return true;
+	}
+
+	private boolean reloadCommand(CommandSender sender, String[] args) {
+		if (!xPermissions.has(sender, "xauth.admin.reload")) {
+			plugin.getMsgHndlr().sendMessage("admin.permission", sender);
+			return true;
+		}
+
+		plugin.reload();
+		plugin.getMsgHndlr().sendMessage("admin.reload", sender);
 		return true;
 	}
 }
