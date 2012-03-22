@@ -80,7 +80,8 @@ public class PlayerDataHandler {
 		p.teleport(plugin.getLocMngr().getLocation(p.getWorld()));
 
 		// clear potion effects
-		plugin.getPlyrMngr().clearPotionEffects(p);
+		for (PotionEffect effect : p.getActivePotionEffects())
+			p.addPotionEffect(new PotionEffect(effect.getType(), 0, 0), true);
 	}
 
 	private String buildItemString(ItemStack[] items) {

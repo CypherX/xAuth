@@ -2,6 +2,7 @@ package com.cypherx.xauth.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -10,6 +11,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 
 import com.cypherx.xauth.PlayerManager;
 import com.cypherx.xauth.xAuth;
@@ -60,6 +62,17 @@ public class xAuthEntityListener implements Listener {
 			xAuthPlayer xp = plyrMngr.getPlayer(((Player) entity).getName());
 			if (plyrMngr.isRestricted(xp, event))
 				event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void onPotionSplash(PotionSplashEvent event) {
+		for (LivingEntity entity : event.getAffectedEntities()) {
+			if (entity instanceof Player) {
+				xAuthPlayer xp = plyrMngr.getPlayer(((Player) entity).getName());
+				if (plyrMngr.isRestricted(xp, event))
+					event.setIntensity(entity, 0);
+			}
 		}
 	}
 }
