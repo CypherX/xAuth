@@ -7,8 +7,6 @@ import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.cypherx.xauth.xAuthLog;
-
 public class ConnectionPool {
 	private static final int maxConnections = 10;
 
@@ -31,7 +29,6 @@ public class ConnectionPool {
 				Connection conn = idleConnections.firstElement();
 				idleConnections.removeElementAt(0);
 				if (conn.isValid(1)) {
-					xAuthLog.info("is valid");
 					busyConnections.add(conn);
 					return conn;
 				} else {
