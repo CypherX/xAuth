@@ -62,10 +62,11 @@ public class DatabaseUpdater {
 
 			// -1 = not created, 0 = default table, 1+ = updated
 			int currentVersion = Integer.parseInt(dbVersionProp.getProperty(tblId, "-1"));
-			Connection conn = dbCon.getConnection();
 
 			// Create table if it does not exist
 			if (currentVersion == -1) {
+				Connection conn = dbCon.getConnection();
+
 				try {
 					String createSql = loadSQL("sql/" + tblId + "/table.sql", tblName);
 					executeQuery(createSql, conn);	
@@ -83,7 +84,7 @@ public class DatabaseUpdater {
 
 			// Time to update~
 			if (updateVersion > currentVersion && currentVersion > -1) {
-				conn = dbCon.getConnection();
+				Connection conn = dbCon.getConnection();
 
 				try {
 					// Let's not commit changes as they get executed (in case of error)
