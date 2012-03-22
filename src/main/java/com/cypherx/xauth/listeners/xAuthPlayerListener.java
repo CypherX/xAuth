@@ -60,7 +60,8 @@ public class xAuthPlayerListener implements Listener {
 		if (p == null || !p.isOnline())
 			return;
 
-		xAuthPlayer xp = plyrMngr.getPlayer(p, true);
+		//xAuthPlayer xp = plyrMngr.getPlayer(p, true);
+		xAuthPlayer xp = plyrMngr.getPlayer(p);
 		String node = "";
 
 		if (xp.isRegistered() || plugin.isAuthURL()) {
