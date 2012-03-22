@@ -1,6 +1,9 @@
 package com.cypherx.xauth;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -103,9 +106,8 @@ public class xAuth extends JavaPlugin {
 		getCommand("changepw").setExecutor(new ChangePwdCommand(this));
 		getCommand("xauth").setExecutor(new xAuthCommand(this));
 
-		lol();
-
 		xAuthLog.info(String.format("v%s Enabled!", getDescription().getVersion()));
+		lol();
 	}
 
 	private void loadConfiguration() {
@@ -171,11 +173,14 @@ public class xAuth extends JavaPlugin {
 	}
 
 	private void lol() {
-		Long now = System.currentTimeMillis() / 1000;
-		if (now >= 1333256400 && now <= 1333342799) {
+		Calendar cal = new GregorianCalendar(TimeZone.getDefault());
+		int month = cal.get(Calendar.MONTH);
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+
+		if (month == 3 && day == 1) {
 			xAuthLog.warning("Your trial version of xAuth expires today!");
 			xAuthLog.warning("Purchase the full version on Steam for $19.99.");
-		} else if (now >= 1333342800 && now <= 1333429199)
-			xAuthLog.warning("April Fools!! xAuth will always be free!");
+		} else if (month == 3 && day == 2)
+			xAuthLog.info("April Fools!! xAuth will always be free!");
 	}
 }
