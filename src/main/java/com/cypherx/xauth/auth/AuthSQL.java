@@ -200,7 +200,7 @@ public class AuthSQL extends Auth {
 			plugin.getDbCtrl().close(conn, ps, rs);
 		}
 
-		return limit >= count;
+		return limit > count;
 	}
 
 	private boolean isValidPass(String pass) {
