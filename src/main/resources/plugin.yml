@@ -44,6 +44,7 @@ permissions:
         xauth.admin.logout: true
         xauth.admin.unregister: true
         xauth.admin.location: true
+        xauth.admin.reload: true
   xauth.admin.register:
     description: Allows you to register other players
     default: op
@@ -58,4 +59,7 @@ permissions:
     default: op
   xauth.admin.location:
     description: Set/remove the current world or global teleport location
+    default: op
+  xauth.admin.reload:
+    description: Allows you to reload the xAuth configuration and player cache.
     default: op
