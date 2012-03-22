@@ -1,4 +1,4 @@
-package com.cypherx.xauth;
+/*package com.cypherx.xauth;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -24,9 +24,9 @@ public class xAuthScheduler {
 	public int scheduleTimeoutTask(final Player player, final int timeout) {
 		return Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
 			public void run() {
-				if (player.isOnline())
+				if (player.isOnline()) 
 					player.kickPlayer(plugin.getMsgHndlr().get("misc.timeout"));
 			}
 		}, plugin.getConfig().getInt("guest.timeout") * 20);
 	}
-}
+}*/

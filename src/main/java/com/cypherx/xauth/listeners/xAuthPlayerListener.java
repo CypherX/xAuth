@@ -79,7 +79,7 @@ public class xAuthPlayerListener implements Listener {
 		}
 
 		if (!node.isEmpty())
-			plugin.getSchdlr().sendDelayedMessage(p, node, 1);
+			sendDelayedMessage(p, node, 1);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -227,5 +227,14 @@ public class xAuthPlayerListener implements Listener {
 			return false;
 
 		return true;
+	}
+
+	private void sendDelayedMessage(final Player player, final String node, int delay) {
+		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+			public void run() {
+				if (player.isOnline())
+					plugin.getMsgHndlr().sendMessage(node, player);
+			}
+		}, delay);
 	}
 }

@@ -163,9 +163,18 @@ public class PlayerManager {
 
 		int timeout = plugin.getConfig().getInt("guest.timeout");
 		if (timeout > 0 && xp.isRegistered())
-			xp.setTimeoutTaskId(plugin.getSchdlr().scheduleTimeoutTask(p, timeout));
+			xp.setTimeoutTaskId(scheduleTimeoutTask(p, timeout));
 
 		xp.setProtected(true);
+	}
+
+	private int scheduleTimeoutTask(final Player player, final int timeout) {
+		return Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+			public void run() {
+				if (player.isOnline()) 
+					player.kickPlayer(plugin.getMsgHndlr().get("misc.timeout"));
+			}
+		}, plugin.getConfig().getInt("guest.timeout") * 20);
 	}
 
 	public void unprotect(xAuthPlayer xp) {
