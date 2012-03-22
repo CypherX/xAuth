@@ -67,6 +67,9 @@ public class Utils {
 	}
 
 	public static boolean isIPAddress(String ipAddress) {
+		if (ipAddress == null)
+			return false;
+
 		Pattern pattern = Pattern.compile(
 			"\\b" + 
 			"((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])\\." +
