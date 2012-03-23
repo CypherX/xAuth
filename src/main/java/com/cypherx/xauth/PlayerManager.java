@@ -411,8 +411,7 @@ public class PlayerManager {
 	
 	public void removeLoggedIn(String player){
 		player = player.toLowerCase();
-		if(isLoggedIn(player))
-			loggedIn.remove(player);
+		loggedIn.remove(player);
 	}
 	
 	public boolean isLoggedIn(String player){
