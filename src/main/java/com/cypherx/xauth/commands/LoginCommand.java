@@ -42,7 +42,8 @@ public class LoginCommand implements CommandExecutor {
 					if(plugin.isAuthURL() && response != null && response != "")
 						plugin.getServer().broadcastMessage(response);
 					response = "login.success";
-					a.online(p.getPlayerName());
+					plugin.getPlyrMngr().addLoggedIn(playerName);
+					a.online(playerName);
 					xAuthLog.info(playerName + " has logged in");
 				} else
 					response = "login.error.general";

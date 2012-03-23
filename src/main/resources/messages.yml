@@ -5,6 +5,7 @@ join:
     error:
         lockout: 'You are temporarily locked out for exceeding the incorrect password threshold.'
         name: 'Your name contains one or more illegal characters.'
+        loggedin: 'You are already logged in.'
 
 register:
     usage: '{RED}Correct Usage: /register <password> [email]'

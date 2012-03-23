@@ -41,6 +41,11 @@ public class xAuthPlayerListener implements Listener {
 		if (!event.getResult().equals(Result.ALLOWED))
 			return;
 
+		//Kick only if already logged in
+		if (plugin.getPlyrMngr().isLoggedIn(event.getPlayer().getName())){
+			event.disallow(Result.KICK_OTHER, plugin.getMsgHndlr().get("join.error.loggedin"));
+		}
+		
 		Player p = event.getPlayer();
 		if (p.isOnline())		
 			plugin.getPlyrMngr().getPlayer(p, true);
@@ -87,8 +92,10 @@ public class xAuthPlayerListener implements Listener {
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
 		if (p.isProtected())
 			plyrMngr.unprotect(p);
-
-		plugin.getAuthClass(p).offline(event.getPlayer().getName());
+		
+		String player = event.getPlayer().getName();
+		plugin.getAuthClass(p).offline(player);
+		plugin.getPlyrMngr().removeLoggedIn(player);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

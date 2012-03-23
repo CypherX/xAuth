@@ -29,6 +29,7 @@ public class LogoutCommand implements CommandExecutor {
 				if (success) {
 					plugin.getPlyrMngr().protect(p);
 					p.setStatus(Status.Registered);
+					plugin.getPlyrMngr().removeLoggedIn(p.getPlayerName());
 					plugin.getAuthClass(p).offline(p.getPlayerName());
 					response = "logout.success";
 				} else
