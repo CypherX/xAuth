@@ -416,7 +416,13 @@ public class PlayerManager {
 	}
 	
 	public boolean isLoggedIn(String player){
-		player = player.toLowerCase();
-		return loggedIn.contains(player);
+		Player pl = plugin.getServer().getPlayer(player);
+		if(pl != null && pl.isOnline()) {
+			return loggedIn.contains(player.toLowerCase());
+		} else {
+			removeLoggedIn(player.toLowerCase());
+			return false;
+		}
+			
 	}
 }
