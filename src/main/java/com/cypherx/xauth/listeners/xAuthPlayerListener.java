@@ -42,8 +42,10 @@ public class xAuthPlayerListener implements Listener {
 			return;
 
 		Player p = event.getPlayer();
-		if (p.isOnline())		
-			plugin.getPlyrMngr().getPlayer(p, true);
+		if (p.isOnline()) {
+			plyrMngr.getPlayer(p).setFixSS(true);
+			//event.disallow(Result.KICK_OTHER, "You are already online!");
+		}
 
 		String ipAddress = event.getKickMessage();
 		if (Utils.isIPAddress(ipAddress))
@@ -60,9 +62,13 @@ public class xAuthPlayerListener implements Listener {
 		if (p == null || !p.isOnline())
 			return;
 
-		//xAuthPlayer xp = plyrMngr.getPlayer(p, true);
 		xAuthPlayer xp = plyrMngr.getPlayer(p);
 		String node = "";
+
+		if (xp.isFixSS()) {
+			plyrMngr.unprotect(xp);
+			xp.setFixSS(false);
+		}
 
 		if (xp.isRegistered() || plugin.isAuthURL()) {
 			if (plyrMngr.checkSession(xp)) {
@@ -85,7 +91,7 @@ public class xAuthPlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerQuit(final PlayerQuitEvent event) {
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
-		if (p.isProtected())
+		if (p.isProtected() && !p.isFixSS())
 			plyrMngr.unprotect(p);
 
 		plugin.getAuthClass(p).offline(event.getPlayer().getName());
