@@ -194,6 +194,9 @@ public class PlayerManager {
 	}
 
 	public boolean isRestricted(xAuthPlayer player, Event event) {
+		if (!player.isProtected())
+			return false;
+
 		boolean restrict = true;
 		String[] split = event.getEventName().split("\\.");
 		String eventName = split[split.length - 1];
@@ -215,7 +218,7 @@ public class PlayerManager {
 				restrict = false;
 		}
 
-		return player.isProtected() && restrict;
+		return restrict;
 	}
 
 	public void sendNotice(xAuthPlayer player) {
