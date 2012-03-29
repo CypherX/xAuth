@@ -28,14 +28,15 @@ public class xAuth extends JavaPlugin {
 	private String h2Version = "1.3.164";
 
 	public void onDisable() {
-		for (Player p : getServer().getOnlinePlayers()) {
-			xAuthPlayer xp = plyrMngr.getPlayer(p);
-			if (xp.isProtected())
-				plyrMngr.unprotect(xp);
-		}
+		if (dbCtrl != null) {
+			for (Player p : getServer().getOnlinePlayers()) {
+				xAuthPlayer xp = plyrMngr.getPlayer(p);
+				if (xp.isProtected())
+					plyrMngr.unprotect(xp);
+			}
 
-		if (dbCtrl != null)
 			dbCtrl.close();
+		}
 	}
 
 	public void onEnable() {
