@@ -267,10 +267,10 @@ public class xAuthCommand implements CommandExecutor {
 	}
 
 	private boolean configCommand(CommandSender sender, String[] args) {
-		/*if (!xPermissions.has(sender, "xauth.admin.config")) {
+		if (!xPermissions.has(sender, "xauth.admin.config")) {
 			plugin.getMsgHndlr().sendMessage("admin.permission", sender);
 			return true;
-		} else */if (args.length < 3) {
+		} else if (args.length < 3) {
 			plugin.getMsgHndlr().sendMessage("admin.config.usage", sender);
 			return true;
 		}
