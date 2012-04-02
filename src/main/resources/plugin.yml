@@ -1,5 +1,5 @@
 name: xAuth
-version: 2.0.3
+version: 2.0.4
 description: Offline-mode Authentication
 author: CypherX
 website: https://github.com/CypherX/xAuth
@@ -48,6 +48,7 @@ permissions:
         xauth.admin.location: true
         xauth.admin.reload: true
         xauth.admin.activate: true
+        xauth.admin.config: true
   xauth.admin.register:
     description: Allows you to register other players
     default: op
@@ -68,4 +69,7 @@ permissions:
     default: op
   xauth.admin.activate:
     description: Allows you to activate a player's account.
+    default: op
+  xauth.admin.config:
+    description: Allows you to modify the configuration via a command.
     default: op

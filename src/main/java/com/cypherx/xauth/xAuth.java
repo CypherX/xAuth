@@ -20,7 +20,6 @@ public class xAuth extends JavaPlugin {
 	private DatabaseController dbCtrl;
 	private MessageHandler msgCtrl;
 	private PlayerManager plyrMngr;
-	//private xAuthScheduler schdlr;
 	private PlayerDataHandler plyrDtHndlr;
 	private PasswordHandler pwdHndlr;
 	private LocationManager locMngr;
@@ -57,7 +56,7 @@ public class xAuth extends JavaPlugin {
 		if (!h2File.exists() && getConfig().getBoolean("main.download-library")) {
 			xAuthLog.info("Downloading required H2 library..");
 			downloadLib(h2File);
-			xAuthLog.info("Download complete, reloading xAuth");
+			xAuthLog.info("Download complete, reloading xAuth..");
 
 			// Probably not the best method
 			getServer().getPluginManager().disablePlugin(this);
@@ -85,7 +84,6 @@ public class xAuth extends JavaPlugin {
 
 		// Initialize ALL THE CLASSES
 		plyrMngr 	= new PlayerManager(this);
-		//schdlr 		= new xAuthScheduler(this);
 		plyrDtHndlr = new PlayerDataHandler(this);
 		pwdHndlr 	= new PasswordHandler(this);
 		locMngr 	= new LocationManager(this);
@@ -151,7 +149,6 @@ public class xAuth extends JavaPlugin {
 	public DatabaseController getDbCtrl() { return dbCtrl; }
 	public MessageHandler getMsgHndlr() { return msgCtrl; }
 	public PlayerManager getPlyrMngr() { return plyrMngr; }
-	//public xAuthScheduler getSchdlr() { return schdlr; }
 	public PlayerDataHandler getPlyrDtHndlr() { return plyrDtHndlr; }
 	public PasswordHandler getPwdHndlr() { return pwdHndlr; }
 	public LocationManager getLocMngr() { return locMngr; }
@@ -163,7 +160,7 @@ public class xAuth extends JavaPlugin {
 		else
 			return new AuthSQL(this, p);
 	}
-	
+
 	public boolean isAuthURL(){
 		return this.getConfig().getBoolean("authurl.enabled");
 	}
