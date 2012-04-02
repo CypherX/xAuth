@@ -42,6 +42,8 @@ public class xAuthCommand implements CommandExecutor {
 				return reloadCommand(sender, args);
 			else if (subCommand.equals("activate"))
 				return activateCommand(sender, args);
+			else if (subCommand.equals("config") || subCommand.equals("conf"))
+				return configCommand(sender, args);
 
 			return true;
 		}
@@ -261,6 +263,47 @@ public class xAuthCommand implements CommandExecutor {
 		boolean success = plugin.getPlyrMngr().activateAcc(xp.getAccountId());
 		plugin.getMsgHndlr().sendMessage(success ? "admin.activate.success" : "admin.activate.error.general", sender, targetName);
 
+		return true;
+	}
+
+	private boolean configCommand(CommandSender sender, String[] args) {
+		/*if (!xPermissions.has(sender, "xauth.admin.config")) {
+			plugin.getMsgHndlr().sendMessage("admin.permission", sender);
+			return true;
+		} else */if (args.length < 3) {
+			plugin.getMsgHndlr().sendMessage("admin.config.usage", sender);
+			return true;
+		}
+
+		String node = args[1];
+		Object defVal = plugin.getConfig().getDefaults().get(node);
+
+		if (defVal == null) {
+			plugin.getMsgHndlr().sendMessage("admin.config.error.exist", sender);
+			return true;
+		}
+
+		String value = args[2];
+
+		try {
+			if (defVal instanceof String)
+				plugin.getConfig().set(node, value);
+			else if (defVal instanceof Integer)
+				plugin.getConfig().set(node, Integer.parseInt(value));
+			else if (defVal instanceof Boolean)
+				plugin.getConfig().set(node, Boolean.parseBoolean(value));
+			else
+				throw new IllegalArgumentException();
+		} catch (NumberFormatException e) {
+			plugin.getMsgHndlr().sendMessage("admin.config.error.int", sender);
+			return true;
+		} catch (IllegalArgumentException e) {
+			plugin.getMsgHndlr().sendMessage("admin.config.error.invalid", sender);
+			return true;
+		}
+
+		plugin.saveConfig();
+		plugin.getMsgHndlr().sendMessage("admin.config.success", sender);
 		return true;
 	}
 }

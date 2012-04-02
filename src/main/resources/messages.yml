@@ -109,3 +109,10 @@ admin:
             active: '{RED}This player is already active!'
             general: '{RED}Something went wrong while activating this player!'
         success: '{BRIGHTGREEN}{TARGET} has been activated!'
+    config:
+        usage: '{RED}Correct Usage: /xauth config <node> <value>'
+        error:
+            exist: '{RED}This configuration node does not exist!'
+            int: '{RED}This configuration node requires an integer value!'
+            invalid: '{RED}This setting cannot be altered using this command!'
+        success: '{BRIGHTGREEN}Configuration updated!'

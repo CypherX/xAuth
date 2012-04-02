@@ -32,6 +32,7 @@ commands:
            /<command> location set|remove [global]
            /<command> reload
            /<command> activate <player>
+           /<command> config <node> <value>
 
 permissions:
   xauth.register:
