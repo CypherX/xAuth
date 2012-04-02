@@ -54,6 +54,9 @@ public class xAuthPlayerListener implements Listener {
 
 		if (!isValidName(p.getName()))
 			event.disallow(Result.KICK_OTHER, plugin.getMsgHndlr().get("join.error.name"));
+
+		if (!event.getResult().equals(Result.ALLOWED))
+			plyrMngr.getPlayer(p).setFixSS(false);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
