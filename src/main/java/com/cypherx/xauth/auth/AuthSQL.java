@@ -12,6 +12,7 @@ import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.database.Table;
+import com.cypherx.xauth.plugins.xPermissions;
 import com.cypherx.xauth.xAuthPlayer.Status;
 
 public class AuthSQL extends Auth {
@@ -152,7 +153,7 @@ public class AuthSQL extends Auth {
 
 	private boolean isWithinAccLimit(String ipaddress) {
 		int limit = plugin.getConfig().getInt("registration.account-limit");
-		if (limit < 1)
+		if (limit < 1 || xPermissions.has(player.getPlayer(), "xauth.bypass.acclimit"))
 			return true;
 
 		int count = 0;

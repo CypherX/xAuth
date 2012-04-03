@@ -49,6 +49,7 @@ permissions:
         xauth.admin.reload: true
         xauth.admin.activate: true
         xauth.admin.config: true
+        xauth.bypass.acclimit: true
   xauth.admin.register:
     description: Allows you to register other players
     default: op
@@ -72,4 +73,7 @@ permissions:
     default: op
   xauth.admin.config:
     description: Allows you to modify the configuration via a command.
+    default: op
+  xauth.bypass.acclimit:
+    description: Allows you to bypass the account limit and register an unlimited amount of accounts.
     default: op
