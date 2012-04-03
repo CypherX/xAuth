@@ -22,6 +22,7 @@ authurl:
     registration: false
     status: false
     groups: false
+    broadcast-login: false
 
 registration:
     enabled: true

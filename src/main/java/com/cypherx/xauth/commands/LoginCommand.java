@@ -39,7 +39,7 @@ public class LoginCommand implements CommandExecutor {
 			if (passChecks) {
 				boolean success = plugin.getPlyrMngr().doLogin(p);
 				if (success) {
-					if(plugin.isAuthURL() && response != null && response != "")
+					if (plugin.isAuthURL() && plugin.getConfig().getBoolean("authurl.broadcast-login") && response != null && response != "")
 						plugin.getServer().broadcastMessage(response);
 					response = "login.success";
 					a.online(p.getPlayerName());
