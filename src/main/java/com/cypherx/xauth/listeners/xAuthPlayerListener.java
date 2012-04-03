@@ -79,10 +79,12 @@ public class xAuthPlayerListener implements Listener {
 				plugin.getAuthClass(xp).online(p.getName());
 				node = "join.resume";
 			} else {
+				xp.setStatus(Status.Registered);
 				node = "join.login";
 				plyrMngr.protect(xp);
 			}
 		} else if (plyrMngr.mustRegister(p)) {
+			xp.setStatus(Status.Guest);
 			node = "join.register";
 			plyrMngr.protect(xp);
 		}

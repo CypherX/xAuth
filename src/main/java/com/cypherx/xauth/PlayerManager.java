@@ -397,7 +397,7 @@ public class PlayerManager {
 			ps.executeUpdate();
 			return true;
 		} catch (SQLException e) {
-			xAuthLog.severe("something went wrong while deleting session for account: " + accountId, e);
+			xAuthLog.severe("Something went wrong while deleting session for account: " + accountId, e);
 			return false;
 		} finally {
 			plugin.getDbCtrl().close(conn, ps);
