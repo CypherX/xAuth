@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -73,6 +74,16 @@ public class xAuthEntityListener implements Listener {
 				if (plyrMngr.isRestricted(xp, event))
 					event.setIntensity(entity, 0);
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
+		Entity entity = event.getEntity();
+		if (entity instanceof Player) {
+			xAuthPlayer xp = plyrMngr.getPlayer(((Player) entity).getName());
+			if (plyrMngr.isRestricted(xp, event))
+				event.setCancelled(true);
 		}
 	}
 }

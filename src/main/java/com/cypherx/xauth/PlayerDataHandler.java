@@ -74,8 +74,9 @@ public class PlayerDataHandler {
 		pInv.setLeggings(null);
 		pInv.setBoots(null);
 
-		// hide location
-		p.teleport(plugin.getLocMngr().getLocation(p.getWorld()));
+		// protect location
+		if (plugin.getConfig().getBoolean("guest.protect-location"))
+			p.teleport(plugin.getLocMngr().getLocation(p.getWorld()));
 
 		// clear potion effects
 		for (PotionEffect effect : p.getActivePotionEffects())

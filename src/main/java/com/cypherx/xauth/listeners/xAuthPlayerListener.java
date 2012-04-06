@@ -24,7 +24,6 @@ import com.cypherx.xauth.Utils;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthPlayer.Status;
-import com.cypherx.xauth.database.Table;
 
 public class xAuthPlayerListener implements Listener {
 	private final xAuth plugin;
@@ -67,6 +66,7 @@ public class xAuthPlayerListener implements Listener {
 
 		xAuthPlayer xp = plyrMngr.getPlayer(p);
 		String node = "";
+		boolean protect = true;
 
 		if (xp.isFixSS()) {
 			plyrMngr.unprotect(xp);
@@ -78,15 +78,23 @@ public class xAuthPlayerListener implements Listener {
 				xp.setStatus(Status.Authenticated);
 				plugin.getAuthClass(xp).online(p.getName());
 				node = "join.resume";
+				protect = false;
 			} else {
 				xp.setStatus(Status.Registered);
 				node = "join.login";
-				plyrMngr.protect(xp);
+				//plyrMngr.protect(xp);
 			}
 		} else if (plyrMngr.mustRegister(p)) {
 			xp.setStatus(Status.Guest);
 			node = "join.register";
-			plyrMngr.protect(xp);
+			//plyrMngr.protect(xp);
+		}
+
+		if (protect) {
+			if (p.hasPlayedBefore())
+				plyrMngr.protect(xp);
+			else
+				scheduleDelayedProtect(xp);
 		}
 
 		if (!node.isEmpty())
@@ -185,7 +193,7 @@ public class xAuthPlayerListener implements Listener {
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
 		if (plyrMngr.isRestricted(p, event)) {
 			World w = p.getPlayer().getWorld();
-			Location loc = plugin.getDbCtrl().isTableActive(Table.LOCATION) ? 
+			Location loc = plugin.getConfig().getBoolean("guest.protect-location") ? 
 					plugin.getLocMngr().getLocation(w) : p.getPlayerData().getLocation();
 
 			Location testLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
@@ -240,8 +248,16 @@ public class xAuthPlayerListener implements Listener {
 		return true;
 	}
 
+	private void scheduleDelayedProtect(final xAuthPlayer xp) {
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+			public void run() {
+				plyrMngr.protect(xp);
+			}
+		}, 2);
+	}
+
 	private void sendDelayedMessage(final Player player, final String node, int delay) {
-		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 			public void run() {
 				if (player.isOnline())
 					plugin.getMsgHndlr().sendMessage(node, player);
