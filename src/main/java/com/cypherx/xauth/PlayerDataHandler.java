@@ -260,7 +260,7 @@ public class PlayerDataHandler {
 		if (potFx != null)
 			p.addPotionEffects(potFx);
 
-		p.saveData();
+		xp.setPlayerData(null);
 
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
