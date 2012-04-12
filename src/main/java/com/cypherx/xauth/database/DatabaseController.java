@@ -86,7 +86,7 @@ public class DatabaseController {
 		try {
 			return connPool.leaseConn();
 		} catch (Exception e) {
-			xAuthLog.severe("Failed to borrow MySQL connection from pool!", e);
+			xAuthLog.severe("Failed to borrow " + getDBMS() + " connection from pool!", e);
 			return null;
 		}
 	}
@@ -137,7 +137,7 @@ public class DatabaseController {
 		try {
 			connPool.close();
 		} catch (Exception e) {
-			xAuthLog.severe("Failed to close MySQL connection pool!", e);
+			xAuthLog.severe("Failed to close " + getDBMS() + " connection pool!", e);
 		}
 	}
 
