@@ -44,6 +44,7 @@ password:
 guest:
     timeout: 300
     notify-cooldown: 5
+    hide-inventory: true
     protect-location: true
     allowed-commands:
         - register

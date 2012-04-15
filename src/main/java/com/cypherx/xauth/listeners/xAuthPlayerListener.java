@@ -4,13 +4,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -146,6 +149,17 @@ public class xAuthPlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void onPlayerDropItem(final PlayerDropItemEvent event) {
+		if (!plugin.getConfig().getBoolean("guest.hide-inventory")) {
+			xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
+			if (plyrMngr.isRestricted(p, event)) {
+				plyrMngr.sendNotice(p);
+				event.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer().getName());
 		if (plyrMngr.isRestricted(p, event)) {
@@ -220,6 +234,20 @@ public class xAuthPlayerListener implements Listener {
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
 		if (plyrMngr.isRestricted(p, event))
 			event.setCancelled(true);
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void onInventoryClick(final InventoryClickEvent event) {
+		if (!plugin.getConfig().getBoolean("guest.hide-inventory")) {
+			HumanEntity entity = event.getWhoClicked();
+			if (entity instanceof Player) {
+				xAuthPlayer p = plyrMngr.getPlayer(((Player) entity).getName());
+				if (plyrMngr.isRestricted(p, event)) {
+					plyrMngr.sendNotice(p);
+					event.setCancelled(true);
+				}
+			}
+		}
 	}
 
 	private boolean isValidName(String pName) {

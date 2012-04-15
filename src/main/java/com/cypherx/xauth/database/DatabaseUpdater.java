@@ -56,7 +56,6 @@ public class DatabaseUpdater {
 	public void runUpdate() {
 		for (Table tbl : dbCon.getActiveTables()) {
 			String tblId = tbl.toString().toLowerCase();
-			//String tblName = plugin.getConfig().getString("mysql.tables." + tblId);
 			String tblName = dbCon.getTable(tbl);
 			List<String> updateFiles = loadUpdateFiles(tblId);
 
@@ -92,6 +91,8 @@ public class DatabaseUpdater {
 
 					// Loop through all update files..
 					for (String updateFile : updateFiles) {
+						if (getUpdateVersion(updateFile) <= currentVersion)
+							continue;
 
 						// Load queries from update files and split into lines (one query per line)
 						String[] updateSql = loadSQL(updateFile, tblName).split(System.getProperty("line.separator"));
@@ -146,13 +147,17 @@ public class DatabaseUpdater {
 		return updateFiles;
 	}
 
+	private int getUpdateVersion(String filePath) {
+		String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.lastIndexOf("."));
+		return Integer.parseInt(fileName.split("_")[0]);
+	}
+
 	private int getLatestUpdateVersion(List<String> updateFiles) {
 		if (updateFiles.size() < 1)
 			return 0;
 
 		String filePath = updateFiles.get(updateFiles.size() - 1);
-		String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.lastIndexOf("."));
-		return Integer.parseInt(fileName.split("_")[0]);
+		return getUpdateVersion(filePath);
 	}
 
 	private String loadSQL(String path, String tblName) {

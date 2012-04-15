@@ -34,53 +34,62 @@ public class PlayerDataHandler {
 		Location loc = p.getLocation();
 		Collection<PotionEffect> potEffects = p.getActivePotionEffects();
 
-		String strItems = buildItemString(items);
-		String strArmor = buildItemString(armor);
-		String strLoc = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
+		String strItems = null;
+		String strArmor = null;
+		String strLoc = null;
 		String strPotFx = buildPotFxString(potEffects);
 		xp.setPlayerData(new PlayerData(items, armor, loc, potEffects));
 
-		Connection conn = plugin.getDbCtrl().getConnection();
-		PreparedStatement ps = null;
-		try {
-			// Store player inventory, location, and potion effects in database.
-			String sql;
-			if (plugin.getDbCtrl().isMySQL())
-				sql = String.format("INSERT IGNORE INTO `%s` VALUES (?, ?, ?, ?, ?)",
-						plugin.getDbCtrl().getTable(Table.PLAYERDATA));
-			else
-				sql = String.format("INSERT INTO `%s` SELECT ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `%s` WHERE `playername` = ?)",
-						plugin.getDbCtrl().getTable(Table.PLAYERDATA), plugin.getDbCtrl().getTable(Table.PLAYERDATA));
+		boolean hideInv = plugin.getConfig().getBoolean("guest.hide-inventory");
+		boolean hideLoc = plugin.getConfig().getBoolean("guest.protect-location");
 
-			ps = conn.prepareStatement(sql);
-			ps.setString(1, p.getName());
-			ps.setString(2, strItems);
-			ps.setString(3, strArmor);
-			ps.setString(4, strLoc);
-			ps.setString(5, strPotFx);
-			if (!plugin.getDbCtrl().isMySQL())
-				ps.setString(6, p.getName());
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			xAuthLog.severe("Failed to insert player data into database!", e);
-		} finally {
-			plugin.getDbCtrl().close(conn, ps);
+		if (hideInv) {
+			strItems = buildItemString(items);
+			strArmor = buildItemString(armor);
+
+			pInv.clear();
+			pInv.setHelmet(null);
+			pInv.setChestplate(null);
+			pInv.setLeggings(null);
+			pInv.setBoots(null);
 		}
 
-		// clear inventory/armor
-		pInv.clear();
-		pInv.setHelmet(null);
-		pInv.setChestplate(null);
-		pInv.setLeggings(null);
-		pInv.setBoots(null);
-
-		// protect location
-		if (plugin.getConfig().getBoolean("guest.protect-location"))
+		if (hideLoc) {
+			strLoc = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
 			p.teleport(plugin.getLocMngr().getLocation(p.getWorld()));
+		}
 
-		// clear potion effects
 		for (PotionEffect effect : p.getActivePotionEffects())
 			p.addPotionEffect(new PotionEffect(effect.getType(), 0, 0), true);
+
+		// only store player data if there's something to insert
+		if (strItems != null || strArmor != null || strLoc != null || strPotFx != null) {
+			Connection conn = plugin.getDbCtrl().getConnection();
+			PreparedStatement ps = null;
+			try {
+				String sql;
+				if (plugin.getDbCtrl().isMySQL())
+					sql = String.format("INSERT IGNORE INTO `%s` VALUES (?, ?, ?, ?, ?)",
+							plugin.getDbCtrl().getTable(Table.PLAYERDATA));
+				else
+					sql = String.format("INSERT INTO `%s` SELECT ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `%s` WHERE `playername` = ?)",
+							plugin.getDbCtrl().getTable(Table.PLAYERDATA), plugin.getDbCtrl().getTable(Table.PLAYERDATA));
+	
+				ps = conn.prepareStatement(sql);
+				ps.setString(1, p.getName());
+				ps.setString(2, strItems);
+				ps.setString(3, strArmor);
+				ps.setString(4, strLoc);
+				ps.setString(5, strPotFx);
+				if (!plugin.getDbCtrl().isMySQL())
+					ps.setString(6, p.getName());
+				ps.executeUpdate();
+			} catch (SQLException e) {
+				xAuthLog.severe("Failed to insert player data into database!", e);
+			} finally {
+				plugin.getDbCtrl().close(conn, ps);
+			}
+		}
 	}
 
 	private String buildItemString(ItemStack[] items) {
@@ -237,7 +246,10 @@ public class PlayerDataHandler {
 		}
 
 		PlayerInventory pInv = p.getInventory();
-		if (items != null) {
+		boolean hideInv = plugin.getConfig().getBoolean("guest.hide-inventory");
+		boolean hideLoc = plugin.getConfig().getBoolean("guest.protect-location");
+
+		if (hideInv && items != null) {
 			// Fix for inventory extension plugins
 			if (pInv.getSize() > items.length) {
 				ItemStack[] newItems = new ItemStack[pInv.getSize()];
@@ -251,10 +263,10 @@ public class PlayerDataHandler {
 			pInv.setContents(items);
 		}
 
-		if (armor != null)
+		if (hideInv && armor != null)
 			pInv.setArmorContents(armor);
 
-		if (loc != null && p.getHealth() > 0)
+		if (hideLoc && loc != null && p.getHealth() > 0)
 			p.teleport(loc);
 
 		if (potFx != null)
@@ -264,7 +276,6 @@ public class PlayerDataHandler {
 
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
-
 		try {
 			String sql = String.format("DELETE FROM `%s` WHERE `playername` = ?",
 					plugin.getDbCtrl().getTable(Table.PLAYERDATA));
