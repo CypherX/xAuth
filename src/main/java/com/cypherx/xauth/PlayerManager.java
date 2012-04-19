@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -21,6 +22,7 @@ import com.cypherx.xauth.xAuthPlayer.Status;
 public class PlayerManager {
 	private final xAuth plugin;
 	private final ConcurrentMap<String, xAuthPlayer> players = new ConcurrentHashMap<String, xAuthPlayer>();
+	private ArrayList<String> loggedIn = new ArrayList<String>();
 
 	public PlayerManager(final xAuth plugin) {
 		this.plugin = plugin;
@@ -402,5 +404,27 @@ public class PlayerManager {
 		} finally {
 			plugin.getDbCtrl().close(conn, ps);
 		}
+	}
+	
+	public void addLoggedIn(String player){
+		player = player.toLowerCase();
+		if(!isLoggedIn(player))
+			loggedIn.add(player);
+	}
+	
+	public void removeLoggedIn(String player){
+		player = player.toLowerCase();
+		loggedIn.remove(player);
+	}
+	
+	public boolean isLoggedIn(String player){
+		Player pl = plugin.getServer().getPlayer(player);
+		if(pl != null && pl.isOnline()) {
+			return loggedIn.contains(player.toLowerCase());
+		} else {
+			removeLoggedIn(player.toLowerCase());
+			return false;
+		}
+			
 	}
 }
