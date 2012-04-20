@@ -105,7 +105,7 @@ public class PlayerManager {
 	public boolean mustRegister(Player player) {
 		if (plugin.getConfig().getBoolean("authurl.enabled"))
 			return plugin.getConfig().getBoolean("authurl.registration");
-		
+
 		return plugin.getConfig().getBoolean("registration.forced") || xPermissions.has(player, "xauth.register");
 	}
 

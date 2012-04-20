@@ -69,7 +69,7 @@ public class xAuthPlayerListener implements Listener {
 
 		xAuthPlayer xp = plyrMngr.getPlayer(p);
 		String node = "";
-		boolean protect = true;
+		boolean protect = false;
 
 		if (xp.isFixSS()) {
 			plyrMngr.unprotect(xp);
@@ -81,16 +81,15 @@ public class xAuthPlayerListener implements Listener {
 				xp.setStatus(Status.Authenticated);
 				plugin.getAuthClass(xp).online(p.getName());
 				node = "join.resume";
-				protect = false;
 			} else {
 				xp.setStatus(Status.Registered);
 				node = "join.login";
-				//plyrMngr.protect(xp);
+				protect = true;
 			}
 		} else if (plyrMngr.mustRegister(p)) {
 			xp.setStatus(Status.Guest);
 			node = "join.register";
-			//plyrMngr.protect(xp);
+			protect = true;
 		}
 
 		if (protect) {
