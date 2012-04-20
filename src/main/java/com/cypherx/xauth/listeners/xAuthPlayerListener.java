@@ -69,7 +69,7 @@ public class xAuthPlayerListener implements Listener {
 
 		xAuthPlayer xp = plyrMngr.getPlayer(p);
 		String node = "";
-		boolean protect = false;
+		//boolean protect = false;
 
 		if (xp.isFixSS()) {
 			plyrMngr.unprotect(xp);
@@ -84,20 +84,22 @@ public class xAuthPlayerListener implements Listener {
 			} else {
 				xp.setStatus(Status.Registered);
 				node = "join.login";
-				protect = true;
+				//protect = true;
+				plyrMngr.protect(xp);
 			}
 		} else if (plyrMngr.mustRegister(p)) {
 			xp.setStatus(Status.Guest);
 			node = "join.register";
-			protect = true;
+			//protect = true;
+			plyrMngr.protect(xp);
 		}
 
-		if (protect) {
+		/*if (protect) {
 			if (p.hasPlayedBefore())
 				plyrMngr.protect(xp);
 			else
 				scheduleDelayedProtect(xp);
-		}
+		}*/
 
 		if (!node.isEmpty())
 			sendDelayedMessage(p, node, 1);
@@ -275,13 +277,13 @@ public class xAuthPlayerListener implements Listener {
 		return true;
 	}
 
-	private void scheduleDelayedProtect(final xAuthPlayer xp) {
+	/*private void scheduleDelayedProtect(final xAuthPlayer xp) {
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 			public void run() {
 				plyrMngr.protect(xp);
 			}
 		}, 2);
-	}
+	}*/
 
 	private void sendDelayedMessage(final Player player, final String node, int delay) {
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
