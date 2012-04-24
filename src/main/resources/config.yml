@@ -1,6 +1,7 @@
 main:
     auto-disable: true
     download-library: true
+    reload-on-join: false
 
 mysql:
     enabled: false
