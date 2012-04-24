@@ -292,10 +292,6 @@ public class PlayerManager {
 		}
 	}
 
-	public void reload() {
-		players.clear();
-	}
-
 	public boolean doLogin(xAuthPlayer xp) {
 		int accountId = xp.getAccountId();
 		String ipAddress = xp.getIPAddress();
@@ -309,9 +305,12 @@ public class PlayerManager {
 				xp.setStatus(Status.Registered);
 			}
 
+			if (plugin.getConfig().getBoolean("extra.track-last-login"))
+				updateLastLogin(accountId, ipAddress, currentTime);
+
 			// insert session if session.length > 0
 			if (plugin.getDbCtrl().isTableActive(Table.SESSION))
-				plugin.getPlyrMngr().createSession(accountId, ipAddress);
+				createSession(accountId, ipAddress);
 
 			// clear strikes
 			plugin.getStrkMngr().getRecord(ipAddress).clearStrikes(xp.getPlayerName());
@@ -345,6 +344,24 @@ public class PlayerManager {
 			return rs.next() ? rs.getInt(1) : -1;
 		} finally {
 			plugin.getDbCtrl().close(conn, ps, rs);
+		}
+	}
+
+	public boolean updateLastLogin(int accountId, String ipAddress, Timestamp currentTime) throws SQLException {
+		Connection conn = plugin.getDbCtrl().getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			String sql = String.format("UPDATE `%s` SET `lastlogindate` = ?, `lastloginip` = ? WHERE `id` = ?",
+					plugin.getDbCtrl().getTable(Table.ACCOUNT));
+			ps = conn.prepareStatement(sql);
+			ps.setTimestamp(1, currentTime);
+			ps.setString(2, ipAddress);
+			ps.setInt(3, accountId);
+			ps.executeUpdate();
+			return true;
+		} finally {
+			plugin.getDbCtrl().close(conn, ps);
 		}
 	}
 
@@ -402,5 +419,9 @@ public class PlayerManager {
 		} finally {
 			plugin.getDbCtrl().close(conn, ps);
 		}
+	}
+
+	public void reload() {
+		players.clear();
 	}
 }
