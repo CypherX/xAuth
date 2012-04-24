@@ -54,7 +54,15 @@ public class xAuthPlayer {
 
 	public String getIPAddress() {
 		Player player = getPlayer();
-		return player == null ? null : player.getAddress().getAddress().getHostAddress();
+		//return player == null ? null : player.getAddress().getAddress().getHostAddress();
+		if (player == null)
+			return null;
+
+		try {
+			return player.getAddress().getAddress().getHostAddress();
+		} catch (NullPointerException e) {
+			return null;
+		}
 	}
 
 	public enum Status {
