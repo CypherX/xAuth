@@ -15,6 +15,7 @@ import com.cypherx.xauth.listeners.*;
 import com.cypherx.xauth.password.PasswordHandler;
 import com.cypherx.xauth.plugins.xPermissions;
 import com.cypherx.xauth.strike.StrikeManager;
+import com.cypherx.xauth.updater.Updater;
 
 public class xAuth extends JavaPlugin {
 	private DatabaseController dbCtrl;
@@ -50,6 +51,12 @@ public class xAuth extends JavaPlugin {
 			xAuthLog.info("Auto-disabling, server is running in online-mode");
 			getServer().getPluginManager().disablePlugin(this);
 			return;
+		}
+
+		if (getConfig().getBoolean("main.check-for-updates")) {
+			Updater updater = new Updater(getDescription().getVersion());
+			if (updater.isUpdateAvailable())
+				updater.printMessage();
 		}
 
 		File h2File = new File("lib", "h2-" + h2Version + ".jar");
@@ -128,22 +135,6 @@ public class xAuth extends JavaPlugin {
 
 		Utils.downloadFile(h2File, "http://dl.dropbox.com/u/24661378/Bukkit/lib/" + h2File.getName());
 	}
-
-	/*private int compareVer(String verStr1, String verStr2) {
-		String[] vals1 = verStr1.split("\\.");
-		String[] vals2 = verStr2.split("\\.");
-		int i = 0;
-
-		while (i < vals1.length && i < vals2.length && vals1[i].equals(vals2[i]))
-		  i++;
-
-		if (i < vals1.length && i < vals2.length) {
-		    int diff = new Integer(vals1[i]).compareTo(new Integer(vals2[i]));
-		    return diff < 0 ? -1 : diff == 0 ? 0 : 1;
-		}
-
-		return vals1.length < vals2.length ? -1 : vals1.length == vals2.length ? 0 : 1;
-	}*/
 
 	public File getJar() { return getFile(); }
 	public DatabaseController getDbCtrl() { return dbCtrl; }
