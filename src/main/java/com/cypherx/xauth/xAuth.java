@@ -158,7 +158,7 @@ public class xAuth extends JavaPlugin {
 
 	public void reload() {
 		loadConfiguration();
-		plyrMngr.reload();
+		//plyrMngr.reload();
 	}
 
 	private void lol() {
