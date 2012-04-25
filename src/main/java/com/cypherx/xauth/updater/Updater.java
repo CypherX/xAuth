@@ -22,9 +22,9 @@ public class Updater {
 	private void loadLatestVersion() {
 	    BufferedReader reader = null;
 
-	    try {
-	    	URL url = new URL(VERSION_FILE);
-	    	reader = new BufferedReader(new InputStreamReader(url.openStream()));
+		try {
+			URL url = new URL(VERSION_FILE);
+			reader = new BufferedReader(new InputStreamReader(url.openStream()));
 			String str = reader.readLine();
 			String[] split = str.split("\\|");
 			latestVer = split[0];
