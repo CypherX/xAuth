@@ -211,10 +211,15 @@ public class xAuthPlayerListener implements Listener {
 			Location loc = plugin.getConfig().getBoolean("guest.protect-location") ? 
 					plugin.getLocMngr().getLocation(w) : p.getPlayerData().getLocation();
 
-			Location testLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
-			while (w.getBlockAt(testLoc).isEmpty() || w.getBlockAt(testLoc).isLiquid())
-				testLoc.setY((int)testLoc.getY() - 1);
-			loc.setY(testLoc.getY() + 1);
+			// I removed this section for now since it broken. You can not asume there is solid ground anywhere
+			// On my server we have void-worlds with floating islands.
+			// A player in creative-mode logs of while flying in the void, the session times out...
+			// ... and when the moderator logs on the server will hang due to this forever while loop.
+					
+			// Location testLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
+			// while (w.getBlockAt(testLoc).isEmpty() || w.getBlockAt(testLoc).isLiquid())
+			// 	testLoc.setY((int)testLoc.getY() - 1);
+			// loc.setY(testLoc.getY() + 1);
 
 			event.setTo(loc);
 			//event.setFrom(loc);
