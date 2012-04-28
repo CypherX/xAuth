@@ -71,7 +71,7 @@ public class xAuthPlayerListener implements Listener {
 		if (p == null || !p.isOnline())
 			return;
 
-		xAuthPlayer xp = plyrMngr.getPlayer(p, plugin.getConfig().getBoolean("extra.reload-on-join"));
+		xAuthPlayer xp = plyrMngr.getPlayer(p, plugin.getConfig().getBoolean("main.reload-on-join"));
 		String node = "";
 		//boolean protect = false;
 

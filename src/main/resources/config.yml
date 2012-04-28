@@ -1,7 +1,8 @@
 main:
     auto-disable: true
-    download-library: true
     check-for-updates: true
+    download-library: true
+    reload-on-join: false
 
 mysql:
     enabled: false
@@ -73,12 +74,11 @@ strikes:
     amount: 5
     lockout-length: 3600
 
+account:
+    track-last-login: false;
+
 filter:
     min-length: 2
     allowed: ''
     disallowed: ''
     blank-name: true
-
-extra:
-    reload-on-join: false
-    track-last-login: false

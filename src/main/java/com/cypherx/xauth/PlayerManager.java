@@ -305,7 +305,7 @@ public class PlayerManager {
 				xp.setStatus(Status.Registered);
 			}
 
-			if (plugin.getConfig().getBoolean("extra.track-last-login"))
+			if (plugin.getConfig().getBoolean("account.track-last-login"))
 				updateLastLogin(accountId, ipAddress, currentTime);
 
 			// insert session if session.length > 0
