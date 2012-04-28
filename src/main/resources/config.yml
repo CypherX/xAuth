@@ -75,7 +75,7 @@ strikes:
     lockout-length: 3600
 
 account:
-    track-last-login: false;
+    track-last-login: false
 
 filter:
     min-length: 2
