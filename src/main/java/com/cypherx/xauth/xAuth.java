@@ -13,7 +13,7 @@ import com.cypherx.xauth.commands.*;
 import com.cypherx.xauth.database.DatabaseController;
 import com.cypherx.xauth.listeners.*;
 import com.cypherx.xauth.password.PasswordHandler;
-import com.cypherx.xauth.plugins.xPermissions;
+//import com.cypherx.xauth.plugins.xPermissions;
 import com.cypherx.xauth.strike.StrikeManager;
 import com.cypherx.xauth.updater.Updater;
 
@@ -72,7 +72,7 @@ public class xAuth extends JavaPlugin {
 		}
 
 		// Initialize permissions support
-		xPermissions.init();
+		//xPermissions.init();
 
 		// Initialize database controller
 		dbCtrl = new DatabaseController(this);

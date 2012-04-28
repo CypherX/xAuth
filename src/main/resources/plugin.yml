@@ -49,7 +49,6 @@ permissions:
         xauth.admin.reload: true
         xauth.admin.activate: true
         xauth.admin.config: true
-        xauth.bypass.acclimit: true
   xauth.admin.register:
     description: Allows you to register other players
     default: op
