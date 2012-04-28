@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.Plugin;
 
 import com.cypherx.xauth.PlayerManager;
 import com.cypherx.xauth.Utils;
@@ -45,11 +46,14 @@ public class xAuthPlayerListener implements Listener {
 
 		Player p = event.getPlayer();
 		if (p.isOnline()) {
-			plyrMngr.getPlayer(p).setFixSS(true);
-			//event.disallow(Result.KICK_OTHER, "You are already online!");
+			Plugin spoutPlugin = plugin.getServer().getPluginManager().getPlugin("Spout");
+			if (spoutPlugin == null)
+				plyrMngr.getPlayer(p).setFixSS(true);
+			else
+				event.disallow(Result.KICK_OTHER, plugin.getMsgHndlr().get("join.error.online"));
 		}
 
-		String ipAddress = event.getKickMessage();
+		String ipAddress = event.getAddress().getHostAddress();
 		if (Utils.isIPAddress(ipAddress))
 			if (plugin.getStrkMngr().isLockedOut(ipAddress, p.getName()))
 				event.disallow(Result.KICK_OTHER, plugin.getMsgHndlr().get("join.error.lockout"));
