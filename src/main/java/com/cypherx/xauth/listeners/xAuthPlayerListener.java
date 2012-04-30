@@ -216,22 +216,15 @@ public class xAuthPlayerListener implements Listener {
 					plugin.getLocMngr().getLocation(w) : p.getPlayerData().getLocation();
 
 			Location testLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
-			while (w.getBlockAt(testLoc).isEmpty() || w.getBlockAt(testLoc).isLiquid())
+			while ((w.getBlockAt(testLoc).isEmpty() || w.getBlockAt(testLoc).isLiquid()) && testLoc.getY() >= 0)
 				testLoc.setY((int)testLoc.getY() - 1);
-			loc.setY(testLoc.getY() + 1);
+
+			if (testLoc.getY() > 0)
+				loc.setY(testLoc.getY() + 1);
 
 			event.setTo(loc);
-			//event.setFrom(loc);
 			plyrMngr.sendNotice(p);
 		}
-
-		// Old code
-		/*xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
-		if (plyrMngr.isRestricted(p, event)) {
-			event.setTo(plugin.getDbCtrl().isTableActive(Table.LOCATION) ?
-					plugin.getLocMngr().getLocation(event.getPlayer().getWorld()) : p.getLocation());
-			plyrMngr.sendNotice(p);
-		}*/
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
