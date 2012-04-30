@@ -90,7 +90,7 @@ public class xAuth extends JavaPlugin {
 		dbCtrl.runUpdater();
 
 		// Initialize ALL THE CLASSES
-		plyrMngr 	= new PlayerManager(this);
+		plyrMngr	= new PlayerManager(this);
 		plyrDtHndlr = new PlayerDataHandler(this);
 		pwdHndlr 	= new PasswordHandler(this);
 		locMngr 	= new LocationManager(this);
