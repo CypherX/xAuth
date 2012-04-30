@@ -31,7 +31,7 @@ public class Updater {
 			priority =  UpdatePriority.getPriority(Integer.parseInt(split[1]));
 		} catch (IOException e) {
 			xAuthLog.severe("Failed to load update version file!", e);
-		} finally {			
+		} finally {
 			try {
 				if (reader != null)
 					reader.close();
