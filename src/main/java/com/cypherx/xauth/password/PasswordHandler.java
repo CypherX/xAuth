@@ -54,6 +54,9 @@ public class PasswordHandler {
 			checkPassHash = hash.substring(0, saltPos) + salt + hash.substring(saltPos);
 		} else if (type == PasswordType.WHIRLPOOL) {
 			checkPassHash = whirlpool(checkPass);
+		} else if (type == PasswordType.AUTHME_SHA256) {
+			String salt = realPass.split("\\$")[2];
+			checkPassHash = "$SHA$" + salt + "$" + hash(hash(checkPass, "SHA-256") + salt, "SHA-256");
 		} else
 			checkPassHash = hash(checkPass, type.getAlgorithm());
 

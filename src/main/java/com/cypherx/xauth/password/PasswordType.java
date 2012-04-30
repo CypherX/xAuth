@@ -5,7 +5,8 @@ public enum PasswordType {
 	WHIRLPOOL(1),
 	MD5(2, "MD5"),
 	SHA1(3, "SHA1"),
-	SHA256(4, "SHA-256");
+	SHA256(4, "SHA-256"),
+	AUTHME_SHA256(5);
 
 	private int type;
 	private String algorithm;
