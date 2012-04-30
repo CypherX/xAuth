@@ -33,6 +33,7 @@ registration:
     validate-email: false
     account-limit: 1
     activation: false
+    require-login: true
 
 password:
     min-length: 6
