@@ -143,9 +143,9 @@ public class AuthURL extends Auth {
     	if (params.length < 2 || ((params.length % 2) != 0))
     		return false;
     	try {
-			HttpURLConnection.setFollowRedirects(false);
+			//HttpURLConnection.setFollowRedirects(false);
 			HttpURLConnection uc = (HttpURLConnection) new URL(plugin.getConfig().getString("authurl.url")).openConnection();
-			
+
 			uc.setRequestMethod("POST");
 			uc.setDoInput(true);
 			uc.setDoOutput(true);
@@ -164,7 +164,7 @@ public class AuthURL extends Auth {
 				writeParam(out, params[x], params[++x]);
 			out.flush();
 			out.close();
-			
+
 			BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream()));
 			String line = in.readLine();
 			boolean success = line != null && line.equals("YES");
