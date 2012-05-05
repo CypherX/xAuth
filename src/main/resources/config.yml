@@ -31,7 +31,7 @@ registration:
     forced: true
     require-email: false
     validate-email: false
-    account-limit: 1
+    account-limit: 0
     activation: false
     require-login: true
 
