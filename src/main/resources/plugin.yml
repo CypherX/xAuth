@@ -37,7 +37,7 @@ commands:
 permissions:
   xauth.register:
     description: Allows players/groups to register when new registrations are disabled.
-    default: true
+    default: false
   xauth.admin.*:
     description: Grants access to all xAuth admin commands
     children:
@@ -75,4 +75,3 @@ permissions:
     default: op
   xauth.bypass.acclimit:
     description: Allows you to bypass the account limit and register an unlimited amount of accounts.
-    default: op
