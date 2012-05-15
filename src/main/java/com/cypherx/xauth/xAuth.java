@@ -64,7 +64,9 @@ public class xAuth extends JavaPlugin {
 			xAuthLog.info("-------------------------------");
 			xAuthLog.info("Downloading required H2 library..");
 			downloadLib(h2File);
-			xAuthLog.info("Download complete. Reload the server to activate xAuth.");
+			xAuthLog.info("Download complete.");
+			xAuthLog.info("");
+			xAuthLog.info("Reload the server to enable xAuth.");
 			xAuthLog.info("-------------------------------");
 
 			getServer().getPluginManager().disablePlugin(this);
