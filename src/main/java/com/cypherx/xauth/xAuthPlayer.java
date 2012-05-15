@@ -16,6 +16,7 @@ public class xAuthPlayer {
 	private int timeoutTaskId = -1;
 	private boolean isProtected = false;
 	private boolean fixSS = false;
+	private Timestamp connectTime;
 
 	public xAuthPlayer(final String playerName) {
 		this.playerName = playerName;
@@ -47,6 +48,8 @@ public class xAuthPlayer {
 	public void setProtected(boolean isProtected) { this.isProtected = isProtected; }
 	public boolean isFixSS() { return fixSS; }
 	public void setFixSS(boolean fixSS) { this.fixSS = fixSS; }
+	public Timestamp getConnectTime() { return connectTime; }
+	public void setConnectTime(Timestamp connectTime) { this.connectTime = connectTime; }
 
 	public boolean isGuest() { return status == Status.Guest; }
 	public boolean isRegistered() {	return status != Status.Guest; }

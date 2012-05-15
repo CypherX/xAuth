@@ -26,6 +26,12 @@ authurl:
     groups: false
     broadcast-login: false
 
+single-session:
+    reverse: true
+    guests:
+        reverse: false
+        immunity-length: 5
+
 registration:
     enabled: true
     forced: true

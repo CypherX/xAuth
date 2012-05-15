@@ -1,5 +1,7 @@
 package com.cypherx.xauth.listeners;
 
+import java.sql.Timestamp;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,7 +23,7 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.Plugin;
+//import org.bukkit.plugin.Plugin;
 
 import com.cypherx.xauth.PlayerManager;
 import com.cypherx.xauth.Utils;
@@ -46,10 +48,24 @@ public class xAuthPlayerListener implements Listener {
 
 		Player p = event.getPlayer();
 		if (p.isOnline()) {
-			Plugin spoutPlugin = plugin.getServer().getPluginManager().getPlugin("Spout");
-			if (spoutPlugin == null)
-				plyrMngr.getPlayer(p).setFixSS(true);
-			else
+			//Plugin spoutPlugin = plugin.getServer().getPluginManager().getPlugin("Spout");
+			//if (spoutPlugin == null)
+			//	plyrMngr.getPlayer(p).setFixSS(true);
+			//else
+				//event.disallow(Result.KICK_OTHER, plugin.getMsgHndlr().get("join.error.online"));
+
+			xAuthPlayer xp = plyrMngr.getPlayer(p);
+			boolean reverse = plugin.getConfig().getBoolean("single-session.reverse");
+
+			if (reverse && !xp.isAuthenticated()) {
+				if (!plugin.getConfig().getBoolean("single-session.guests.reverse")) {
+					Timestamp expireTime = new Timestamp(xp.getConnectTime().getTime() +
+							(plugin.getConfig().getInt("single-session.guests.immunity-length") * 1000));
+					reverse = !(expireTime.compareTo(new Timestamp(System.currentTimeMillis())) < 0);
+				}
+			}
+
+			if (reverse)
 				event.disallow(Result.KICK_OTHER, plugin.getMsgHndlr().get("join.error.online"));
 		}
 
@@ -72,6 +88,8 @@ public class xAuthPlayerListener implements Listener {
 			return;
 
 		xAuthPlayer xp = plyrMngr.getPlayer(p, plugin.getConfig().getBoolean("main.reload-on-join"));
+		xp.setConnectTime(new Timestamp(System.currentTimeMillis()));
+
 		String node = "";
 		boolean protect = false;
 
