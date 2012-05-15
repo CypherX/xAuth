@@ -8,7 +8,7 @@ import java.net.URL;
 import com.cypherx.xauth.xAuthLog;
 
 public class Updater {
-	private static final String VERSION_FILE = "http://dl.dropbox.com/u/24661378/Bukkit/xAuth/version.txt";
+	private static final String VERSION_FILE = "http://love-despite.com/cypher/bukkit/xAuth/version.txt";
 
 	private final String currVer;
 	private String latestVer;

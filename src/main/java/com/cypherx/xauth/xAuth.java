@@ -60,14 +60,14 @@ public class xAuth extends JavaPlugin {
 		}
 
 		File h2File = new File("lib", "h2-" + h2Version + ".jar");
-		if (!h2File.exists() && getConfig().getBoolean("main.download-library")) {
+		if (!h2File.exists() && getConfig().getBoolean("main.download-library") && !getConfig().getBoolean("mysql.enabled")) {
+			xAuthLog.info("-------------------------------");
 			xAuthLog.info("Downloading required H2 library..");
 			downloadLib(h2File);
-			xAuthLog.info("Download complete, reloading xAuth..");
+			xAuthLog.info("Download complete. Reload the server to activate xAuth.");
+			xAuthLog.info("-------------------------------");
 
-			// Probably not the best method
 			getServer().getPluginManager().disablePlugin(this);
-			getServer().getPluginManager().enablePlugin(this);
 			return;
 		}
 
@@ -133,7 +133,7 @@ public class xAuth extends JavaPlugin {
 		if (!dir.exists())
 			dir.mkdir();		
 
-		Utils.downloadFile(h2File, "http://dl.dropbox.com/u/24661378/Bukkit/lib/" + h2File.getName());
+		Utils.downloadFile(h2File, "http://love-despite.com/cypher/bukkit/lib/" + h2File.getName());
 	}
 
 	public File getJar() { return getFile(); }
