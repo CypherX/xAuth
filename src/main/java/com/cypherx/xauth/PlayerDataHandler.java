@@ -33,12 +33,14 @@ public class PlayerDataHandler {
 		ItemStack[] armor = pInv.getArmorContents();
 		Location loc = p.getLocation();
 		Collection<PotionEffect> potEffects = p.getActivePotionEffects();
+		int fireTicks = p.getFireTicks();
+		int remainingAir = p.getRemainingAir();
 
 		String strItems = null;
 		String strArmor = null;
 		String strLoc = null;
 		String strPotFx = buildPotFxString(potEffects);
-		xp.setPlayerData(new PlayerData(items, armor, loc, potEffects));
+		xp.setPlayerData(new PlayerData(items, armor, loc, potEffects, fireTicks, remainingAir));
 
 		boolean hideInv = plugin.getConfig().getBoolean("guest.hide-inventory");
 		boolean hideLoc = plugin.getConfig().getBoolean("guest.protect-location");
@@ -62,27 +64,33 @@ public class PlayerDataHandler {
 		for (PotionEffect effect : p.getActivePotionEffects())
 			p.addPotionEffect(new PotionEffect(effect.getType(), 0, 0), true);
 
+		p.setFireTicks(0);
+		p.setRemainingAir(300);
+
 		// only store player data if there's something to insert
 		if (strItems != null || strArmor != null || strLoc != null || strPotFx != null) {
 			Connection conn = plugin.getDbCtrl().getConnection();
 			PreparedStatement ps = null;
+
 			try {
 				String sql;
 				if (plugin.getDbCtrl().isMySQL())
-					sql = String.format("INSERT IGNORE INTO `%s` VALUES (?, ?, ?, ?, ?)",
+					sql = String.format("INSERT IGNORE INTO `%s` VALUES (?, ?, ?, ?, ?, ?, ?)",
 							plugin.getDbCtrl().getTable(Table.PLAYERDATA));
 				else
-					sql = String.format("INSERT INTO `%s` SELECT ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `%s` WHERE `playername` = ?)",
+					sql = String.format("INSERT INTO `%s` SELECT ?, ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `%s` WHERE `playername` = ?)",
 							plugin.getDbCtrl().getTable(Table.PLAYERDATA), plugin.getDbCtrl().getTable(Table.PLAYERDATA));
-	
+
 				ps = conn.prepareStatement(sql);
 				ps.setString(1, p.getName());
 				ps.setString(2, strItems);
 				ps.setString(3, strArmor);
 				ps.setString(4, strLoc);
 				ps.setString(5, strPotFx);
+				ps.setInt(6, fireTicks);
+				ps.setInt(7, remainingAir);
 				if (!plugin.getDbCtrl().isMySQL())
-					ps.setString(6, p.getName());
+					ps.setString(8, p.getName());
 				ps.executeUpdate();
 			} catch (SQLException e) {
 				xAuthLog.severe("Failed to insert player data into database!", e);
@@ -203,6 +211,8 @@ public class PlayerDataHandler {
 		ItemStack[] armor = null;
 		Location loc = null;
 		Collection<PotionEffect> potFx = null;
+		int fireTicks = 0;
+		int remainingAir = 300;
 
 		// Use cached copy of player data, if it exists
 		PlayerData playerData = xp.getPlayerData();
@@ -211,13 +221,14 @@ public class PlayerDataHandler {
 			armor = playerData.getArmor();
 			loc = playerData.getLocation();
 			potFx = playerData.getPotionEffects();
+			fireTicks = playerData.getFireTicks();
 		} else {
 			Connection conn = plugin.getDbCtrl().getConnection();
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 
 			try {
-				String sql = String.format("SELECT `items`, `armor`, `location`, `potioneffects` FROM `%s` WHERE `playername` = ?",
+				String sql = String.format("SELECT `items`, `armor`, `location`, `potioneffects`, `fireticks`, `remainingair` FROM `%s` WHERE `playername` = ?",
 						plugin.getDbCtrl().getTable(Table.PLAYERDATA));
 				ps = conn.prepareStatement(sql);
 				ps.setString(1, p.getName());
@@ -237,6 +248,9 @@ public class PlayerDataHandler {
 					String rsPotFx = rs.getString("potioneffects");
 					if (rsPotFx != null)
 						potFx = buildPotFx(rsPotFx);
+
+					fireTicks = rs.getInt("fireticks");
+					remainingAir = rs.getInt("remainingair");
 				}
 			} catch (SQLException e) {
 				xAuthLog.severe("Failed to load playerdata from database for player: " + p.getName(), e);
@@ -272,6 +286,8 @@ public class PlayerDataHandler {
 		if (potFx != null)
 			p.addPotionEffects(potFx);
 
+		p.setFireTicks(fireTicks);
+		p.setRemainingAir(remainingAir);
 		xp.setPlayerData(null);
 
 		Connection conn = plugin.getDbCtrl().getConnection();
