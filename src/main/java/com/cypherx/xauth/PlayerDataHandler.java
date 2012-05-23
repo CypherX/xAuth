@@ -222,6 +222,7 @@ public class PlayerDataHandler {
 			loc = playerData.getLocation();
 			potFx = playerData.getPotionEffects();
 			fireTicks = playerData.getFireTicks();
+			remainingAir = playerData.getRemainingAir();
 		} else {
 			Connection conn = plugin.getDbCtrl().getConnection();
 			PreparedStatement ps = null;
