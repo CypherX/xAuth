@@ -3,6 +3,7 @@ package com.cypherx.xauth.plugins;
 //import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.entity.Player;
 //import org.bukkit.plugin.Plugin;
 //import org.bukkit.plugin.PluginDescriptionFile;
@@ -41,7 +42,7 @@ public class xPermissions {
 	public static boolean has(CommandSender sender, String permission) {
 		if (sender instanceof Player)
 			return has((Player)sender, permission);
-		else if (sender instanceof ConsoleCommandSender)
+		else if (sender instanceof ConsoleCommandSender || sender instanceof RemoteConsoleCommandSender)
 			return true;
 		else
 			return false;
