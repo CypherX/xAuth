@@ -153,6 +153,9 @@ public class PlayerManager {
 
 	public void protect(xAuthPlayer xp) {
 		Player p = xp.getPlayer();
+		if (p == null)
+			return;
+
 		plugin.getPlyrDtHndlr().storeData(xp, p);
 
 		xp.setCreative(p.getGameMode().equals(GameMode.CREATIVE));
@@ -171,7 +174,7 @@ public class PlayerManager {
 	private int scheduleTimeoutTask(final Player player, final int timeout) {
 		return Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 			public void run() {
-				if (player.isOnline()) 
+				if (player.isOnline())
 					player.kickPlayer(plugin.getMsgHndlr().get("misc.timeout"));
 			}
 		}, plugin.getConfig().getInt("guest.timeout") * 20);
