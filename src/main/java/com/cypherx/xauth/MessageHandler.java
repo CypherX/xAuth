@@ -51,14 +51,14 @@ public class MessageHandler {
 	public void sendMessage(String node, CommandSender sender, String targetName) {
 		if (sender != null) {
 			String message = get(node, sender.getName(), targetName);
-	
+
 			for (String line : message.split("\n"))
 				sender.sendMessage(line);
 		}
 	}
 
 	public String get(String node) {
-		return get(node, null, null);		
+		return get(node, null, null);
 	}
 
 	private String get(String node, String playerName, String targetName) {
