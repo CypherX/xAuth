@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.cypherx.xauth.database.Table;
 import com.cypherx.xauth.plugins.xPermissions;
@@ -240,10 +241,10 @@ public class PlayerManager {
 		return nextNotifyTime.compareTo(new Timestamp(System.currentTimeMillis())) < 0;
 	}
 
-	public boolean hasGodmode(xAuthPlayer player) {
+	public boolean hasGodmode(xAuthPlayer player, DamageCause cause) {
 		int godmodeLength = plugin.getConfig().getInt("session.godmode-length");
 		Timestamp loginTime = player.getLoginTime();
-		if (godmodeLength < 1 || loginTime == null)
+		if (godmodeLength < 1 || loginTime == null || cause == DamageCause.FIRE_TICK || cause == DamageCause.DROWNING)
 			return false;
 
 		Timestamp expireTime = new Timestamp(loginTime.getTime() + (godmodeLength * 1000));

@@ -31,7 +31,7 @@ public class xAuthEntityListener implements Listener {
 		Entity entity = event.getEntity();
 		if (entity instanceof Player && ((Player)entity).isOnline()) { // player taking damage
 			xAuthPlayer xp = plyrMngr.getPlayer(((Player)entity).getName());
-			if (plyrMngr.isRestricted(xp, event) || plyrMngr.hasGodmode(xp))
+			if (plyrMngr.isRestricted(xp, event) || plyrMngr.hasGodmode(xp, event.getCause()))
 				event.setCancelled(true);
 		}
 
