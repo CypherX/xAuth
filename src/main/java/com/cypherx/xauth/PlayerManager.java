@@ -407,6 +407,9 @@ public class PlayerManager {
 	}
 
 	public boolean deleteSession(int accountId) {
+		if (!plugin.getDbCtrl().isTableActive(Table.SESSION))
+			return true;
+
 		Connection conn = plugin.getDbCtrl().getConnection();
 		PreparedStatement ps = null;
 
