@@ -69,9 +69,6 @@ public class xAuthPlayerListener implements Listener {
 
 		if (!isValidName(p.getName()))
 			event.disallow(Result.KICK_OTHER, plugin.getMsgHndlr().get("join.error.name"));
-
-		if (!event.getResult().equals(Result.ALLOWED))
-			plyrMngr.getPlayer(p).setFixSS(false);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -85,11 +82,6 @@ public class xAuthPlayerListener implements Listener {
 
 		String node = "";
 		boolean protect = false;
-
-		if (xp.isFixSS()) {
-			plyrMngr.unprotect(xp);
-			xp.setFixSS(false);
-		}
 
 		if (xp.isRegistered() || plugin.isAuthURL()) {
 			if (plyrMngr.checkSession(xp)) {
@@ -109,8 +101,10 @@ public class xAuthPlayerListener implements Listener {
 			//plyrMngr.protect(xp);
 		}
 
-		if (protect)
+		if (protect) {
+			xp.setProtected(true);
 			scheduleDelayedProtect(xp);
+		}
 
 		if (!node.isEmpty())
 			sendDelayedMessage(p, node, 1);
@@ -119,7 +113,7 @@ public class xAuthPlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerQuit(final PlayerQuitEvent event) {
 		xAuthPlayer p = plyrMngr.getPlayer(event.getPlayer());
-		if (p.isProtected() && !p.isFixSS())
+		if (p.isProtected())
 			plyrMngr.unprotect(p);
 
 		plugin.getAuthClass(p).offline(event.getPlayer().getName());
