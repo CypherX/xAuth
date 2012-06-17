@@ -15,7 +15,6 @@ public class xAuthPlayer {
 	private boolean creativeMode;
 	private int timeoutTaskId = -1;
 	private boolean isProtected = false;
-	private boolean fixSS = false;
 	private Timestamp connectTime;
 
 	public xAuthPlayer(final String playerName) {
@@ -46,8 +45,6 @@ public class xAuthPlayer {
 	public void setTimeoutTaskId(int timeoutTaskId) { this.timeoutTaskId = timeoutTaskId; }
 	public boolean isProtected() { return isProtected; }
 	public void setProtected(boolean isProtected) { this.isProtected = isProtected; }
-	public boolean isFixSS() { return fixSS; }
-	public void setFixSS(boolean fixSS) { this.fixSS = fixSS; }
 	public Timestamp getConnectTime() { return connectTime; }
 	public void setConnectTime(Timestamp connectTime) { this.connectTime = connectTime; }
 
@@ -57,7 +54,6 @@ public class xAuthPlayer {
 
 	public String getIPAddress() {
 		Player player = getPlayer();
-		//return player == null ? null : player.getAddress().getAddress().getHostAddress();
 		if (player == null)
 			return null;
 
