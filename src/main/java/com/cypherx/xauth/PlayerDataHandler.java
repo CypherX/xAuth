@@ -31,9 +31,9 @@ public class PlayerDataHandler {
 		PlayerInventory pInv = p.getInventory();
 		ItemStack[] items = pInv.getContents();
 		ItemStack[] armor = pInv.getArmorContents();
-		Location loc = p.getLocation();
+		Location loc = p.isDead() ? null : p.getLocation();
 		Collection<PotionEffect> potEffects = p.getActivePotionEffects();
-		int fireTicks = p.getFireTicks();
+		int fireTicks = p.isDead() ? 0 : p.getFireTicks();
 		int remainingAir = p.getRemainingAir();
 
 		String strItems = null;
@@ -56,7 +56,7 @@ public class PlayerDataHandler {
 			pInv.setBoots(null);
 		}
 
-		if (hideLoc) {
+		if (hideLoc && !p.isDead()) {
 			strLoc = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch();
 			p.teleport(plugin.getLocMngr().getLocation(p.getWorld()));
 		}
