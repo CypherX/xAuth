@@ -3,7 +3,6 @@ main:
     check-for-updates: true
     download-library: true
     reload-on-join: false
-
 mysql:
     enabled: false
     host: localhost
@@ -17,7 +16,8 @@ mysql:
         lockout: lockouts
         playerdata: playerdata
         session: sessions
-
+permissions:
+    backend: 'pex'
 authurl:
     enabled: false
     url: http://google.com
@@ -25,13 +25,11 @@ authurl:
     status: false
     groups: false
     broadcast-login: false
-
 single-session:
     reverse: true
     guests:
         reverse: false
         immunity-length: 5
-
 registration:
     enabled: true
     forced: true
@@ -40,7 +38,6 @@ registration:
     account-limit: 0
     activation: false
     require-login: true
-
 password:
     min-length: 6
     allow-change: true
@@ -49,7 +46,6 @@ password:
         uppercase: false
         number: false
         symbol: false
-
 guest:
     timeout: 300
     notify-cooldown: 5
@@ -71,21 +67,20 @@ guest:
         entity:
             damage: true
             target: true
-
 session:
     length: 3600
     verifyip: true
     godmode-length: 5
-
 strikes:
     amount: 5
     lockout-length: 3600
-
 account:
     track-last-login: false
-
 filter:
     min-length: 2
     allowed: ''
     disallowed: ''
     blank-name: true
+groups:
+    guest: ''
+    authenticated: ''

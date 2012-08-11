@@ -1,177 +1,311 @@
+/*
+ * xAuth for Bukkit
+ * Copyright (C) 2012 Lycano <https://github.com/lycano/xAuth/>
+ *
+ * Copyright (C) 2011 CypherX <https://github.com/CypherX/xAuth/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.cypherx.xauth;
+
+import com.cypherx.xauth.auth.Auth;
+import com.cypherx.xauth.auth.AuthSQL;
+import com.cypherx.xauth.auth.AuthURL;
+import com.cypherx.xauth.commands.*;
+import com.cypherx.xauth.database.DatabaseController;
+import com.cypherx.xauth.exceptions.xAuthNotAvailable;
+import com.cypherx.xauth.listeners.xAuthBlockListener;
+import com.cypherx.xauth.listeners.xAuthEntityListener;
+import com.cypherx.xauth.listeners.xAuthPlayerListener;
+import com.cypherx.xauth.password.PasswordHandler;
+import com.cypherx.xauth.permissions.PermissionBackend;
+import com.cypherx.xauth.permissions.PermissionManager;
+import com.cypherx.xauth.permissions.backends.BukkitPermissionsSupport;
+import com.cypherx.xauth.permissions.backends.PermissionsExSupport;
+import com.cypherx.xauth.strike.StrikeManager;
+import com.cypherx.xauth.updater.Updater;
+import com.cypherx.xauth.utils.Utils;
+import com.cypherx.xauth.utils.xAuthLog;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import com.cypherx.xauth.auth.*;
-import com.cypherx.xauth.commands.*;
-import com.cypherx.xauth.database.DatabaseController;
-import com.cypherx.xauth.listeners.*;
-import com.cypherx.xauth.password.PasswordHandler;
-//import com.cypherx.xauth.plugins.xPermissions;
-import com.cypherx.xauth.strike.StrikeManager;
-import com.cypherx.xauth.updater.Updater;
-
 public class xAuth extends JavaPlugin {
-	private DatabaseController dbCtrl;
-	private MessageHandler msgCtrl;
-	private PlayerManager plyrMngr;
-	private PlayerDataHandler plyrDtHndlr;
-	private PasswordHandler pwdHndlr;
-	private LocationManager locMngr;
-	private StrikeManager strkMngr;
-	private String h2Version = "1.3.164";
+    private DatabaseController databaseController;
+    private MessageHandler messageHandler;
+    private PlayerManager playerManager;
+    private PlayerDataHandler playerDataHandler;
+    private PasswordHandler passwordHandler;
+    private LocationManager locationManager;
+    private StrikeManager strikeManager;
 
-	public void onDisable() {
-		if (dbCtrl != null) {
-			for (Player p : getServer().getOnlinePlayers()) {
-				xAuthPlayer xp = plyrMngr.getPlayer(p);
-				if (xp.isProtected())
-					plyrMngr.unprotect(xp);
-			}
+    protected PermissionManager permissionManager;
+    protected Configuration config;
 
-			dbCtrl.close();
-		}
-	}
+    private String h2Version = "1.3.164";
+    private String libURLPath = "http://bukkit.luricos.de/plugins/xAuth/lib/";
 
-	public void onEnable() {
-		// Create any required directories
-		getDataFolder().mkdirs();
+    public void onLoad() {
+        this.initConfiguration();
+        xAuthLog.initLogger();
+    }
 
-		// Create/load configuration and customizable messages
-		loadConfiguration();
+    public void onDisable() {
+        if (databaseController != null) {
+            for (Player p : getServer().getOnlinePlayers()) {
+                xAuthPlayer xp = playerManager.getPlayer(p);
+                if (xp.isProtected())
+                    playerManager.unprotect(xp);
+            }
 
-		// Disable plugin if auto-disable is set to true and server is running in online-mode
-		if (getConfig().getBoolean("main.auto-disable") && getServer().getOnlineMode()) {
-			xAuthLog.info("Auto-disabling, server is running in online-mode");
-			getServer().getPluginManager().disablePlugin(this);
-			return;
-		}
+            databaseController.close();
+        }
 
-		if (getConfig().getBoolean("main.check-for-updates")) {
-			Updater updater = new Updater(getDescription().getVersion());
-			if (updater.isUpdateAvailable())
-				updater.printMessage();
-		}
+        // remove permissionManager instance
+        if (this.permissionManager != null) {
+            this.permissionManager.end();
+        }
 
-		File h2File = new File("lib", "h2-" + h2Version + ".jar");
-		if (!h2File.exists() && getConfig().getBoolean("main.download-library") && !getConfig().getBoolean("mysql.enabled")) {
-			xAuthLog.info("-------------------------------");
-			xAuthLog.info("Downloading required H2 library..");
-			downloadLib(h2File);
-			xAuthLog.info("Download complete.");
-			xAuthLog.info("");
-			xAuthLog.info("Reload the server to enable xAuth.");
-			xAuthLog.info("-------------------------------");
+        // free config object
+        config = null;
 
-			getServer().getPluginManager().disablePlugin(this);
-			return;
-		}
+        xAuthLog.info(String.format("v%s Disabled!", getDescription().getVersion()));
+    }
 
-		// Initialize permissions support
-		//xPermissions.init();
+    public void onEnable() {
+        // Create any required directories
+        getDataFolder().mkdirs();
 
-		// Initialize database controller
-		dbCtrl = new DatabaseController(this);
+        // Create/load configuration and customizable messages
+        loadConfiguration();
 
-		// Test connection to database
-		if (!dbCtrl.isConnectable()) {
-			xAuthLog.severe("Failed to establish " + dbCtrl.getDBMS() + " database connection!");
+        // Disable plugin if auto-disable is set to true and server is running in online-mode
+        if (getConfig().getBoolean("main.auto-disable") && getServer().getOnlineMode()) {
+            xAuthLog.info("Auto-disabling, server is running in online-mode");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
-			// disable (for now, may change in the future)
-			getServer().getPluginManager().disablePlugin(this);
-			return;
-		}
+        if (getConfig().getBoolean("main.check-for-updates")) {
+            Updater updater = new Updater(getDescription().getVersion());
+            if (updater.isUpdateAvailable())
+                updater.printMessage();
+        }
 
-		xAuthLog.info("Successfully established connection to " + dbCtrl.getDBMS() + " database");
-		dbCtrl.runUpdater();
+        File h2File = new File("lib", "h2-" + h2Version + ".jar");
+        if (!h2File.exists() && getConfig().getBoolean("main.download-library") && !getConfig().getBoolean("mysql.enabled")) {
+            xAuthLog.info("-------------------------------");
+            xAuthLog.info("Downloading required H2 library..");
+            downloadLib(h2File);
+            xAuthLog.info("Download complete.");
+            xAuthLog.info("");
+            xAuthLog.info("Reload the server to enable xAuth.");
+            xAuthLog.info("-------------------------------");
 
-		// Initialize ALL THE CLASSES
-		plyrMngr	= new PlayerManager(this);
-		plyrDtHndlr = new PlayerDataHandler(this);
-		pwdHndlr 	= new PasswordHandler(this);
-		locMngr 	= new LocationManager(this);
-		strkMngr	= new StrikeManager(this);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
-		Player[] players = getServer().getOnlinePlayers();
-		if (players.length > 0)
-			plyrMngr.handleReload(players);
+        // Initialize permissions support
+        // register Permission backends
+        PermissionBackend.registerBackendAlias("pex", PermissionsExSupport.class);
+        PermissionBackend.registerBackendAlias("bukkit", BukkitPermissionsSupport.class);
 
-		// Initialize listeners
-		new xAuthPlayerListener(this);
-		new xAuthBlockListener(this);
-		new xAuthEntityListener(this);
+        // load config if not already done
+        if (this.config == null) {
+            this.initConfiguration();
+        }
 
-		// Register commands
-		getCommand("register").setExecutor(new RegisterCommand(this));
-		getCommand("login").setExecutor(new LoginCommand(this));
-		getCommand("logout").setExecutor(new LogoutCommand(this));
-		getCommand("changepw").setExecutor(new ChangePwdCommand(this));
-		getCommand("xauth").setExecutor(new xAuthCommand(this));
+        // init permissionManager; backend is set via config static call
+        if (this.permissionManager == null) {
+            this.permissionManager = new PermissionManager(this.config);
+        }
 
-		xAuthLog.info(String.format("v%s Enabled!", getDescription().getVersion()));
-		lol();
-	}
+        // Initialize database controller
+        databaseController = new DatabaseController(this);
 
-	private void loadConfiguration() {
-		// configuration
-		getConfig().options().copyDefaults(true);
-		saveConfig();
+        // Test connection to database
+        if (!databaseController.isConnectable()) {
+            xAuthLog.severe("Failed to establish " + databaseController.getDBMS() + " database connection!");
 
-		// messages
-		msgCtrl = new MessageHandler(this);
-		msgCtrl.getConfig().options().copyDefaults(true);
-		msgCtrl.saveConfig();
-		msgCtrl.reloadConfig();
-	}
+            // disable (for now, may change in the future)
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
-	private void downloadLib(File h2File) {
-		File dir = new File("lib");
-		if (!dir.exists())
-			dir.mkdir();		
+        xAuthLog.info("Successfully established connection to " + databaseController.getDBMS() + " database");
+        databaseController.runUpdater();
 
-		Utils.downloadFile(h2File, "http://love-despite.com/cypher/bukkit/lib/" + h2File.getName());
-	}
+        // Initialize ALL THE CLASSES
+        playerManager = new PlayerManager(this);
+        playerDataHandler = new PlayerDataHandler(this);
+        passwordHandler = new PasswordHandler(this);
+        locationManager = new LocationManager(this);
+        strikeManager = new StrikeManager(this);
 
-	public File getJar() { return getFile(); }
-	public DatabaseController getDbCtrl() { return dbCtrl; }
-	public MessageHandler getMsgHndlr() { return msgCtrl; }
-	public PlayerManager getPlyrMngr() { return plyrMngr; }
-	public PlayerDataHandler getPlyrDtHndlr() { return plyrDtHndlr; }
-	public PasswordHandler getPwdHndlr() { return pwdHndlr; }
-	public LocationManager getLocMngr() { return locMngr; }
-	public StrikeManager getStrkMngr() { return strkMngr; }
+        Player[] players = getServer().getOnlinePlayers();
+        if (players.length > 0)
+            playerManager.handleReload(players);
 
-	public Auth getAuthClass(xAuthPlayer p){
-		if (isAuthURL())
-			return new AuthURL(this, p.getIPAddress());
-		else
-			return new AuthSQL(this, p);
-	}
+        // Initialize listeners
+        new xAuthPlayerListener(this);
+        new xAuthBlockListener(this);
+        new xAuthEntityListener(this);
 
-	public boolean isAuthURL(){
-		return this.getConfig().getBoolean("authurl.enabled");
-	}
+        // Register commands
+        getCommand("register").setExecutor(new RegisterCommand(this));
+        getCommand("login").setExecutor(new LoginCommand(this));
+        getCommand("logout").setExecutor(new LogoutCommand(this));
+        getCommand("changepw").setExecutor(new ChangePwdCommand(this));
+        getCommand("xauth").setExecutor(new xAuthCommand(this));
 
-	public void reload() {
-		loadConfiguration();
-		//plyrMngr.reload();
-	}
+        xAuthLog.info(String.format("v%s Enabled!", getDescription().getVersion()));
+        lol();
+    }
 
-	private void lol() {
-		Calendar cal = new GregorianCalendar(TimeZone.getDefault());
-		int month = cal.get(Calendar.MONTH);
-		int day = cal.get(Calendar.DAY_OF_MONTH);
+    private void initConfiguration() {
+        this.config = this.getConfig();
+        this.config.options().copyDefaults(true);
+        saveConfig();
+    }
 
-		if (month == 3 && day == 1) {
-			xAuthLog.warning("Your trial version of xAuth expires today!");
-			xAuthLog.warning("Purchase the full version on Steam for $19.99.");
-		} else if (month == 3 && day == 2)
-			xAuthLog.info("April Fools!! xAuth will always be free!");
-	}
+    private void loadConfiguration() {
+        // configuration
+        this.initConfiguration();
+
+        // messages
+        messageHandler = new MessageHandler(this);
+        messageHandler.getConfig().options().copyDefaults(true);
+        messageHandler.saveConfig();
+        messageHandler.reloadConfig();
+    }
+
+    private void downloadLib(File h2File) {
+        File dir = new File("lib");
+        if (!dir.exists())
+            dir.mkdir();
+
+        Utils.downloadFile(h2File, this.libURLPath + h2File.getName());
+    }
+
+    public File getJar() {
+        return getFile();
+    }
+
+    public DatabaseController getDatabaseController() {
+        return databaseController;
+    }
+
+    public MessageHandler getMessageHandler() {
+        return messageHandler;
+    }
+
+    public PlayerManager getPlayerManager() {
+        return playerManager;
+    }
+
+    public PlayerDataHandler getPlayerDataHandler() {
+        return playerDataHandler;
+    }
+
+    public PasswordHandler getPasswordHandler() {
+        return passwordHandler;
+    }
+
+    public LocationManager getLocationManager() {
+        return locationManager;
+    }
+
+    public StrikeManager getStrikeManager() {
+        return strikeManager;
+    }
+
+    public Auth getAuthClass(xAuthPlayer p) {
+        if (isAuthURL())
+            return new AuthURL(this, p.getIPAddress());
+        else
+            return new AuthSQL(this, p);
+    }
+
+    public boolean isAuthURL() {
+        return this.getConfig().getBoolean("authurl.enabled");
+    }
+
+    public void reload() {
+        loadConfiguration();
+        //playerManager.reload();
+    }
+
+    /**
+     * Get the permissionManager.
+     *
+     * @return the PermissionManager
+     */
+    public static PermissionManager getPermissionManager() {
+        try {
+            if (!isPluginAvailable()) {
+                throw new xAuthNotAvailable("This plugin is not ready yet." + ((!getPlugin().isEnabled()) ? " Loading sequence is still in progress." : ""));
+            }
+        } catch (xAuthNotAvailable e) {
+            xAuthLog.warning(e.getMessage());
+        }
+
+        return ((xAuth) getPlugin()).permissionManager;
+    }
+
+    /**
+     * Gets the plugin.
+     *
+     * @return the plugin instance
+     */
+    public static xAuth getPlugin() {
+        Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("xAuth");
+        if (plugin == null || !(plugin instanceof xAuth)) {
+            throw new RuntimeException("'xAuth' not found. 'xAuth' plugin disabled?");
+        }
+
+        return ((xAuth) plugin);
+    }
+
+    public static boolean isPluginAvailable() {
+        Plugin plugin = getPlugin();
+        if ((plugin instanceof xAuth)) {
+            if (((xAuth) plugin).permissionManager != null) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    private void lol() {
+        Calendar cal = new GregorianCalendar(TimeZone.getDefault());
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        if (month == 3 && day == 1) {
+            xAuthLog.warning("Your trial version of xAuth expires today!");
+            xAuthLog.warning("Purchase the full version on Steam for $19.99.");
+        } else if (month == 3 && day == 2)
+            xAuthLog.info("April Fools!! xAuth will always be free!");
+    }
 }

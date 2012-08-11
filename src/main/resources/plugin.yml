@@ -1,9 +1,8 @@
 name: xAuth
-version: 2.0.9
+version: 2.0.12
 description: Offline-mode Authentication
-author: CypherX
-website: https://github.com/CypherX/xAuth
-
+author: [CypherX, lycano]
+website: https://github.com/lycano/xAuth
 main: com.cypherx.xauth.xAuth
 
 commands:
