@@ -17,7 +17,7 @@ mysql:
         playerdata: playerdata
         session: sessions
 permissions:
-    backend: 'pex'
+    backend: 'bukkit'
 authurl:
     enabled: false
     url: http://google.com
@@ -77,8 +77,8 @@ strikes:
 account:
     track-last-login: false
 filter:
-    min-length: 2
-    allowed: ''
+    min-length: 3
+    allowed: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_
     disallowed: ''
     blank-name: true
 groups:

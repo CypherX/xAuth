@@ -6,9 +6,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Updater {
-    private static final String VERSION_FILE = "http://bukkit.luricos.de/plugins/xAuth/version.txt";
+    private static final String VERSION_PATH = "http://ci.luricos.de/public/xAuth/?C=M;O=D";
 
     private final String currVer;
     private String latestVer;
@@ -23,14 +25,26 @@ public class Updater {
         BufferedReader reader = null;
 
         try {
-            URL url = new URL(VERSION_FILE);
+            URL url = new URL(VERSION_PATH);
             reader = new BufferedReader(new InputStreamReader(url.openStream()));
-            String str = reader.readLine();
-            String[] split = str.split("\\|");
-            latestVer = split[0];
-            priority = UpdatePriority.getPriority(Integer.parseInt(split[1]));
+            String line = "";
+            StringBuilder contents = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                contents.append(line);
+            }
+
+            Pattern versionPattern = Pattern.compile("<a[^>]+>xAuth-([0-9].+?)-bin.+</a>");
+            Matcher versionMatch = versionPattern.matcher(contents.toString());
+
+            if (!versionMatch.find()) {
+                throw new IOException("Could not check for newer version!");
+            }
+
+            latestVer = versionMatch.group(1);
+            // @TODO modify package.xml to re-implement priority feature - low prio
+            priority = UpdatePriority.getPriority(3);
         } catch (IOException e) {
-            xAuthLog.warning("Could not check for newer version!");
+            xAuthLog.warning(e.getMessage());
             latestVer = null;
         } finally {
             try {
