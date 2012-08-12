@@ -69,16 +69,16 @@ public class xAuthPlayerListener implements Listener {
             }
 
             if (reverse)
-                event.disallow(Result.KICK_OTHER, plugin.getMessageHandler().get("join.error.online"));
+                event.disallow(Result.KICK_OTHER, plugin.getMessageHandler().getNode("join.error.online"));
         }
 
         String ipAddress = event.getAddress().getHostAddress();
         if (Utils.isIPAddress(ipAddress))
             if (plugin.getStrikeManager().isLockedOut(ipAddress, p.getName()))
-                event.disallow(Result.KICK_OTHER, plugin.getMessageHandler().get("join.error.lockout"));
+                event.disallow(Result.KICK_OTHER, plugin.getMessageHandler().getNode("join.error.lockout"));
 
         if (!isValidName(p.getName()))
-            event.disallow(Result.KICK_OTHER, plugin.getMessageHandler().get("join.error.name"));
+            event.disallow(Result.KICK_OTHER, plugin.getMessageHandler().getNode("join.error.name"));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

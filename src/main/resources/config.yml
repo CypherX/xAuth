@@ -20,7 +20,7 @@ permissions:
     backend: 'bukkit'
 authurl:
     enabled: false
-    url: http://google.com
+    url: http://localhost
     registration: false
     status: false
     groups: false

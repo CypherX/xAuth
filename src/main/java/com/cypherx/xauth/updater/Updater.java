@@ -56,10 +56,8 @@ public class Updater {
     }
 
     public boolean isUpdateAvailable() {
-        if (latestVer == null)
-            return false;
+        return getLatestVersionString() != null && compareVer(getLatestVersionString(), getCurrentVer()) > 0;
 
-        return compareVer(latestVer, currVer) > 0;
     }
 
     private int compareVer(String str1, String str2) {
@@ -78,12 +76,24 @@ public class Updater {
         return vals1.length < vals2.length ? -1 : vals1.length == vals2.length ? 0 : 1;
     }
 
+    public String getLatestVersionString() {
+        return latestVer;
+    }
+
+    public String getCurrentVer() {
+        return currVer;
+    }
+
+    public UpdatePriority getPriority() {
+        return priority;
+    }
+
     public void printMessage() {
         xAuthLog.warning("-------- xAuth Updater --------");
         xAuthLog.warning("This server appears to be running an older version");
-        xAuthLog.warning(String.format("of xAuth. Version %s is now available.", latestVer));
+        xAuthLog.warning(String.format("of xAuth. Version %s is now available.", getLatestVersionString()));
         xAuthLog.warning("");
-        xAuthLog.warning(String.format("Priority: %s", priority));
+        xAuthLog.warning(String.format("Priority: %s", getPriority().toString()));
         xAuthLog.warning("Details: http://github.com/lycano/xAuth/");
         xAuthLog.warning("Download: http://ci.luricos.de/public/xAuth/");
         xAuthLog.warning("-------------------------------");

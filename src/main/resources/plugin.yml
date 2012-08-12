@@ -1,5 +1,5 @@
 name: xAuth
-version: 2.0.14
+version: 2.0.15
 description: Offline-mode Authentication
 author: [CypherX, lycano]
 website: https://github.com/lycano/xAuth
@@ -33,6 +33,8 @@ commands:
            /<command> reload
            /<command> activate <player>
            /<command> config <node> <value>
+           /<command> debug [INFO,FINE,FINER,FINEST]
+           /<command> version
 
 permissions:
   xauth.register:
@@ -75,3 +77,6 @@ permissions:
     default: op
   xauth.bypass.acclimit:
     description: Allows you to bypass the account limit and register an unlimited amount of accounts.
+  xauth.version:
+    description: Show plugin version / Remote version
+    default: true

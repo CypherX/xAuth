@@ -118,3 +118,8 @@ admin:
             int: '{RED}This configuration node requires an integer value!'
             invalid: '{RED}This setting cannot be altered using this command!'
         success: '{BRIGHTGREEN}Configuration updated!'
+version:
+    current-version: '{BRIGHTGREEN}xAuth version: %s'
+    update-available: '{BRIGHTGREEN}New version %s available. Check your server.log for download instructions.'
+    no-update-needed: '{BRIGHTGREEN}Latest xAuth version %s is installed. No update needed.'
+    success: '{BRIGHTGREEN}Latest xAuth version is %s'

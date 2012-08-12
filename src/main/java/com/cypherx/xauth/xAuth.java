@@ -84,8 +84,12 @@ public class xAuth extends JavaPlugin {
             this.permissionManager.end();
         }
 
+        messageHandler.reloadConfig();
+        this.reloadConfig();
+
         // free config object
         config = null;
+        messageHandler = null;
 
         xAuthLog.info(String.format("v%s Disabled!", getDescription().getVersion()));
     }
@@ -182,7 +186,9 @@ public class xAuth extends JavaPlugin {
     }
 
     private void initConfiguration() {
-        this.config = this.getConfig();
+        if (this.config == null) {
+            this.config = this.getConfig();
+        }
         this.config.options().copyDefaults(true);
         saveConfig();
     }
@@ -191,11 +197,10 @@ public class xAuth extends JavaPlugin {
         // configuration
         this.initConfiguration();
 
-        // messages
+        // messages; do not overwrite existing values
         messageHandler = new MessageHandler(this);
         messageHandler.getConfig().options().copyDefaults(true);
         messageHandler.saveConfig();
-        messageHandler.reloadConfig();
     }
 
     private void downloadLib(File h2File) {

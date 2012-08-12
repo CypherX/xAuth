@@ -19,6 +19,7 @@
  */
 package com.cypherx.xauth;
 
+import com.cypherx.xauth.utils.Utils;
 import com.cypherx.xauth.utils.xAuthLog;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -31,7 +32,7 @@ import java.io.InputStream;
 public class MessageHandler {
     private final xAuth plugin;
     private final String fileName = "messages.yml";
-    private final File configFile;
+    private File configFile = null;
     private FileConfiguration config = null;
 
     public MessageHandler(final xAuth plugin) {
@@ -40,13 +41,17 @@ public class MessageHandler {
     }
 
     public FileConfiguration getConfig() {
-        if (config == null)
+        if (config == null) {
             reloadConfig();
+        }
 
         return config;
     }
 
     public void reloadConfig() {
+        if (configFile == null) {
+            configFile = new File(plugin.getDataFolder(), fileName);
+        }
         config = YamlConfiguration.loadConfiguration(configFile);
 
         InputStream defConfigStream = plugin.getResource(fileName);
@@ -57,6 +62,10 @@ public class MessageHandler {
     }
 
     public void saveConfig() {
+        if (config == null || configFile == null) {
+            return;
+        }
+
         try {
             getConfig().save(configFile);
         } catch (IOException e) {
@@ -70,41 +79,22 @@ public class MessageHandler {
 
     public void sendMessage(String node, CommandSender sender, String targetName) {
         if (sender != null) {
-            String message = get(node, sender.getName(), targetName);
+            String message = getNode(node, sender.getName(), targetName);
 
             for (String line : message.split("\n"))
                 sender.sendMessage(line);
         }
     }
 
-    public String get(String node) {
-        return get(node, null, null);
+    public String getNode(String node) {
+        return getNode(node, null, null);
     }
 
-    private String get(String node, String playerName, String targetName) {
+    private String getNode(String node, String playerName, String targetName) {
         return replace(config.getString(node, node), playerName, targetName);
     }
 
     private String replace(String message, String playerName, String targetName) {
-        // colors
-        message = message.replace("{BLACK}", "&0");
-        message = message.replace("{DARKBLUE}", "&1");
-        message = message.replace("{DARKGREEN}", "&2");
-        message = message.replace("{DARKTEAL}", "&3");
-        message = message.replace("{DARKRED}", "&4");
-        message = message.replace("{PURPLE}", "&5");
-        message = message.replace("{GOLD}", "&6");
-        message = message.replace("{GRAY}", "&7");
-        message = message.replace("{DARKGRAY}", "&8");
-        message = message.replace("{BLUE}", "&9");
-        message = message.replace("{BRIGHTGREEN}", "&a");
-        message = message.replace("{TEAL}", "&b");
-        message = message.replace("{RED}", "&c");
-        message = message.replace("{PINK}", "&d");
-        message = message.replace("{YELLOW}", "&e");
-        message = message.replace("{WHITE}", "&f");
-        message = message.replace("&", "\u00a7");
-
         // player
         if (playerName != null)
             message = message.replace("{PLAYER}", playerName);
@@ -118,6 +108,10 @@ public class MessageHandler {
 
         // newline
         message = message.replace("{NEWLINE}", "\n");
+
+        // replace colors
+        message = Utils.replaceColors(message);
+
         return message;
     }
 }

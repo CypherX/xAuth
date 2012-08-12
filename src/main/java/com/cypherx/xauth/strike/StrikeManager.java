@@ -46,7 +46,7 @@ public class StrikeManager {
     }
 
     public void strikeout(Player player) {
-        player.kickPlayer(plugin.getMessageHandler().get("misc.strikeout"));
+        player.kickPlayer(plugin.getMessageHandler().getNode("misc.strikeout"));
         xAuthLog.info(player.getName() + " kicked for passing the incorrect password threshold");
 
         if (plugin.getConfig().getInt("strikes.lockout-length") > 0) {

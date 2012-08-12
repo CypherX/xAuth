@@ -20,6 +20,7 @@
 package com.cypherx.xauth.commands;
 
 import com.cypherx.xauth.auth.Auth;
+import com.cypherx.xauth.updater.Updater;
 import com.cypherx.xauth.utils.xAuthLog;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthPlayer;
@@ -64,6 +65,9 @@ public class xAuthCommand implements CommandExecutor {
                 return profileCommand(sender, args);
             else if (subCommand.equals("debug"))
                 return debugCommand(sender, args);
+            else if (subCommand.equals("version"))
+                return versionCommand(sender, args);
+
             return true;
         }
 
@@ -207,7 +211,7 @@ public class xAuthCommand implements CommandExecutor {
         }
 
         String action = args[1];
-        boolean global = args.length > 2 && args[2].equals("global") ? true : false;
+        boolean global = args.length > 2 && args[2].equals("global");
         String response;
 
         if (action.equals("set")) {
@@ -349,8 +353,13 @@ public class xAuthCommand implements CommandExecutor {
     }
 
     private boolean debugCommand(CommandSender sender, String[] args) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.admin.debug")) {
+        if (!xAuth.getPermissionManager().has(sender, "xauth.admin.config")) {
             plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            return true;
+        }
+
+        if (args.length == 1) {
+            plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("admin.debug"), xAuthLog.getLevel().toString()), sender);
             return true;
         }
 
@@ -360,7 +369,29 @@ public class xAuthCommand implements CommandExecutor {
             xAuthLog.setLevel(toLevel);
         }
 
-        plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().get("admin.debug"), toLevel.toString()), sender);
+        plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("admin.debug"), toLevel.toString()), sender);
+        return true;
+    }
+
+    private boolean versionCommand(CommandSender sender, String[] args) {
+        if (!xAuth.getPermissionManager().has(sender, "xauth.version")) {
+            plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            return true;
+        }
+
+        xAuthLog.info("Version command executed... checking for latest version");
+        plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("version.current-version"), plugin.getDescription().getVersion()), sender);
+
+        if (xAuth.getPlugin().getConfig().getBoolean("main.check-for-updates")) {
+            Updater updater = new Updater(xAuth.getPlugin().getDescription().getVersion());
+            if (updater.isUpdateAvailable()) {
+                updater.printMessage();
+                plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("version.update-available"), updater.getLatestVersionString()), sender);
+            } else {
+                xAuthLog.info(String.format(plugin.getMessageHandler().getNode("version.no-update-needed"), plugin.getDescription().getVersion()));
+                plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("version.no-update-needed"), updater.getLatestVersionString()), sender);
+            }
+        }
         return true;
     }
 }

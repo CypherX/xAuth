@@ -188,7 +188,7 @@ public class PlayerManager {
         return Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             public void run() {
                 if (player.isOnline())
-                    player.kickPlayer(plugin.getMessageHandler().get("misc.timeout"));
+                    player.kickPlayer(plugin.getMessageHandler().getNode("misc.timeout"));
             }
         }, plugin.getConfig().getInt("guest.timeout") * 20);
     }
