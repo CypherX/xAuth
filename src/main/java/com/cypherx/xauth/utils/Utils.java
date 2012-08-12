@@ -19,6 +19,8 @@
  */
 package com.cypherx.xauth.utils;
 
+import org.bukkit.ChatColor;
+
 import java.io.*;
 import java.net.URL;
 import java.util.regex.Matcher;
@@ -103,5 +105,27 @@ public class Utils {
                 return false;
 
         return true;
+    }
+
+    public static String replaceColors(String s) {
+        s = s.replace("{BLACK}", "&0");
+        s = s.replace("{DARKBLUE}", "&1");
+        s = s.replace("{DARKGREEN}", "&2");
+        s = s.replace("{DARKTEAL}", "&3");
+        s = s.replace("{DARKRED}", "&4");
+        s = s.replace("{PURPLE}", "&5");
+        s = s.replace("{GOLD}", "&6");
+        s = s.replace("{GRAY}", "&7");
+        s = s.replace("{DARKGRAY}", "&8");
+        s = s.replace("{BLUE}", "&9");
+        s = s.replace("{BRIGHTGREEN}", "&a");
+        s = s.replace("{TEAL}", "&b");
+        s = s.replace("{RED}", "&c");
+        s = s.replace("{PINK}", "&d");
+        s = s.replace("{YELLOW}", "&e");
+        s = s.replace("{WHITE}", "&f");
+        s = s.replace('&', ChatColor.COLOR_CHAR);
+
+        return s;
     }
 }

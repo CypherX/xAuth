@@ -1,10 +1,10 @@
 name: xAuth
-version: 2.0.15
+version: 2.0.16
 description: Offline-mode Authentication
 author: [CypherX, lycano]
 website: https://github.com/lycano/xAuth
 main: com.cypherx.xauth.xAuth
-softdepend: [PermissionsEx]
+softdepend: [PermissionsEx, Essentials, GroupManager]
 
 commands:
   register:

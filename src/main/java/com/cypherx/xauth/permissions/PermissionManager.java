@@ -88,11 +88,11 @@ public class PermissionManager {
     }
 
     public boolean has(CommandSender sender, String permissionString) {
-        return backend.has((Player) sender, permissionString);
+        return !(sender instanceof Player) || backend.has((Player) sender, permissionString);
     }
 
     public boolean hasPermission(CommandSender sender, String permissionString) {
-        return backend.hasPermission((Player) sender, permissionString);
+        return !(sender instanceof Player) || backend.hasPermission((Player) sender, permissionString);
     }
 
     public boolean has(Player player, String permissionString) {

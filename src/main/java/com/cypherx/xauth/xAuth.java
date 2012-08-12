@@ -32,6 +32,7 @@ import com.cypherx.xauth.password.PasswordHandler;
 import com.cypherx.xauth.permissions.PermissionBackend;
 import com.cypherx.xauth.permissions.PermissionManager;
 import com.cypherx.xauth.permissions.backends.BukkitPermissionsSupport;
+import com.cypherx.xauth.permissions.backends.GroupManagerSupport;
 import com.cypherx.xauth.permissions.backends.PermissionsExSupport;
 import com.cypherx.xauth.strike.StrikeManager;
 import com.cypherx.xauth.updater.Updater;
@@ -131,6 +132,7 @@ public class xAuth extends JavaPlugin {
         // Initialize permissions support
         // register Permission backends
         PermissionBackend.registerBackendAlias("pex", PermissionsExSupport.class);
+        PermissionBackend.registerBackendAlias("gm", GroupManagerSupport.class);
         PermissionBackend.registerBackendAlias("bukkit", BukkitPermissionsSupport.class);
 
         // load config if not already done
