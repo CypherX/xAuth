@@ -4,6 +4,7 @@ description: Offline-mode Authentication
 author: [CypherX, lycano]
 website: https://github.com/lycano/xAuth
 main: com.cypherx.xauth.xAuth
+softdepend: [PermissionsEx]
 
 commands:
   register:

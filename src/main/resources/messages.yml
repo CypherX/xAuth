@@ -56,6 +56,7 @@ misc:
 
 admin:
     permission: 'You do not have permission to use this command!'
+    debug: 'Debugging level set to %s'
     register:
         usage: '{RED}Correct Usage: /xauth register <player> <password> [email]'
         success: '{BRIGHTGREEN}Account successfully created for: {WHITE}{TARGET}'
