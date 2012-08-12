@@ -287,8 +287,7 @@ public class PlayerDataHandler {
             // Fix for inventory extension plugins
             if (pInv.getSize() > items.length) {
                 ItemStack[] newItems = new ItemStack[pInv.getSize()];
-                for (int i = 0; i < items.length; i++)
-                    newItems[i] = items[i];
+                System.arraycopy(items, 0, newItems, 0, items.length);
 
                 items = newItems;
             }

@@ -20,7 +20,7 @@
 package com.cypherx.xauth.permissions.backends;
 
 import com.cypherx.xauth.permissions.PermissionBackend;
-import com.cypherx.xauth.permissions.PermissionManager;
+import com.cypherx.xauth.utils.xAuthLog;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 
@@ -29,20 +29,22 @@ import org.bukkit.entity.Player;
  */
 public class BukkitPermissionsSupport extends PermissionBackend {
 
-    protected BukkitPermissionsSupport(PermissionManager manager, Configuration config) {
+    public BukkitPermissionsSupport(com.cypherx.xauth.permissions.PermissionManager manager, Configuration config) {
         super(manager, config);
     }
 
     @Override
     public void initialize() {
+        xAuthLog.info("Attached to Bukkit");
     }
 
     @Override
     public void reload() {
+        xAuthLog.info("Detached from Bukkit");
     }
 
     public String getName() {
-        return "BukkitPerms";
+        return "Bukkit";
     }
 
     @Override

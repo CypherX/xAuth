@@ -122,7 +122,8 @@ public class xAuthPlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(final PlayerQuitEvent event) {
-        xAuthPlayer p = playerManager.getPlayer(event.getPlayer());
+        Player player = (event.getPlayer().isOnline()) ? event.getPlayer() : (Player) Bukkit.getOfflinePlayer(event.getPlayer().getName());
+        xAuthPlayer p = playerManager.getPlayer(player);
         if (p.isProtected())
             playerManager.unprotect(p);
 
@@ -220,18 +221,29 @@ public class xAuthPlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
+        // do nothing if player hasn't moved a block or world.
+        // This will also filter out any player that only moves his mouse
+        if (!this.hasChangedBlockCoordinates(event.getFrom(), event.getTo())) {
+            return;
+        }
+
         xAuthPlayer p = playerManager.getPlayer(event.getPlayer());
         if (playerManager.isRestricted(p, event)) {
             World w = p.getPlayer().getWorld();
+
             Location loc = plugin.getConfig().getBoolean("guest.protect-location") ?
                     plugin.getLocationManager().getLocation(w) : p.getPlayerData().getLocation();
 
             Location testLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
-            while ((w.getBlockAt(testLoc).isEmpty() || w.getBlockAt(testLoc).isLiquid()) && testLoc.getY() >= 0)
+            // @TODO check if this is causing playerdeath
+            while ((w.getBlockAt(testLoc).isEmpty() || w.getBlockAt(testLoc).isLiquid()) && testLoc.getY() >= 0) {
                 testLoc.setY((int) testLoc.getY() - 1);
+            }
 
-            if (testLoc.getY() > 0)
+            // @TODO this would set you one block higher then before (eye level), still needed in later builds?
+            if (testLoc.getY() > 0) {
                 loc.setY(testLoc.getY() + 1);
+            }
 
             event.setTo(loc);
             playerManager.sendNotice(p);
@@ -274,15 +286,13 @@ public class xAuthPlayerListener implements Listener {
         String disallowed = plugin.getConfig().getString("filter.disallowed");
         if (disallowed.length() > 0) {
             for (int i = 0; i < pName.length(); i++) {
-                if (disallowed.indexOf(pName.charAt(i)) >= 0)
+                if (disallowed.indexOf(pName.charAt(i)) >= 0) {
                     return false;
+                }
             }
         }
 
-        if (plugin.getConfig().getBoolean("filter.blank-name") && Utils.isWhitespace(pName))
-            return false;
-
-        return true;
+        return !(plugin.getConfig().getBoolean("filter.blank-name") && Utils.isWhitespace(pName));
     }
 
     private void scheduleDelayedProtect(final xAuthPlayer xp) {
@@ -300,5 +310,12 @@ public class xAuthPlayerListener implements Listener {
                     plugin.getMessageHandler().sendMessage(node, player);
             }
         }, delay);
+    }
+
+    private boolean hasChangedBlockCoordinates(final Location fromLoc, final Location toLoc) {
+        return !(fromLoc.getWorld().equals(toLoc.getWorld())
+                && fromLoc.getBlockX() == toLoc.getBlockX()
+                && fromLoc.getBlockY() == toLoc.getBlockY()
+                && fromLoc.getBlockZ() == toLoc.getBlockZ());
     }
 }

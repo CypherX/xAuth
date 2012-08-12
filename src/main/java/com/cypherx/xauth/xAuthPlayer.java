@@ -20,6 +20,7 @@
 package com.cypherx.xauth;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.sql.Timestamp;
@@ -148,6 +149,10 @@ public class xAuthPlayer {
         } catch (NullPointerException e) {
             return null;
         }
+    }
+
+    public Location getLocation() {
+        return getPlayer().getLocation();
     }
 
     public enum Status {

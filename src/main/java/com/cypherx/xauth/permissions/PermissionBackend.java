@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public abstract class PermissionBackend {
 
-    protected final static String defaultBackend = "pex";
+    protected final static String defaultBackend = "bukkit";
     protected static Map<String, Class<? extends PermissionBackend>> registeredBackendAliases = new HashMap<String, Class<? extends PermissionBackend>>();
     protected PermissionManager manager;
     protected Configuration config;
