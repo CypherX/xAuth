@@ -26,7 +26,9 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,10 +40,12 @@ public abstract class PermissionBackend {
     protected static Map<String, Class<? extends PermissionBackend>> registeredBackendAliases = new HashMap<String, Class<? extends PermissionBackend>>();
     protected PermissionManager manager;
     protected Configuration config;
+    protected String providerName;
 
-    protected PermissionBackend(PermissionManager manager, Configuration config) {
+    protected PermissionBackend(PermissionManager manager, Configuration config, String providerName) {
         this.manager = manager;
         this.config = config;
+        this.providerName = providerName;
     }
 
     /**
@@ -55,11 +59,11 @@ public abstract class PermissionBackend {
     public abstract void reload();
 
     /**
-     * Get Backend Name
-     *
-     * @return String backendName
+     * Get ProviderName
      */
-    public abstract String getName();
+    public String getProviderName() {
+        return providerName;
+    }
 
     /**
      * Return class name for backendAlias
@@ -73,6 +77,20 @@ public abstract class PermissionBackend {
         }
 
         return alias;
+    }
+
+    /**
+     * Reuturn PluginName from ClassName
+     *
+     * @param alias
+     * @return pluginName
+     */
+    public static String getBackendPluginName(String alias) {
+        String pluginName = getBackendClassName(alias);
+        if (pluginName.lastIndexOf('.') > 0) {
+            pluginName = pluginName.substring(pluginName.lastIndexOf('.'));
+        }
+        return pluginName.substring(1, pluginName.length() - "Support".length());
     }
 
     /**
@@ -173,8 +191,8 @@ public abstract class PermissionBackend {
 
             xAuthLog.info("Initializing " + backendName + " backend");
 
-            Constructor<? extends PermissionBackend> constructor = backendClass.getConstructor(PermissionManager.class, Configuration.class);
-            return (PermissionBackend) constructor.newInstance(manager, config);
+            Constructor<? extends PermissionBackend> constructor = backendClass.getConstructor(PermissionManager.class, Configuration.class, String.class);
+            return (PermissionBackend) constructor.newInstance(manager, config, getBackendPluginName(backendName));
         } catch (ClassNotFoundException e) {
 
             xAuthLog.warning("Backend \"" + backendName + "\" not found");
@@ -191,6 +209,14 @@ public abstract class PermissionBackend {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<String> getRegisteredAliases() {
+        return new ArrayList<String>(registeredBackendAliases.keySet());
+    }
+
+    public static List<Class<? extends PermissionBackend>> getRegisteredClasses() {
+        return new ArrayList<Class<? extends PermissionBackend>>(registeredBackendAliases.values());
     }
 
     /**

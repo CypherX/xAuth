@@ -27,10 +27,10 @@ import org.bukkit.entity.Player;
 /**
  * @author lycano
  */
-public class BukkitPermissionsSupport extends PermissionBackend {
+public class BukkitSupport extends PermissionBackend {
 
-    public BukkitPermissionsSupport(com.cypherx.xauth.permissions.PermissionManager manager, Configuration config) {
-        super(manager, config);
+    public BukkitSupport(com.cypherx.xauth.permissions.PermissionManager manager, Configuration config, String providerName) {
+        super(manager, config, providerName);
     }
 
     @Override
@@ -40,11 +40,7 @@ public class BukkitPermissionsSupport extends PermissionBackend {
 
     @Override
     public void reload() {
-        xAuthLog.info("Detached from Bukkit");
-    }
-
-    public String getName() {
-        return "Bukkit";
+        xAuthLog.info("Detached from BukkitSupport");
     }
 
     @Override

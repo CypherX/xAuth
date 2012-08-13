@@ -20,6 +20,7 @@
 package com.cypherx.xauth;
 
 import com.cypherx.xauth.database.Table;
+import com.cypherx.xauth.exceptions.xAuthPlayerDataException;
 import com.cypherx.xauth.utils.xAuthLog;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -226,6 +227,11 @@ public class PlayerDataHandler {
     }
 
     public void restoreData(xAuthPlayer xp, Player p) {
+        restoreData(xp, p.getName());
+    }
+
+    //@TODO refactor
+    public void restoreData(xAuthPlayer xp, String playerName) {
         ItemStack[] items = null;
         ItemStack[] armor = null;
         Location loc = null;
@@ -251,7 +257,7 @@ public class PlayerDataHandler {
                 String sql = String.format("SELECT `items`, `armor`, `location`, `potioneffects`, `fireticks`, `remainingair` FROM `%s` WHERE `playername` = ?",
                         plugin.getDatabaseController().getTable(Table.PLAYERDATA));
                 ps = conn.prepareStatement(sql);
-                ps.setString(1, p.getName());
+                ps.setString(1, playerName);
                 rs = ps.executeQuery();
 
                 if (rs.next()) {
@@ -273,52 +279,65 @@ public class PlayerDataHandler {
                     remainingAir = rs.getInt("remainingair");
                 }
             } catch (SQLException e) {
-                xAuthLog.severe("Failed to load playerdata from database for player: " + p.getName(), e);
+                xAuthLog.severe("Failed to load playerdata from database for player: " + playerName, e);
             } finally {
                 plugin.getDatabaseController().close(conn, ps, rs);
             }
         }
 
-        PlayerInventory pInv = p.getInventory();
-        boolean hideInv = plugin.getConfig().getBoolean("guest.hide-inventory");
-        boolean hideLoc = plugin.getConfig().getBoolean("guest.protect-location");
-
-        if (hideInv && items != null) {
-            // Fix for inventory extension plugins
-            if (pInv.getSize() > items.length) {
-                ItemStack[] newItems = new ItemStack[pInv.getSize()];
-                System.arraycopy(items, 0, newItems, 0, items.length);
-
-                items = newItems;
+        Player player = xp.getPlayer();
+        try {
+            // @TODO remove after next 1.3.1 RB as this is a bug
+            if (player == null) {
+                throw new xAuthPlayerDataException("Error during restoreData execution. Can't restore player inventory.");
             }
-            //End Fix for inventory extension plugins
 
-            pInv.setContents(items);
+            PlayerInventory pInv = player.getInventory();
+            boolean hideInv = plugin.getConfig().getBoolean("guest.hide-inventory");
+            boolean hideLoc = plugin.getConfig().getBoolean("guest.protect-location");
+
+            if (hideInv && items != null) {
+                // Fix for inventory extension plugins
+                if (pInv.getSize() > items.length) {
+                    ItemStack[] newItems = new ItemStack[pInv.getSize()];
+                    System.arraycopy(items, 0, newItems, 0, items.length);
+
+                    items = newItems;
+                }
+                //End Fix for inventory extension plugins
+
+                pInv.setContents(items);
+            }
+
+            if (hideInv && armor != null)
+                pInv.setArmorContents(armor);
+
+            if (hideLoc && loc != null && player.getHealth() > 0)
+                player.teleport(loc);
+
+            if (potFx != null)
+                player.addPotionEffects(potFx);
+
+            player.setFireTicks(fireTicks);
+            player.setRemainingAir(remainingAir);
+        } catch (xAuthPlayerDataException e) {
+            xAuthLog.severe(e.getMessage());
         }
 
-        if (hideInv && armor != null)
-            pInv.setArmorContents(armor);
-
-        if (hideLoc && loc != null && p.getHealth() > 0)
-            p.teleport(loc);
-
-        if (potFx != null)
-            p.addPotionEffects(potFx);
-
-        p.setFireTicks(fireTicks);
-        p.setRemainingAir(remainingAir);
+        // reset playerData
         xp.setPlayerData(null);
 
+        // release playerdata from database
         Connection conn = plugin.getDatabaseController().getConnection();
         PreparedStatement ps = null;
         try {
             String sql = String.format("DELETE FROM `%s` WHERE `playername` = ?",
                     plugin.getDatabaseController().getTable(Table.PLAYERDATA));
             ps = conn.prepareStatement(sql);
-            ps.setString(1, p.getName());
+            ps.setString(1, playerName);
             ps.executeUpdate();
         } catch (SQLException e) {
-            xAuthLog.severe("Could not delete playerdata record from database for player: " + p.getName(), e);
+            xAuthLog.severe("Could not delete playerdata record from database for player: " + playerName, e);
         } finally {
             plugin.getDatabaseController().close(conn, ps);
         }

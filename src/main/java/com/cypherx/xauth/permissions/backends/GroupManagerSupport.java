@@ -21,7 +21,6 @@ package com.cypherx.xauth.permissions.backends;
 
 import com.cypherx.xauth.permissions.PermissionBackend;
 import com.cypherx.xauth.utils.xAuthLog;
-import org.anjocaido.groupmanager.GroupManager;
 import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
@@ -33,17 +32,17 @@ import org.bukkit.plugin.Plugin;
  */
 public class GroupManagerSupport extends PermissionBackend {
 
-    protected GroupManager provider = null;
+    protected org.anjocaido.groupmanager.GroupManager provider = null;
 
-    public GroupManagerSupport(com.cypherx.xauth.permissions.PermissionManager manager, Configuration config) {
-        super(manager, config);
+    public GroupManagerSupport(com.cypherx.xauth.permissions.PermissionManager manager, Configuration config, String providerName) {
+        super(manager, config, providerName);
     }
 
     @Override
     public void initialize() {
-        Plugin testPlugin = Bukkit.getServer().getPluginManager().getPlugin(this.getName());
-        if ((testPlugin != null) && (Bukkit.getServer().getPluginManager().isPluginEnabled(this.getName()))) {
-            provider = (GroupManager) testPlugin;
+        Plugin testPlugin = Bukkit.getServer().getPluginManager().getPlugin(providerName);
+        if ((testPlugin != null) && (Bukkit.getServer().getPluginManager().isPluginEnabled(providerName))) {
+            provider = (org.anjocaido.groupmanager.GroupManager) testPlugin;
         }
         xAuthLog.info("Attached to GroupManager");
     }
@@ -51,11 +50,7 @@ public class GroupManagerSupport extends PermissionBackend {
     @Override
     public void reload() {
         provider = null;
-        xAuthLog.info("Detached from GroupManager");
-    }
-
-    public String getName() {
-        return "GroupManager";
+        xAuthLog.info("Detached from GroupManagerSupport");
     }
 
     @Override

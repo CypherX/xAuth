@@ -131,6 +131,10 @@ public class xAuthPlayer {
         return status == Status.Guest;
     }
 
+    public boolean isOnline() {
+        return Bukkit.getPlayer(playerName).isOnline();
+    }
+
     public boolean isRegistered() {
         return status != Status.Guest;
     }

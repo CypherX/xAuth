@@ -39,10 +39,10 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class PermissionsExSupport extends PermissionBackend {
 
-    protected PermissionManager provider;
+    protected PermissionManager provider = null;
 
-    public PermissionsExSupport(com.cypherx.xauth.permissions.PermissionManager manager, Configuration config) {
-        super(manager, config);
+    public PermissionsExSupport(com.cypherx.xauth.permissions.PermissionManager manager, Configuration config, String providerName) {
+        super(manager, config, providerName);
     }
 
     @Override
@@ -51,14 +51,14 @@ public class PermissionsExSupport extends PermissionBackend {
             return;
         }
 
-        Plugin testPlugin = Bukkit.getServer().getPluginManager().getPlugin(this.getName());
-        if ((testPlugin != null) && (Bukkit.getServer().getPluginManager().isPluginEnabled(this.getName()))) {
+        Plugin testPlugin = Bukkit.getServer().getPluginManager().getPlugin(getProviderName());
+        if ((testPlugin != null) && (Bukkit.getServer().getPluginManager().isPluginEnabled(getProviderName()))) {
             final String version = testPlugin.getDescription().getVersion();
             checkPermissionsVersion(version);
 
             try {
                 provider = PermissionsEx.getPermissionManager();
-                xAuthLog.info("Attached to " + this.getName() + " version " + version);
+                xAuthLog.info("Attached to " + providerName + " version " + version);
             } catch (final ClassCastException e) {
                 xAuthLog.warning("Failed to get Permissions Handler. Defaulting to built-in permissions.");
             }
@@ -70,11 +70,7 @@ public class PermissionsExSupport extends PermissionBackend {
     @Override
     public void reload() {
         provider = null;
-        xAuthLog.info("Detached from Permissions plugin '" + this.getName() + "'.");
-    }
-
-    public String getName() {
-        return "PermissionsEx";
+        xAuthLog.info("Detached from Permissions plugin '" + getProviderName() + "'.");
     }
 
     /**

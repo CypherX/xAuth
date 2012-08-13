@@ -31,7 +31,7 @@ import com.cypherx.xauth.listeners.xAuthPlayerListener;
 import com.cypherx.xauth.password.PasswordHandler;
 import com.cypherx.xauth.permissions.PermissionBackend;
 import com.cypherx.xauth.permissions.PermissionManager;
-import com.cypherx.xauth.permissions.backends.BukkitPermissionsSupport;
+import com.cypherx.xauth.permissions.backends.BukkitSupport;
 import com.cypherx.xauth.permissions.backends.GroupManagerSupport;
 import com.cypherx.xauth.permissions.backends.PermissionsExSupport;
 import com.cypherx.xauth.strike.StrikeManager;
@@ -48,6 +48,7 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.logging.Level;
 
 public class xAuth extends JavaPlugin {
     private DatabaseController databaseController;
@@ -133,12 +134,15 @@ public class xAuth extends JavaPlugin {
         // register Permission backends
         PermissionBackend.registerBackendAlias("pex", PermissionsExSupport.class);
         PermissionBackend.registerBackendAlias("gm", GroupManagerSupport.class);
-        PermissionBackend.registerBackendAlias("bukkit", BukkitPermissionsSupport.class);
+        PermissionBackend.registerBackendAlias("bukkit", BukkitSupport.class);
 
         // load config if not already done
         if (this.config == null) {
             this.initConfiguration();
         }
+
+        // resolve currently used PermissionPlugin
+        this.resolvePermissionBackends();
 
         // init permissionManager; backend is set via config static call
         if (this.permissionManager == null) {
@@ -205,6 +209,28 @@ public class xAuth extends JavaPlugin {
         messageHandler.saveConfig();
     }
 
+    /**
+     * Resolve permissions plugin
+     *
+     * first enabled will be used.
+     * Config node permissions.backend will be set to linked backend
+     */
+    private void resolvePermissionBackends() {
+        for (String providerAlias : PermissionBackend.getRegisteredAliases()) {
+            String pluginName = PermissionBackend.getBackendPluginName(providerAlias);
+            xAuthLog.info("Attempting to use supported permissions plugin '" + pluginName + "'");
+
+            Plugin permToLoad = Bukkit.getPluginManager().getPlugin(pluginName);
+            if ((permToLoad != null) && (permToLoad.isEnabled())) {
+                this.config.set("permissions.backend", providerAlias);
+                xAuthLog.info("Config node permissions.backend changed to '" + providerAlias + "'");
+                return;
+            } else {
+                xAuthLog.fine("Permission backend '" + providerAlias + "' was not found as plugin or not enabled!");
+            }
+        }
+    }
+
     private void downloadLib(File h2File) {
         File dir = new File("lib");
         if (!dir.exists())
@@ -257,7 +283,10 @@ public class xAuth extends JavaPlugin {
     }
 
     public void reload() {
-        loadConfiguration();
+        messageHandler.reloadConfig();
+        this.reloadConfig();
+
+        //loadConfiguration();
         //playerManager.reload();
     }
 
@@ -269,7 +298,9 @@ public class xAuth extends JavaPlugin {
     public static PermissionManager getPermissionManager() {
         try {
             if (!isPluginAvailable()) {
-                throw new xAuthNotAvailable("This plugin is not ready yet." + ((!getPlugin().isEnabled()) ? " Loading sequence is still in progress." : ""));
+                // show warnings only to externals
+                if ((xAuthLog.getLevel().intValue() < Level.WARNING.intValue()) && (!(getPlugin() instanceof xAuth)))
+                    throw new xAuthNotAvailable("This plugin is not ready yet.");
             }
         } catch (xAuthNotAvailable e) {
             xAuthLog.warning(e.getMessage());
@@ -284,7 +315,7 @@ public class xAuth extends JavaPlugin {
      * @return the plugin instance
      */
     public static xAuth getPlugin() {
-        Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("xAuth");
+        Plugin plugin = org.bukkit.Bukkit.getServer().getPluginManager().getPlugin("xAuth");
         if (plugin == null || !(plugin instanceof xAuth)) {
             throw new RuntimeException("'xAuth' not found. 'xAuth' plugin disabled?");
         }

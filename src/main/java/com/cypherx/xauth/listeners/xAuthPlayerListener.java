@@ -44,7 +44,7 @@ public class xAuthPlayerListener implements Listener {
     private final xAuth plugin;
     private final PlayerManager playerManager;
 
-    public xAuthPlayerListener(final xAuth plugin) {
+    public xAuthPlayerListener(xAuth plugin) {
         this.plugin = plugin;
         this.playerManager = plugin.getPlayerManager();
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
@@ -121,13 +121,14 @@ public class xAuthPlayerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerQuit(final PlayerQuitEvent event) {
-        Player player = (event.getPlayer().isOnline()) ? event.getPlayer() : (Player) Bukkit.getOfflinePlayer(event.getPlayer().getName());
-        xAuthPlayer p = playerManager.getPlayer(player);
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        String playerName = event.getPlayer().getName();
+        xAuthPlayer p = playerManager.getPlayer(playerName);
+
         if (p.isProtected())
             playerManager.unprotect(p);
 
-        plugin.getAuthClass(p).offline(event.getPlayer().getName());
+        plugin.getAuthClass(p).offline(playerName);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

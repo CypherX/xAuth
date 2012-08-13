@@ -115,11 +115,11 @@ public class DatabaseUpdater {
                             continue;
 
                         // Load queries from update files and split into lines (one query per line)
-                        String[] updateSql = loadSQL(updateFile, tblName).split(System.getProperty("line.separator"));
+                        String[] updateSql = loadSQL(updateFile, tblName).split(";");
 
                         // ANOTHER LOOP (Loop through each query)
                         for (String sql : updateSql)
-                            executeQuery(sql, conn);
+                            executeQuery(sql + ";", conn);
 
                         // Let's commit those changes now that no errors have occurred
                         conn.commit();
@@ -185,7 +185,8 @@ public class DatabaseUpdater {
         String sql = Utils.streamToString(plugin.getResource(path));
         sql = sql.replace("{TABLE}", tblName);
         sql = sql.replace("{TABLE_ACCOUNT}",
-                plugin.getDatabaseController().getTable(Table.ACCOUNT)); // foreign key in session table
+
+        plugin.getDatabaseController().getTable(Table.ACCOUNT)); // foreign key in session table
         return sql;
     }
 

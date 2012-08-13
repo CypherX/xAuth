@@ -20,6 +20,7 @@
 package com.cypherx.xauth;
 
 import com.cypherx.xauth.database.Table;
+import com.cypherx.xauth.exceptions.xAuthPlayerUnprotectException;
 import com.cypherx.xauth.utils.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer.Status;
 import org.bukkit.Bukkit;
@@ -55,13 +56,15 @@ public class PlayerManager {
     private xAuthPlayer getPlayer(String playerName, boolean reload) {
         String lowPlayerName = playerName.toLowerCase();
 
-        if (players.containsKey(lowPlayerName) && !reload)
+        if (players.containsKey(lowPlayerName) && !reload) {
             return players.get(lowPlayerName);
+        }
 
         xAuthPlayer player = loadPlayer(playerName);
 
-        if (player == null)
+        if (player == null) {
             player = new xAuthPlayer(playerName);
+        }
 
         players.put(lowPlayerName, player);
         return player;
@@ -194,18 +197,27 @@ public class PlayerManager {
     }
 
     public void unprotect(xAuthPlayer xp) {
-        Player p = xp.getPlayer();
-        plugin.getPlayerDataHandler().restoreData(xp, p);
-
-        if (xp.isCreativeMode())
-            p.setGameMode(GameMode.CREATIVE);
-
+        //@TODO redesign
+        // guest protection cancel task. See @PlayerManager.protect(xAuthPlayer p)
         int timeoutTaskId = xp.getTimeoutTaskId();
         if (timeoutTaskId > -1) {
             Bukkit.getScheduler().cancelTask(timeoutTaskId);
             xp.setTimeoutTaskId(-1);
         }
 
+        Player p = xp.getPlayer();
+        try {
+            if (p == null)
+                throw new xAuthPlayerUnprotectException("Could not unprotect Player during fetch Player object from xAuthPlayer.");
+        } catch (xAuthPlayerUnprotectException e) {
+            xAuthLog.severe(e.getMessage());
+            return;
+        }
+
+        if (xp.isCreativeMode())
+            p.setGameMode(GameMode.CREATIVE);
+
+        plugin.getPlayerDataHandler().restoreData(xp, p.getName());
         xp.setProtected(false);
     }
 
