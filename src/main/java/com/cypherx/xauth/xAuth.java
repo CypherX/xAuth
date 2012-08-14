@@ -45,9 +45,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.logging.Level;
 
 public class xAuth extends JavaPlugin {
@@ -86,8 +84,8 @@ public class xAuth extends JavaPlugin {
             this.permissionManager.end();
         }
 
-        messageHandler.reloadConfig();
         this.reloadConfig();
+        this.saveConfig();
 
         // free config object
         config = null;
@@ -184,6 +182,7 @@ public class xAuth extends JavaPlugin {
         getCommand("register").setExecutor(new RegisterCommand(this));
         getCommand("login").setExecutor(new LoginCommand(this));
         getCommand("logout").setExecutor(new LogoutCommand(this));
+        getCommand("quit").setExecutor(new QuitCommand(this));
         getCommand("changepw").setExecutor(new ChangePwdCommand(this));
         getCommand("xauth").setExecutor(new xAuthCommand(this));
 
@@ -207,6 +206,7 @@ public class xAuth extends JavaPlugin {
         messageHandler = new MessageHandler(this);
         messageHandler.getConfig().options().copyDefaults(true);
         messageHandler.saveConfig();
+        messageHandler.reloadConfig();
     }
 
     /**
@@ -283,11 +283,10 @@ public class xAuth extends JavaPlugin {
     }
 
     public void reload() {
-        messageHandler.reloadConfig();
         this.reloadConfig();
+        loadConfiguration();
 
-        //loadConfiguration();
-        //playerManager.reload();
+        playerManager.reload();
     }
 
     /**
@@ -299,7 +298,7 @@ public class xAuth extends JavaPlugin {
         try {
             if (!isPluginAvailable()) {
                 // show warnings only to externals
-                if ((xAuthLog.getLevel().intValue() < Level.WARNING.intValue()) && (!(getPlugin() instanceof xAuth)))
+                if (xAuthLog.getLevel().intValue() < Level.WARNING.intValue())
                     throw new xAuthNotAvailable("This plugin is not ready yet.");
             }
         } catch (xAuthNotAvailable e) {

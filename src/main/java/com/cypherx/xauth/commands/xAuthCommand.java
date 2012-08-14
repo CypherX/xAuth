@@ -293,7 +293,7 @@ public class xAuthCommand implements CommandExecutor {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.config")) {
             plugin.getMessageHandler().sendMessage("admin.permission", sender);
             return true;
-        } else if (args.length < 3) {
+        } else if (args.length < 2) {
             plugin.getMessageHandler().sendMessage("admin.config.usage", sender);
             return true;
         }
@@ -306,17 +306,38 @@ public class xAuthCommand implements CommandExecutor {
             return true;
         }
 
-        String value = args[2];
+        boolean getVal = false;
+        Object nodeVal = null;
+        String value = null;
+        if (args.length > 2) {
+            value = args[2];
+        }
+
+        if ((value == null) || value.isEmpty())
+            getVal = true;
 
         try {
-            if (defVal instanceof String)
-                plugin.getConfig().set(node, value);
-            else if (defVal instanceof Integer)
-                plugin.getConfig().set(node, Integer.parseInt(value));
-            else if (defVal instanceof Boolean)
-                plugin.getConfig().set(node, Boolean.parseBoolean(value));
-            else
+            if (defVal instanceof String) {
+                if (getVal) {
+                    nodeVal = plugin.getConfig().get(node);
+                } else {
+                    plugin.getConfig().set(node, value);
+                }
+            } else if (defVal instanceof Integer) {
+                if (getVal) {
+                    nodeVal = plugin.getConfig().get(node);
+                } else {
+                    plugin.getConfig().set(node, Integer.parseInt(value));
+                }
+            } else if (defVal instanceof Boolean) {
+                if (getVal) {
+                    nodeVal = plugin.getConfig().get(node);
+                } else {
+                    plugin.getConfig().set(node, Boolean.parseBoolean(value));
+                }
+            } else {
                 throw new IllegalArgumentException();
+            }
         } catch (NumberFormatException e) {
             plugin.getMessageHandler().sendMessage("admin.config.error.int", sender);
             return true;
@@ -325,8 +346,12 @@ public class xAuthCommand implements CommandExecutor {
             return true;
         }
 
-        plugin.saveConfig();
-        plugin.getMessageHandler().sendMessage("admin.config.success", sender);
+        if (!getVal) {
+            plugin.saveConfig();
+            plugin.getMessageHandler().sendMessage("admin.config.success", sender);
+        } else {
+            plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("admin.config.value"), node, nodeVal), sender);
+        }
         return true;
     }
 

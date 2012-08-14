@@ -17,7 +17,7 @@ mysql:
         playerdata: playerdata
         session: sessions
 permissions:
-    backend: 'bukkit'
+    backend: bukkit
 authurl:
     enabled: false
     url: http://localhost
@@ -52,9 +52,9 @@ guest:
     hide-inventory: true
     protect-location: true
     allowed-commands:
-        - register
-        - login
-        - l
+    - register
+    - login
+    - l
     restrict:
         player:
             chat: true

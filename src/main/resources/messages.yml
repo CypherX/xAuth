@@ -34,6 +34,12 @@ logout:
         logged: '{RED}You are not logged in!'
         general: '{RED}Something went wrong while logging you out!'
 
+quit:
+    success: '{BRIGHTGREEN}Client closed connection.'
+    error:
+        logged: '{RED}You are not logged in!'
+        general: '{RED}Something went wrong while ending your session!'
+
 changepw:
     usage: '{RED}Correct Usage: /changepw <old password> <new password>'
     success: '{BRIGHTGREEN}Password changed!'
@@ -118,6 +124,7 @@ admin:
             int: '{RED}This configuration node requires an integer value!'
             invalid: '{RED}This setting cannot be altered using this command!'
         success: '{BRIGHTGREEN}Configuration updated!'
+        value: '{BRIGHTGREEN}%s: {WHITE}%s'
 version:
     current-version: '{BRIGHTGREEN}xAuth version: %s'
     update-available: '{BRIGHTGREEN}New version %s available. Check your server.log for download instructions.'

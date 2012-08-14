@@ -93,6 +93,10 @@ public class PlayerManager {
         }
     }
 
+    public void reload() {
+        players.clear();
+    }
+
     public void handleReload(Player[] players) {
         for (Player p : players) {
             xAuthPlayer xp = getPlayer(p.getName());
@@ -442,9 +446,5 @@ public class PlayerManager {
         } finally {
             plugin.getDatabaseController().close(conn, ps);
         }
-    }
-
-    public void reload() {
-        players.clear();
     }
 }

@@ -80,7 +80,7 @@ public abstract class PermissionBackend {
     }
 
     /**
-     * Reuturn PluginName from ClassName
+     * Return PluginName from ClassName
      *
      * @param alias
      * @return pluginName

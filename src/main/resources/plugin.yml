@@ -1,5 +1,5 @@
 name: xAuth
-version: 2.0.17
+version: 2.0.18
 description: Offline-mode Authentication
 author: [CypherX, lycano]
 website: https://github.com/lycano/xAuth
@@ -16,6 +16,9 @@ commands:
     usage: /<command> <password>
   logout:
     description: Manually end your login session.
+    usage: /<command>
+  quit:
+    description: Manually quit your session.
     usage: /<command>
   changepw:
     description: Change your password.
@@ -46,6 +49,7 @@ permissions:
         xauth.admin.register: true
         xauth.admin.changepw: true
         xauth.admin.logout: true
+        xauth.admin.quit: true
         xauth.admin.unregister: true
         xauth.admin.location: true
         xauth.admin.reload: true
@@ -59,6 +63,9 @@ permissions:
     default: op
   xauth.admin.logout:
     description: Allows you to end a players session
+    default: op
+  xauth.admin.quit:
+    description: Allows you to quit the session
     default: op
   xauth.admin.unregister:
     description: Remove a players registration
