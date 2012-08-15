@@ -202,13 +202,7 @@ public class PlayerManager {
 
     public void unprotect(xAuthPlayer xp) {
         //@TODO redesign
-        // guest protection cancel task. See @PlayerManager.protect(xAuthPlayer p)
-        int timeoutTaskId = xp.getTimeoutTaskId();
-        if (timeoutTaskId > -1) {
-            Bukkit.getScheduler().cancelTask(timeoutTaskId);
-            xp.setTimeoutTaskId(-1);
-        }
-
+        // order is getPlayer(), restoreData, setCreativeMode when needed, cancelTask, setProtected(false)
         Player p = xp.getPlayer();
         try {
             if (p == null)
@@ -218,10 +212,18 @@ public class PlayerManager {
             return;
         }
 
+        plugin.getPlayerDataHandler().restoreData(xp, p.getName());
+
         if (xp.isCreativeMode())
             p.setGameMode(GameMode.CREATIVE);
 
-        plugin.getPlayerDataHandler().restoreData(xp, p.getName());
+        // guest protection cancel task. See @PlayerManager.protect(xAuthPlayer p)
+        int timeoutTaskId = xp.getTimeoutTaskId();
+        if (timeoutTaskId > -1) {
+            Bukkit.getScheduler().cancelTask(timeoutTaskId);
+            xp.setTimeoutTaskId(-1);
+        }
+
         xp.setProtected(false);
     }
 
