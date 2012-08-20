@@ -121,20 +121,6 @@ public class xAuthPlayerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerKickEvent(PlayerKickEvent event) {
-        String playerName = event.getPlayer().getName();
-        xAuthPlayer p = playerManager.getPlayer(playerName);
-
-        if (p.isProtected())
-            playerManager.unprotect(p);
-
-        plugin.getAuthClass(p).offline(playerName);
-    }
-
-    /**
-     * Moved to KickEvent til this gets fixed
-     *
-    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
         String playerName = event.getPlayer().getName();
         xAuthPlayer p = playerManager.getPlayer(playerName);
@@ -144,7 +130,6 @@ public class xAuthPlayerListener implements Listener {
 
         plugin.getAuthClass(p).offline(playerName);
     }
-    **/
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerChat(PlayerChatEvent event) {
@@ -199,7 +184,7 @@ public class xAuthPlayerListener implements Listener {
             Action action = event.getAction();
             Material type = event.getClickedBlock().getType();
 
-            // TODO add missing blocks
+            // TODO add missing blocks; check routine
             if (action == Action.LEFT_CLICK_BLOCK) {
                 if (type == Material.NOTE_BLOCK
                         || type == Material.WOODEN_DOOR
