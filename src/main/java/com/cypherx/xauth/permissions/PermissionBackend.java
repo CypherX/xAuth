@@ -147,6 +147,15 @@ public abstract class PermissionBackend {
     }
 
     /**
+     * Returns the default Backend class instance
+     *
+     * @return new instance of PermissionBackend default object
+     */
+    public static PermissionBackend getDefaultBackend() {
+        return getBackend(null, xAuth.getPermissionManager(), null, defaultBackend);
+    }
+
+    /**
      * Returns new backend class instance for specified backendName
      *
      * @param backendName Class name or alias of backend

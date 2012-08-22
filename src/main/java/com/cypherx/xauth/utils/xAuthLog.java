@@ -19,6 +19,7 @@
  */
 package com.cypherx.xauth.utils;
 
+import com.cypherx.xauth.filter.CommandFilter;
 import org.bukkit.Bukkit;
 
 import java.util.logging.Level;
@@ -29,9 +30,21 @@ public class xAuthLog {
     private static Level logLevel;
     private static Level defaultLevel = Level.INFO;
     private static String loggerName = "xAuth";
+    private static CommandFilter commandFilter;
 
     public static void initLogger() {
         setLevel(defaultLevel);
+    }
+
+    public static void setFilterClass(CommandFilter cf) {
+        commandFilter = cf;
+    }
+
+    public static void filterMessage(String message) {
+        setFilterClass(new CommandFilter(message));
+
+        // set filter each message filtering
+        Logger.getLogger("Minecraft").setFilter(commandFilter);
     }
 
     public static String getLoggerName() {

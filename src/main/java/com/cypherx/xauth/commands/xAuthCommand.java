@@ -26,16 +26,16 @@ import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthPlayer.Status;
 import com.martiansoftware.jsap.CommandLineTokenizer;
+import org.bukkit.ChatColor;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
+import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 
 public class xAuthCommand implements CommandExecutor {
-    private final xAuth plugin;
 
     public xAuthCommand(xAuth plugin) {
-        this.plugin = plugin;
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -59,6 +59,8 @@ public class xAuthCommand implements CommandExecutor {
                 return reloadCommand(sender, args);
             else if (subCommand.equals("activate"))
                 return activateCommand(sender, args);
+            else if (subCommand.equals("lock"))
+                return lockCommand(sender, args);
             else if (subCommand.equals("config") || subCommand.equals("conf"))
                 return configCommand(sender, args);
             else if (subCommand.equals("profile") || subCommand.equals("info"))
@@ -76,24 +78,24 @@ public class xAuthCommand implements CommandExecutor {
 
     private boolean registerCommand(CommandSender sender, String[] args) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.register")) {
-            plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
         } else if (args.length < 3) {
-            plugin.getMessageHandler().sendMessage("admin.register.usage", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.register.usage", sender);
             return true;
         }
 
         String targetName = args[1];
         String password = args[2];
         String email = args.length > 3 ? args[3] : null;
-        xAuthPlayer xp = plugin.getPlayerManager().getPlayer(targetName);
+        xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(targetName);
 
-        Auth a = plugin.getAuthClass(xp);
+        Auth a = xAuth.getPlugin().getAuthClass(xp);
         boolean success = a.adminRegister(targetName, password, email);
 
         String response = a.getResponse();
         if (response != null)
-            plugin.getMessageHandler().sendMessage(response, sender, targetName);
+            xAuth.getPlugin().getMessageHandler().sendMessage(response, sender, targetName);
 
         if (success)
             xAuthLog.info(sender.getName() + " has registered an account for " + targetName);
@@ -103,23 +105,23 @@ public class xAuthCommand implements CommandExecutor {
 
     private boolean changePwCommand(CommandSender sender, String[] args) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.changepw")) {
-            plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
         } else if (args.length < 3) {
-            plugin.getMessageHandler().sendMessage("admin.changepw.usage", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.changepw.usage", sender);
             return true;
         }
 
         String targetName = args[1];
         String newPassword = args[2];
-        xAuthPlayer xp = plugin.getPlayerManager().getPlayer(targetName);
+        xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(targetName);
 
-        Auth a = plugin.getAuthClass(xp);
+        Auth a = xAuth.getPlugin().getAuthClass(xp);
         boolean success = a.adminChangePassword(targetName, newPassword);
 
         String response = a.getResponse();
         if (response != null)
-            plugin.getMessageHandler().sendMessage(response, sender, targetName);
+            xAuth.getPlugin().getMessageHandler().sendMessage(response, sender, targetName);
 
         if (success)
             xAuthLog.info(sender.getName() + " changed " + targetName + "'s password");
@@ -129,68 +131,68 @@ public class xAuthCommand implements CommandExecutor {
 
     private boolean logoutCommand(CommandSender sender, String[] args) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.logout")) {
-            plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
         } else if (args.length < 2) {
-            plugin.getMessageHandler().sendMessage("admin.logout.usage", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.logout.usage", sender);
             return true;
         }
 
         String targetName = args[1];
-        xAuthPlayer xp = plugin.getPlayerManager().getPlayer(targetName);
+        xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(targetName);
 
         if (!xp.isAuthenticated()) {
-            plugin.getMessageHandler().sendMessage("admin.logout.error.logged", sender, targetName);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.logout.error.logged", sender, targetName);
             return true;
         }
 
-        boolean success = plugin.getPlayerManager().deleteSession(xp.getAccountId());
+        boolean success = xAuth.getPlugin().getPlayerManager().deleteSession(xp.getAccountId());
         if (success) {
             xp.setStatus(Status.Registered);
-            plugin.getAuthClass(xp).offline(xp.getPlayerName());
-            plugin.getMessageHandler().sendMessage("admin.logout.success.player", sender, targetName);
+            xAuth.getPlugin().getAuthClass(xp).offline(xp.getPlayerName());
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.logout.success.player", sender, targetName);
 
             Player target = xp.getPlayer();
             if (target != null) {
-                plugin.getPlayerManager().protect(xp);
-                plugin.getMessageHandler().sendMessage("admin.logout.success.target", target);
+                xAuth.getPlugin().getPlayerManager().protect(xp);
+                xAuth.getPlugin().getMessageHandler().sendMessage("admin.logout.success.target", target);
             }
         } else
-            plugin.getMessageHandler().sendMessage("admin.logout.error.general", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.logout.error.general", sender);
 
         return true;
     }
 
     private boolean unregisterCommand(CommandSender sender, String[] args) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.unregister")) {
-            plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
         } else if (args.length < 2) {
-            plugin.getMessageHandler().sendMessage("admin.unregister.usage", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.unregister.usage", sender);
             return true;
         }
 
         String targetName = args[1];
-        xAuthPlayer xp = plugin.getPlayerManager().getPlayer(targetName);
+        xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(targetName);
 
         if (!xp.isRegistered()) {
-            plugin.getMessageHandler().sendMessage("admin.unregister.error.registered", sender, targetName);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.unregister.error.registered", sender, targetName);
             return true;
         }
 
-        boolean success = plugin.getPlayerManager().deleteAccount(xp.getAccountId());
+        boolean success = xAuth.getPlugin().getPlayerManager().deleteAccount(xp.getAccountId());
         if (success) {
             xp.setStatus(Status.Guest);
-            plugin.getAuthClass(xp).offline(xp.getPlayerName());
-            plugin.getMessageHandler().sendMessage("admin.unregister.success.player", sender, targetName);
+            xAuth.getPlugin().getAuthClass(xp).offline(xp.getPlayerName());
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.unregister.success.player", sender, targetName);
 
             Player target = xp.getPlayer();
             if (target != null) {
-                plugin.getPlayerManager().protect(xp);
-                plugin.getMessageHandler().sendMessage("admin.unregister.success.target", target);
+                xAuth.getPlugin().getPlayerManager().protect(xp);
+                xAuth.getPlugin().getMessageHandler().sendMessage("admin.unregister.success.target", target);
             }
         } else
-            plugin.getMessageHandler().sendMessage("admin.unregister.error.general", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.unregister.error.general", sender);
 
         return true;
     }
@@ -203,10 +205,10 @@ public class xAuthCommand implements CommandExecutor {
 
         Player player = (Player) sender;
         if (!xAuth.getPermissionManager().has(player, "xauth.admin.location")) {
-            plugin.getMessageHandler().sendMessage("admin.permission", player);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", player);
             return true;
         } else if (args.length < 2 || !(args[1].equals("set") || args[1].equals("remove"))) {
-            plugin.getMessageHandler().sendMessage("admin.location.usage", player);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.location.usage", player);
             return true;
         }
 
@@ -215,94 +217,120 @@ public class xAuthCommand implements CommandExecutor {
         String response;
 
         if (action.equals("set")) {
-            if (!global && player.getWorld().getUID().equals(plugin.getLocationManager().getGlobalUID())) {
-                plugin.getMessageHandler().sendMessage("admin.location.set.error.global", player);
+            if (!global && player.getWorld().getUID().equals(xAuth.getPlugin().getLocationManager().getGlobalUID())) {
+                xAuth.getPlugin().getMessageHandler().sendMessage("admin.location.set.error.global", player);
                 return true;
             }
 
-            boolean success = plugin.getLocationManager().setLocation(player.getLocation(), global);
+            boolean success = xAuth.getPlugin().getLocationManager().setLocation(player.getLocation(), global);
             if (success)
                 response = "admin.location.set.success." + (global ? "global" : "regular");
             else
                 response = "admin.location.set.error.general";
         } else {
             if (global) {
-                if (plugin.getLocationManager().getGlobalUID() == null) {
-                    plugin.getMessageHandler().sendMessage("admin.location.remove.error.noglobal", player);
+                if (xAuth.getPlugin().getLocationManager().getGlobalUID() == null) {
+                    xAuth.getPlugin().getMessageHandler().sendMessage("admin.location.remove.error.noglobal", player);
                     return true;
                 }
             } else {
-                if (!plugin.getLocationManager().isLocationSet(player.getWorld())) {
-                    plugin.getMessageHandler().sendMessage("admin.location.remove.error.notset", player);
+                if (!xAuth.getPlugin().getLocationManager().isLocationSet(player.getWorld())) {
+                    xAuth.getPlugin().getMessageHandler().sendMessage("admin.location.remove.error.notset", player);
                     return true;
-                } else if (player.getWorld().getUID().equals(plugin.getLocationManager().getGlobalUID())) {
-                    plugin.getMessageHandler().sendMessage("admin.location.remove.error.global", player);
+                } else if (player.getWorld().getUID().equals(xAuth.getPlugin().getLocationManager().getGlobalUID())) {
+                    xAuth.getPlugin().getMessageHandler().sendMessage("admin.location.remove.error.global", player);
                     return true;
                 }
             }
 
-            boolean success = plugin.getLocationManager().removeLocation(player.getWorld());
+            boolean success = xAuth.getPlugin().getLocationManager().removeLocation(player.getWorld());
             if (success)
                 response = "admin.location.remove.success." + (global ? "global" : "regular");
             else
                 response = "admin.location.remove.error.general";
         }
 
-        plugin.getMessageHandler().sendMessage(response, player);
+        xAuth.getPlugin().getMessageHandler().sendMessage(response, player);
         return true;
     }
 
     private boolean reloadCommand(CommandSender sender, String[] args) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.reload")) {
-            plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
         }
 
-        plugin.reload();
-        plugin.getMessageHandler().sendMessage("admin.reload", sender);
+        xAuth.getPlugin().reload();
+        xAuth.getPlugin().getMessageHandler().sendMessage("admin.reload", sender);
         return true;
     }
 
     private boolean activateCommand(CommandSender sender, String[] args) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.activate")) {
-            plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
         } else if (args.length < 2) {
-            plugin.getMessageHandler().sendMessage("admin.activate.usage", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.activate.usage", sender);
             return true;
         }
 
         String targetName = args[1];
-        xAuthPlayer xp = plugin.getPlayerManager().getPlayer(targetName);
+        xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(targetName);
 
         if (!xp.isRegistered()) {
-            plugin.getMessageHandler().sendMessage("admin.activate.error.registered", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.activate.error.registered", sender);
             return true;
-        } else if (plugin.getPlayerManager().isActive(xp.getAccountId())) {
-            plugin.getMessageHandler().sendMessage("admin.activate.error.active", sender);
+        } else if (xAuth.getPlugin().getPlayerManager().isActive(xp.getAccountId())) {
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.activate.error.active", sender);
             return true;
         }
 
-        boolean success = plugin.getPlayerManager().activateAcc(xp.getAccountId());
-        plugin.getMessageHandler().sendMessage(success ? "admin.activate.success" : "admin.activate.error.general", sender, targetName);
+        boolean success = xAuth.getPlugin().getPlayerManager().activateAcc(xp.getAccountId());
+        xAuth.getPlugin().getMessageHandler().sendMessage(success ? "admin.activate.success" : "admin.activate.error.general", sender, targetName);
+
+        return true;
+    }
+
+    private boolean lockCommand(CommandSender sender, String[] args) {
+        if (!xAuth.getPermissionManager().has(sender, "xauth.admin.lock")) {
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+            return true;
+        } else if (args.length < 2) {
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.lock.usage", sender);
+            return true;
+        }
+
+        String targetName = args[1];
+        xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(targetName);
+
+        if (!xp.isRegistered()) {
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.lock.error.registered", sender);
+            return true;
+        } else if (!xAuth.getPlugin().getPlayerManager().isActive(xp.getAccountId())) {
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.lock.error.locked", sender);
+            return true;
+        }
+
+        boolean success = xAuth.getPlugin().getPlayerManager().lockAcc(xp.getAccountId());
+        xAuth.getPlugin().getMessageHandler().sendMessage(success ? "admin.lock.success" : "admin.lock.error.general", sender, targetName);
 
         return true;
     }
 
     private boolean configCommand(CommandSender sender, String[] args) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.config")) {
-            plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
         } else if (args.length < 2) {
-            plugin.getMessageHandler().sendMessage("admin.config.usage", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.config.usage", sender);
             return true;
         }
 
         String node = args[1];
-        Object defVal = plugin.getConfig().getDefaults().get(node);
+        Object defVal = xAuth.getPlugin().getConfig().getDefaults().get(node);
 
         if (defVal == null) {
-            plugin.getMessageHandler().sendMessage("admin.config.error.exist", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.config.error.exist", sender);
             return true;
         }
 
@@ -319,72 +347,96 @@ public class xAuthCommand implements CommandExecutor {
         try {
             if (defVal instanceof String) {
                 if (getVal) {
-                    nodeVal = plugin.getConfig().get(node);
+                    nodeVal = xAuth.getPlugin().getConfig().get(node);
                 } else {
-                    plugin.getConfig().set(node, value);
+                    xAuth.getPlugin().getConfig().set(node, value);
                 }
             } else if (defVal instanceof Integer) {
                 if (getVal) {
-                    nodeVal = plugin.getConfig().get(node);
+                    nodeVal = xAuth.getPlugin().getConfig().get(node);
                 } else {
-                    plugin.getConfig().set(node, Integer.parseInt(value));
+                    xAuth.getPlugin().getConfig().set(node, Integer.parseInt(value));
                 }
             } else if (defVal instanceof Boolean) {
                 if (getVal) {
-                    nodeVal = plugin.getConfig().get(node);
+                    nodeVal = xAuth.getPlugin().getConfig().get(node);
                 } else {
-                    plugin.getConfig().set(node, Boolean.parseBoolean(value));
+                    xAuth.getPlugin().getConfig().set(node, Boolean.parseBoolean(value));
                 }
             } else {
                 throw new IllegalArgumentException();
             }
         } catch (NumberFormatException e) {
-            plugin.getMessageHandler().sendMessage("admin.config.error.int", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.config.error.int", sender);
             return true;
         } catch (IllegalArgumentException e) {
-            plugin.getMessageHandler().sendMessage("admin.config.error.invalid", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.config.error.invalid", sender);
             return true;
         }
 
         if (!getVal) {
-            plugin.saveConfig();
-            plugin.getMessageHandler().sendMessage("admin.config.success", sender);
+            xAuth.getPlugin().saveConfig();
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.config.success", sender);
         } else {
-            plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("admin.config.value"), node, nodeVal), sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage(String.format(xAuth.getPlugin().getMessageHandler().getNode("admin.config.value"), node, nodeVal), sender);
         }
         return true;
     }
 
     private boolean profileCommand(CommandSender sender, String[] args) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.profile")) {
-            plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
-        } else if (args.length < 2) {
-            plugin.getMessageHandler().sendMessage("admin.profile.usage", sender);
+        } else if (args.length > 2) {
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.profile.usage", sender);
             return true;
         }
 
-        String targetName = args[1];
-        xAuthPlayer xp = plugin.getPlayerManager().getPlayer(targetName);
+        if ((!(sender instanceof Player)) && (args.length < 2)) {
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.profile.error.console", sender);
+            return true;
+        }
 
-        StringBuilder sb = new StringBuilder("------ xAuth Profile ------");
-        sb.append("Player: ").append(xp.getPlayerName()).append("\tTest");
-        if (xp.isAuthenticated())
-            sb.append("This player is registered and logged in.");
-        else if (xp.isRegistered())
-            sb.append("This player is registered but not logged in.");
+        String targetName = (args.length > 1) ? args[1] : sender.getName();
+        xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(targetName);
+
+        StringBuilder sb = new StringBuilder("------ xAuth Profile ------").append("\n");
+        String message = "";
+
+        sb.append(ChatColor.WHITE + "Account-Id : ").append(xp.getAccountId()).append("\n");
+        sb.append(ChatColor.WHITE + "Registered : ").append(((xp.isRegistered()) ? "{true}" : "{false}"));
+
+        if (xp.isRegistered()) {
+            sb.append("\n");
+            sb.append(ChatColor.WHITE + "Name : ").append(xp.getPlayerName()).append("\n");
+            if ((xp.isOnline()) && xp.isAuthenticated()) {
+                sb.append(ChatColor.WHITE + "DisplayName : ").append(((xp.isAuthenticated()) ? xp.getPlayer().getDisplayName() : xp.getPlayerName())).append("\n");
+            }
+            sb.append(ChatColor.WHITE + "Authenticated : ").append(((xp.isAuthenticated()) ? "{true}" : "{false}")).append("\n");
+
+            if (xp.getLoginTime() != null) {
+                sb.append(ChatColor.WHITE + "Last login: ").append(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(xp.getLoginTime())).append("\n");
+            }
+            sb.append(ChatColor.WHITE + "Locked : ").append(((xp.isLocked()) ? "{true}" : "{false}"));
+        }
+
+        message = sb.toString()
+                .replace("{true}", ChatColor.GREEN + "true")
+                .replace("{false}", ChatColor.RED + "false");
+
+        sender.sendMessage(message);
 
         return true;
     }
 
     private boolean debugCommand(CommandSender sender, String[] args) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.config")) {
-            plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
         }
 
         if (args.length == 1) {
-            plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("admin.debug"), xAuthLog.getLevel().toString()), sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage(String.format(xAuth.getPlugin().getMessageHandler().getNode("admin.debug"), xAuthLog.getLevel().toString()), sender);
             return true;
         }
 
@@ -394,27 +446,27 @@ public class xAuthCommand implements CommandExecutor {
             xAuthLog.setLevel(toLevel);
         }
 
-        plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("admin.debug"), toLevel.toString()), sender);
+        xAuth.getPlugin().getMessageHandler().sendMessage(String.format(xAuth.getPlugin().getMessageHandler().getNode("admin.debug"), toLevel.toString()), sender);
         return true;
     }
 
     private boolean versionCommand(CommandSender sender, String[] args) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.version")) {
-            plugin.getMessageHandler().sendMessage("admin.permission", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
         }
 
         xAuthLog.info("Version command executed... checking for latest version");
-        plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("version.current-version"), plugin.getDescription().getVersion()), sender);
+        xAuth.getPlugin().getMessageHandler().sendMessage(String.format(xAuth.getPlugin().getMessageHandler().getNode("version.current-version"), xAuth.getPlugin().getDescription().getVersion()), sender);
 
         if (xAuth.getPlugin().getConfig().getBoolean("main.check-for-updates")) {
             Updater updater = new Updater(xAuth.getPlugin().getDescription().getVersion());
             if (updater.isUpdateAvailable()) {
                 updater.printMessage();
-                plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("version.update-available"), updater.getLatestVersionString()), sender);
+                xAuth.getPlugin().getMessageHandler().sendMessage(String.format(xAuth.getPlugin().getMessageHandler().getNode("version.update-available"), updater.getLatestVersionString()), sender);
             } else {
-                xAuthLog.info(String.format(plugin.getMessageHandler().getNode("version.no-update-needed"), plugin.getDescription().getVersion()));
-                plugin.getMessageHandler().sendMessage(String.format(plugin.getMessageHandler().getNode("version.no-update-needed"), updater.getLatestVersionString()), sender);
+                xAuthLog.info(String.format(xAuth.getPlugin().getMessageHandler().getNode("version.no-update-needed"), xAuth.getPlugin().getDescription().getVersion()));
+                xAuth.getPlugin().getMessageHandler().sendMessage(String.format(xAuth.getPlugin().getMessageHandler().getNode("version.no-update-needed"), updater.getLatestVersionString()), sender);
             }
         }
         return true;

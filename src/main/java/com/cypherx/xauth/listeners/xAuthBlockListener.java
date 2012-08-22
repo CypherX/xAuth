@@ -32,9 +32,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 public class xAuthBlockListener implements Listener {
     private final PlayerManager playerManager;
 
-    public xAuthBlockListener(final xAuth plugin) {
-        this.playerManager = plugin.getPlayerManager();
-        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
+    public xAuthBlockListener() {
+        this.playerManager = xAuth.getPlugin().getPlayerManager();
+        Bukkit.getServer().getPluginManager().registerEvents(this, xAuth.getPlugin());
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

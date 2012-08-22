@@ -30,44 +30,42 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class LoginCommand implements CommandExecutor {
-    private final xAuth plugin;
 
-    public LoginCommand(final xAuth plugin) {
-        this.plugin = plugin;
+    public LoginCommand() {
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         args = CommandLineTokenizer.tokenize(args);
 
         if (sender instanceof Player) {
-            xAuthPlayer p = plugin.getPlayerManager().getPlayer((Player) sender);
+            xAuthPlayer p = xAuth.getPlugin().getPlayerManager().getPlayer((Player) sender);
 
             if (args.length < 1) {
-                plugin.getMessageHandler().sendMessage("login.usage", p.getPlayer());
+                xAuth.getPlugin().getMessageHandler().sendMessage("login.usage", p.getPlayer());
                 return true;
             }
 
             String playerName = p.getPlayerName();
             String password = args[0];
 
-            Auth a = plugin.getAuthClass(p);
+            Auth a = xAuth.getPlugin().getAuthClass(p);
             boolean passChecks = a.login(playerName, password);
             String response = a.getResponse();
 
             if (passChecks) {
-                boolean success = plugin.getPlayerManager().doLogin(p);
+                boolean success = xAuth.getPlugin().getPlayerManager().doLogin(p);
                 if (success) {
-                    if (plugin.isAuthURL() && plugin.getConfig().getBoolean("authurl.broadcast-login") && response != null && response != "")
-                        plugin.getServer().broadcastMessage(response);
+                    if (xAuth.getPlugin().isAuthURL() && xAuth.getPlugin().getConfig().getBoolean("authurl.broadcast-login") && response != null && response != "")
+                        xAuth.getPlugin().getServer().broadcastMessage(response);
                     response = "login.success";
                     a.online(p.getPlayerName());
-                    xAuthLog.info(playerName + " has logged in");
+                    xAuthLog.info(playerName + " authenticated");
                 } else
                     response = "login.error.general";
             }
 
             if (response != null)
-                plugin.getMessageHandler().sendMessage(response, p.getPlayer());
+                xAuth.getPlugin().getMessageHandler().sendMessage(response, p.getPlayer());
 
             return true;
         }

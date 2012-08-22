@@ -34,9 +34,9 @@ import org.bukkit.event.entity.*;
 public class xAuthEntityListener implements Listener {
     private final PlayerManager playerManager;
 
-    public xAuthEntityListener(final xAuth plugin) {
-        this.playerManager = plugin.getPlayerManager();
-        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
+    public xAuthEntityListener() {
+        this.playerManager = xAuth.getPlugin().getPlayerManager();
+        Bukkit.getServer().getPluginManager().registerEvents(this, xAuth.getPlugin());
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

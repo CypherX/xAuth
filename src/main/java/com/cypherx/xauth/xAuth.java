@@ -27,6 +27,7 @@ import com.cypherx.xauth.database.DatabaseController;
 import com.cypherx.xauth.exceptions.xAuthNotAvailable;
 import com.cypherx.xauth.listeners.xAuthBlockListener;
 import com.cypherx.xauth.listeners.xAuthEntityListener;
+import com.cypherx.xauth.listeners.xAuthEventListener;
 import com.cypherx.xauth.listeners.xAuthPlayerListener;
 import com.cypherx.xauth.password.PasswordHandler;
 import com.cypherx.xauth.permissions.PermissionBackend;
@@ -45,7 +46,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.logging.Level;
 
 public class xAuth extends JavaPlugin {
@@ -174,16 +177,17 @@ public class xAuth extends JavaPlugin {
             playerManager.handleReload(players);
 
         // Initialize listeners
-        new xAuthPlayerListener(this);
-        new xAuthBlockListener(this);
-        new xAuthEntityListener(this);
+        this.getServer().getPluginManager().registerEvents(new xAuthEventListener(), this);
+        this.getServer().getPluginManager().registerEvents(new xAuthEntityListener(), this);
+        this.getServer().getPluginManager().registerEvents(new xAuthPlayerListener(), this);
+        this.getServer().getPluginManager().registerEvents(new xAuthBlockListener(), this);
 
         // Register commands
-        getCommand("register").setExecutor(new RegisterCommand(this));
-        getCommand("login").setExecutor(new LoginCommand(this));
-        getCommand("logout").setExecutor(new LogoutCommand(this));
-        getCommand("quit").setExecutor(new QuitCommand(this));
-        getCommand("changepw").setExecutor(new ChangePwdCommand(this));
+        getCommand("register").setExecutor(new RegisterCommand());
+        getCommand("login").setExecutor(new LoginCommand());
+        getCommand("logout").setExecutor(new LogoutCommand());
+        getCommand("quit").setExecutor(new QuitCommand());
+        getCommand("changepw").setExecutor(new ChangePwdCommand());
         getCommand("xauth").setExecutor(new xAuthCommand(this));
 
         xAuthLog.info(String.format("v%s Enabled!", getDescription().getVersion()));
@@ -221,7 +225,7 @@ public class xAuth extends JavaPlugin {
             xAuthLog.info("Attempting to use supported permissions plugin '" + pluginName + "'");
 
             Plugin permToLoad = Bukkit.getPluginManager().getPlugin(pluginName);
-            if ((permToLoad != null) && (permToLoad.isEnabled())) {
+            if ((pluginName.equals(PermissionBackend.getDefaultBackend().getProviderName())) || ((permToLoad != null) && (permToLoad.isEnabled()))) {
                 this.config.set("permissions.backend", providerAlias);
                 xAuthLog.info("Config node permissions.backend changed to '" + providerAlias + "'");
                 return;

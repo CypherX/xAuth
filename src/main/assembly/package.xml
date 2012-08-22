@@ -9,7 +9,7 @@
     <fileSets>
         <fileSet>
 			<directory>${basedir}/src/main/resources/</directory>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>/${project.build.finalName}/</outputDirectory>
 			<includes>
 			  <include>config.yml</include>
 			  <include>messages.yml</include>
@@ -18,7 +18,7 @@
         </fileSet>
         <fileSet>
 			<directory>${basedir}/src/main/resources/sql/</directory>
-			<outputDirectory>/sql/</outputDirectory>
+			<outputDirectory>${project.build.finalName}/sql/</outputDirectory>
 			<includes>
 			  <include>**/*.sql</include>
 			</includes>				

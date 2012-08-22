@@ -29,32 +29,30 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class LogoutCommand implements CommandExecutor {
-    private final xAuth plugin;
 
-    public LogoutCommand(final xAuth plugin) {
-        this.plugin = plugin;
+    public LogoutCommand() {
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         args = CommandLineTokenizer.tokenize(args);
 
         if (sender instanceof Player) {
-            xAuthPlayer p = plugin.getPlayerManager().getPlayer((Player) sender);
+            xAuthPlayer p = xAuth.getPlugin().getPlayerManager().getPlayer((Player) sender);
             String response = null;
 
             if (p.isAuthenticated()) {
-                boolean success = plugin.getPlayerManager().deleteSession(p.getAccountId());
+                boolean success = xAuth.getPlugin().getPlayerManager().deleteSession(p.getAccountId());
                 if (success) {
-                    plugin.getPlayerManager().protect(p);
+                    xAuth.getPlugin().getPlayerManager().protect(p);
                     p.setStatus(Status.Registered);
-                    plugin.getAuthClass(p).offline(p.getPlayerName());
+                    xAuth.getPlugin().getAuthClass(p).offline(p.getPlayerName());
                     response = "logout.success";
                 } else
                     response = "logout.error.general";
             } else
                 response = "logout.error.logged";
 
-            plugin.getMessageHandler().sendMessage(response, p.getPlayer());
+            xAuth.getPlugin().getMessageHandler().sendMessage(response, p.getPlayer());
             return true;
         }
 

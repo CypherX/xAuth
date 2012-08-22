@@ -1,5 +1,5 @@
 name: xAuth
-version: 2.0.20
+version: 2.0.21
 description: Offline-mode Authentication
 author: [CypherX, lycano]
 website: https://github.com/lycano/xAuth
@@ -19,6 +19,7 @@ commands:
     usage: /<command>
   quit:
     description: Manually quit your session.
+    aliases: [q]
     usage: /<command>
   changepw:
     description: Change your password.
@@ -35,6 +36,9 @@ commands:
            /<command> location set|remove [global]
            /<command> reload
            /<command> activate <player>
+           /<command> lock <player>           
+           /<command> get <player> status
+           /<command> profile <player>
            /<command> config <node> <value>
            /<command> debug [INFO,FINE,FINER,FINEST]
            /<command> version
@@ -54,7 +58,9 @@ permissions:
         xauth.admin.location: true
         xauth.admin.reload: true
         xauth.admin.activate: true
+        xauth.admin.lock: true
         xauth.admin.config: true
+        xauth.admin.profile: true
   xauth.admin.register:
     description: Allows you to register other players
     default: op
@@ -79,8 +85,14 @@ permissions:
   xauth.admin.activate:
     description: Allows you to activate a player's account.
     default: op
+  xauth.admin.lock:
+    description: Allows you to lock a player's account.
+    default: op    
   xauth.admin.config:
     description: Allows you to modify the configuration via a command.
+    default: op
+  xauth.admin.profile:
+    description: Allows you to display a <players> profile
     default: op
   xauth.bypass.acclimit:
     description: Allows you to bypass the account limit and register an unlimited amount of accounts.

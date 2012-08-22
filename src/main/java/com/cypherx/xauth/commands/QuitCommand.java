@@ -29,26 +29,24 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class QuitCommand implements CommandExecutor {
-    private final xAuth plugin;
 
-    public QuitCommand(final xAuth plugin) {
-        this.plugin = plugin;
+    public QuitCommand() {
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         args = CommandLineTokenizer.tokenize(args);
 
         if (sender instanceof Player) {
-            xAuthPlayer p = plugin.getPlayerManager().getPlayer((Player) sender);
+            xAuthPlayer p = xAuth.getPlugin().getPlayerManager().getPlayer((Player) sender);
             String response = null;
             boolean kickPlayer = false;
 
             if (p.isAuthenticated()) {
-                boolean success = plugin.getPlayerManager().deleteSession(p.getAccountId());
+                boolean success = xAuth.getPlugin().getPlayerManager().deleteSession(p.getAccountId());
                 if (success) {
-                    plugin.getPlayerManager().protect(p);
+                    xAuth.getPlugin().getPlayerManager().protect(p);
                     p.setStatus(Status.Registered);
-                    plugin.getAuthClass(p).offline(p.getPlayerName());
+                    xAuth.getPlugin().getAuthClass(p).offline(p.getPlayerName());
                     response = "quit.success";
                     kickPlayer = true;
                 } else {
@@ -59,9 +57,9 @@ public class QuitCommand implements CommandExecutor {
             }
 
             if (kickPlayer) {
-                p.getPlayer().kickPlayer(plugin.getMessageHandler().getNode(response));
+                p.getPlayer().kickPlayer(xAuth.getPlugin().getMessageHandler().getNode(response));
             } else {
-                plugin.getMessageHandler().sendMessage(response, p.getPlayer());
+                xAuth.getPlugin().getMessageHandler().sendMessage(response, p.getPlayer());
             }
             return true;
         }

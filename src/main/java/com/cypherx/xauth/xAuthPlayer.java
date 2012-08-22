@@ -35,16 +35,22 @@ public class xAuthPlayer {
     private boolean creativeMode;
     private int timeoutTaskId = -1;
     private boolean isProtected = false;
+    private boolean isLocked = true;
     private Timestamp connectTime;
 
-    public xAuthPlayer(final String playerName) {
-        this.playerName = playerName;
+    public xAuthPlayer(String playerName) {
+        this(playerName, -1, true, Status.Guest);
     }
 
-    public xAuthPlayer(final String playerName, final int accountId) {
+    public xAuthPlayer(String playerName, int accountId) {
+        this(playerName, accountId, true, Status.Guest);
+    }
+
+    public xAuthPlayer(String playerName, int accountId, boolean locked, Status status) {
         this.playerName = playerName;
         this.accountId = accountId;
-        status = Status.Registered;
+        this.isLocked = locked;
+        this.status = status;
     }
 
     public String getPlayerName() {
@@ -61,6 +67,10 @@ public class xAuthPlayer {
 
     public void setAccountId(int accountId) {
         this.accountId = accountId;
+    }
+
+    public boolean isLocked() {
+        return this.isLocked;
     }
 
     public Status getStatus() {
@@ -132,7 +142,8 @@ public class xAuthPlayer {
     }
 
     public boolean isOnline() {
-        return Bukkit.getPlayer(playerName).isOnline();
+        Player player = Bukkit.getPlayerExact(playerName);
+        return ((player != null) && (player.isOnline()));
     }
 
     public boolean isRegistered() {

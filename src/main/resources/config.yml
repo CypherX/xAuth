@@ -75,7 +75,7 @@ strikes:
     amount: 5
     lockout-length: 3600
 account:
-    track-last-login: false
+    track-last-login: true
 filter:
     min-length: 3
     allowed: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_

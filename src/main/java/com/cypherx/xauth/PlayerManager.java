@@ -42,7 +42,7 @@ public class PlayerManager {
     }
 
     public xAuthPlayer getPlayer(Player player) {
-        return getPlayer(player, false);
+        return getPlayer(player.getName(), false);
     }
 
     public xAuthPlayer getPlayer(Player player, boolean reload) {
@@ -76,7 +76,7 @@ public class PlayerManager {
         ResultSet rs = null;
 
         try {
-            String sql = String.format("SELECT `id` FROM `%s` WHERE `playername` = ?",
+            String sql = String.format("SELECT `id`,`active` FROM `%s` WHERE `playername` = ?",
                     plugin.getDatabaseController().getTable(Table.ACCOUNT));
             ps = conn.prepareStatement(sql);
             ps.setString(1, playerName);
@@ -84,7 +84,7 @@ public class PlayerManager {
             if (!rs.next())
                 return null;
 
-            return new xAuthPlayer(playerName, rs.getInt("id"));
+            return new xAuthPlayer(playerName, rs.getInt("id"), !rs.getBoolean("active"), Status.Registered);
         } catch (SQLException e) {
             xAuthLog.severe(String.format("Failed to load player: %s", playerName), e);
             return null;
@@ -274,9 +274,6 @@ public class PlayerManager {
     }
 
     public boolean isActive(int id) {
-        if (!plugin.getConfig().getBoolean("registration.activation"))
-            return true;
-
         Connection conn = plugin.getDatabaseController().getConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -287,10 +284,7 @@ public class PlayerManager {
             ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
             rs = ps.executeQuery();
-            if (!rs.next())
-                return false;
-
-            return rs.getBoolean("active");
+            return rs.next() && rs.getBoolean("active");
         } catch (SQLException e) {
             xAuthLog.severe("Failed to check active status of account: " + id, e);
             return false;
@@ -300,18 +294,26 @@ public class PlayerManager {
     }
 
     public boolean activateAcc(int id) {
+        return setActive(id, 1);
+    }
+
+    public boolean lockAcc(int id) {
+        return setActive(id, 0);
+    }
+
+    private boolean setActive(int id, int active) {
         Connection conn = plugin.getDatabaseController().getConnection();
         PreparedStatement ps = null;
 
         try {
-            String sql = String.format("UPDATE `%s` SET `active` = 1 WHERE `id` = ?",
-                    plugin.getDatabaseController().getTable(Table.ACCOUNT));
+            String sql = String.format("UPDATE `%s` SET `active` = %d WHERE `id` = ?",
+                    plugin.getDatabaseController().getTable(Table.ACCOUNT), active);
             ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            xAuthLog.severe("Failed to activate account: " + id, e);
+            xAuthLog.severe("Failed to " + ((active > 0) ? "activate" : "lock") + " account: " + id, e);
             return false;
         } finally {
             plugin.getDatabaseController().close(conn, ps);
@@ -355,6 +357,7 @@ public class PlayerManager {
         Connection conn = plugin.getDatabaseController().getConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;
+        int id = -1;
 
         try {
             String sql = String.format("INSERT INTO `%s` (`playername`, `password`, `email`, `registerdate`, `registerip`) VALUES (?, ?, ?, ?, ?)",
@@ -367,7 +370,16 @@ public class PlayerManager {
             ps.setString(5, ipaddress);
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
-            return rs.next() ? rs.getInt(1) : -1;
+
+            // set lastId
+            id = rs.next() ? rs.getInt(1) : -1;
+
+            // activate user if registration.activation is set to false in config
+            if ((id > 0) && (!plugin.getConfig().getBoolean("registration.activation"))) {
+                activateAcc(id);
+            }
+
+            return id;
         } finally {
             plugin.getDatabaseController().close(conn, ps, rs);
         }

@@ -30,20 +30,18 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class RegisterCommand implements CommandExecutor {
-    private final xAuth plugin;
 
-    public RegisterCommand(final xAuth plugin) {
-        this.plugin = plugin;
+    public RegisterCommand() {
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         args = CommandLineTokenizer.tokenize(args);
 
         if (sender instanceof Player) {
-            xAuthPlayer p = plugin.getPlayerManager().getPlayer((Player) sender);
+            xAuthPlayer p = xAuth.getPlugin().getPlayerManager().getPlayer((Player) sender);
 
-            if ((plugin.getConfig().getBoolean("registration.require-email") && args.length < 2) || args.length < 1) {
-                plugin.getMessageHandler().sendMessage("register.usage", p.getPlayer());
+            if ((xAuth.getPlugin().getConfig().getBoolean("registration.require-email") && args.length < 2) || args.length < 1) {
+                xAuth.getPlugin().getMessageHandler().sendMessage("register.usage", p.getPlayer());
                 return true;
             }
 
@@ -51,16 +49,16 @@ public class RegisterCommand implements CommandExecutor {
             String password = args[0];
             String email = args.length > 1 ? args[1] : null;
 
-            Auth a = plugin.getAuthClass(p);
+            Auth a = xAuth.getPlugin().getAuthClass(p);
             boolean success = a.register(playerName, password, email);
 
             String response = a.getResponse();
             if (response != null)
-                plugin.getMessageHandler().sendMessage(response, p.getPlayer());
+                xAuth.getPlugin().getMessageHandler().sendMessage(response, p.getPlayer());
 
             if (success) {
-                if (!plugin.getConfig().getBoolean("registration.require-login"))
-                    plugin.getPlayerManager().doLogin(p);
+                if (!xAuth.getPlugin().getConfig().getBoolean("registration.require-login"))
+                    xAuth.getPlugin().getPlayerManager().doLogin(p);
 
                 xAuthLog.info(playerName + " has registered");
             }

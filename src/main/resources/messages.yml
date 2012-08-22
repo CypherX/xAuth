@@ -117,6 +117,20 @@ admin:
             active: '{RED}This player is already active!'
             general: '{RED}Something went wrong while activating this player!'
         success: '{BRIGHTGREEN}{TARGET} has been activated!'
+    profile:
+        usage: '{RED}Correct Usage: /xauth profile [player]'
+        error:
+            registered: '{RED}This player is not registered!'
+            console: '{RED}Invalid argument count.'
+            general: '{RED}Something went wrong while executing this command!'
+        success: '{BRIGHTGREEN}{TARGET}''s profile!'
+    lock:
+        usage: '{RED}Correct Usage: /xauth lock <player>'
+        error:
+            registered: '{RED}This player is not registered!'
+            locked: '{RED}This player is already locked!'
+            general: '{RED}Something went wrong while locking this player!'
+        success: '{BRIGHTGREEN}{TARGET} has been locked!'
     config:
         usage: '{RED}Correct Usage: /xauth config <node> <value>'
         error:

@@ -21,6 +21,7 @@ package com.cypherx.xauth.listeners;
 
 import com.cypherx.xauth.PlayerManager;
 import com.cypherx.xauth.utils.Utils;
+import com.cypherx.xauth.utils.xAuthLog;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthPlayer.Status;
@@ -30,6 +31,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -39,15 +41,22 @@ import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class xAuthPlayerListener implements Listener {
-    private final xAuth plugin;
     private final PlayerManager playerManager;
+    private List<String> commandsFilterList = new ArrayList<String>();
 
-    public xAuthPlayerListener(xAuth plugin) {
-        this.plugin = plugin;
-        this.playerManager = plugin.getPlayerManager();
-        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
+    public xAuthPlayerListener() {
+        Map<String, Map<String, Object>> commandsMap = xAuth.getPlugin().getDescription().getCommands();
+
+        this.playerManager = xAuth.getPlugin().getPlayerManager();
+        this.commandsFilterList.addAll(commandsMap.keySet());
+        for (String commandName: commandsMap.keySet()) {
+            commandsFilterList.addAll(xAuth.getPlugin().getCommand(commandName).getAliases());
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -58,27 +67,27 @@ public class xAuthPlayerListener implements Listener {
         Player p = event.getPlayer();
         if (p.isOnline()) {
             xAuthPlayer xp = playerManager.getPlayer(p);
-            boolean reverse = plugin.getConfig().getBoolean("single-session.reverse");
+            boolean reverse = xAuth.getPlugin().getConfig().getBoolean("single-session.reverse");
 
             if (reverse && !xp.isAuthenticated()) {
-                if (!plugin.getConfig().getBoolean("single-session.guests.reverse")) {
+                if (!xAuth.getPlugin().getConfig().getBoolean("single-session.guests.reverse")) {
                     Timestamp expireTime = new Timestamp(xp.getConnectTime().getTime() +
-                            (plugin.getConfig().getInt("single-session.guests.immunity-length") * 1000));
+                            (xAuth.getPlugin().getConfig().getInt("single-session.guests.immunity-length") * 1000));
                     reverse = !(expireTime.compareTo(new Timestamp(System.currentTimeMillis())) < 0);
                 }
             }
 
             if (reverse)
-                event.disallow(Result.KICK_OTHER, plugin.getMessageHandler().getNode("join.error.online"));
+                event.disallow(Result.KICK_OTHER, xAuth.getPlugin().getMessageHandler().getNode("join.error.online"));
         }
 
         String ipAddress = event.getAddress().getHostAddress();
         if (Utils.isIPAddress(ipAddress))
-            if (plugin.getStrikeManager().isLockedOut(ipAddress, p.getName()))
-                event.disallow(Result.KICK_OTHER, plugin.getMessageHandler().getNode("join.error.lockout"));
+            if (xAuth.getPlugin().getStrikeManager().isLockedOut(ipAddress, p.getName()))
+                event.disallow(Result.KICK_OTHER, xAuth.getPlugin().getMessageHandler().getNode("join.error.lockout"));
 
         if (!isValidName(p.getName()))
-            event.disallow(Result.KICK_OTHER, plugin.getMessageHandler().getNode("join.error.name"));
+            event.disallow(Result.KICK_OTHER, xAuth.getPlugin().getMessageHandler().getNode("join.error.name"));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -87,16 +96,16 @@ public class xAuthPlayerListener implements Listener {
         if (p == null || !p.isOnline())
             return;
 
-        xAuthPlayer xp = playerManager.getPlayer(p, plugin.getConfig().getBoolean("main.reload-on-join"));
+        xAuthPlayer xp = playerManager.getPlayer(p, xAuth.getPlugin().getConfig().getBoolean("main.reload-on-join"));
         xp.setConnectTime(new Timestamp(System.currentTimeMillis()));
 
         String node = "";
         boolean protect = false;
 
-        if (xp.isRegistered() || plugin.isAuthURL()) {
+        if (xp.isRegistered() || xAuth.getPlugin().isAuthURL()) {
             if (playerManager.checkSession(xp)) {
                 xp.setStatus(Status.Authenticated);
-                plugin.getAuthClass(xp).online(p.getName());
+                xAuth.getPlugin().getAuthClass(xp).online(p.getName());
                 node = "join.resume";
             } else {
                 xp.setStatus(Status.Registered);
@@ -125,50 +134,73 @@ public class xAuthPlayerListener implements Listener {
         String playerName = event.getPlayer().getName();
         xAuthPlayer p = playerManager.getPlayer(playerName);
 
+        // @TODO update player object
+        // @TODO update logout time (to implement)
+
         if (p.isProtected())
             playerManager.unprotect(p);
 
-        plugin.getAuthClass(p).offline(playerName);
+        xAuth.getPlugin().getAuthClass(p).offline(playerName);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerChat(PlayerChatEvent event) {
-        xAuthPlayer p = playerManager.getPlayer(event.getPlayer());
+        if (this.handlePlayerChatEvent(event.getPlayer(),  event))
+            event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPlayerAsyncChat(AsyncPlayerChatEvent event) {
+        if (this.handlePlayerChatEvent(event.getPlayer(),  event))
+            event.setCancelled(true);
+    }
+
+    private boolean handlePlayerChatEvent(Player player, Event event) {
+        xAuthPlayer p = playerManager.getPlayer(player);
         if (playerManager.isRestricted(p, event)) {
             playerManager.sendNotice(p);
-            event.setCancelled(true);
+            return true;
         }
+        return false;
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+        String message = event.getMessage();
         xAuthPlayer p = playerManager.getPlayer(event.getPlayer().getName());
         if (playerManager.isRestricted(p, event)) {
             String command = event.getMessage().split(" ")[0].replaceFirst("/", "");
 
             // Idea was to auto-detect command aliases so they didn't have to be added to the allow list.
             // Currently doesn't work as it allows native Minecraft commands to slip through
-            /*PluginCommand pCommand = plugin.getServer().getPluginCommand(command);
+            /*PluginCommand pCommand = xAuth.getPlugin().getServer().getPluginCommand(command);
                if (pCommand == null)
                return;
 
-               if (!plugin.getConfig().getStringList("guest.allowed-commands").contains(pCommand.getName())) {
+               if (!xAuth.getPlugin().getConfig().getStringList("guest.allowed-commands").contains(pCommand.getName())) {
                    playerManager.sendNotice(p);
                    event.setMessage("/");
                    event.setCancelled(true);
                }*/
 
-            if (!plugin.getConfig().getStringList("guest.allowed-commands").contains(command)) {
+            if (!xAuth.getPlugin().getConfig().getStringList("guest.allowed-commands").contains(command)) {
                 playerManager.sendNotice(p);
                 event.setMessage("/");
                 event.setCancelled(true);
+            }
+        }
+
+        // filter out implemented xAuth commands in server.log due to a new MC-1.3.2 feature
+        for (String command: commandsFilterList) {
+            if (message.toLowerCase().startsWith(command, 1)) {
+                xAuthLog.filterMessage(event.getMessage());
             }
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerDropItem(final PlayerDropItemEvent event) {
-        if (!plugin.getConfig().getBoolean("guest.hide-inventory")) {
+        if (!xAuth.getPlugin().getConfig().getBoolean("guest.hide-inventory")) {
             xAuthPlayer p = playerManager.getPlayer(event.getPlayer());
             if (playerManager.isRestricted(p, event)) {
                 playerManager.sendNotice(p);
@@ -232,8 +264,8 @@ public class xAuthPlayerListener implements Listener {
         if (playerManager.isRestricted(p, event)) {
             World w = p.getPlayer().getWorld();
 
-            Location loc = plugin.getConfig().getBoolean("guest.protect-location") ?
-                    plugin.getLocationManager().getLocation(w) : p.getPlayerData().getLocation();
+            Location loc = xAuth.getPlugin().getConfig().getBoolean("guest.protect-location") ?
+                    xAuth.getPlugin().getLocationManager().getLocation(w) : p.getPlayerData().getLocation();
 
             Location testLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
             // @TODO check if this is causing playerdeath
@@ -260,7 +292,7 @@ public class xAuthPlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onInventoryClick(final InventoryClickEvent event) {
-        if (!plugin.getConfig().getBoolean("guest.hide-inventory")) {
+        if (!xAuth.getPlugin().getConfig().getBoolean("guest.hide-inventory")) {
             HumanEntity entity = event.getWhoClicked();
             if (entity instanceof Player) {
                 xAuthPlayer p = playerManager.getPlayer(((Player) entity).getName());
@@ -273,10 +305,10 @@ public class xAuthPlayerListener implements Listener {
     }
 
     private boolean isValidName(String pName) {
-        if (pName.length() < plugin.getConfig().getInt("filter.min-length"))
+        if (pName.length() < xAuth.getPlugin().getConfig().getInt("filter.min-length"))
             return false;
 
-        String allowed = plugin.getConfig().getString("filter.allowed");
+        String allowed = xAuth.getPlugin().getConfig().getString("filter.allowed");
         if (allowed.length() > 0) {
             for (int i = 0; i < pName.length(); i++) {
                 if (allowed.indexOf(pName.charAt(i)) == -1)
@@ -284,7 +316,7 @@ public class xAuthPlayerListener implements Listener {
             }
         }
 
-        String disallowed = plugin.getConfig().getString("filter.disallowed");
+        String disallowed = xAuth.getPlugin().getConfig().getString("filter.disallowed");
         if (disallowed.length() > 0) {
             for (int i = 0; i < pName.length(); i++) {
                 if (disallowed.indexOf(pName.charAt(i)) >= 0) {
@@ -293,11 +325,11 @@ public class xAuthPlayerListener implements Listener {
             }
         }
 
-        return !(plugin.getConfig().getBoolean("filter.blank-name") && Utils.isWhitespace(pName));
+        return !(xAuth.getPlugin().getConfig().getBoolean("filter.blank-name") && Utils.isWhitespace(pName));
     }
 
     private void scheduleDelayedProtect(final xAuthPlayer xp) {
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(xAuth.getPlugin(), new Runnable() {
             public void run() {
                 playerManager.protect(xp);
             }
@@ -305,10 +337,10 @@ public class xAuthPlayerListener implements Listener {
     }
 
     private void sendDelayedMessage(final Player player, final String node, int delay) {
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(xAuth.getPlugin(), new Runnable() {
             public void run() {
                 if (player.isOnline())
-                    plugin.getMessageHandler().sendMessage(node, player);
+                    xAuth.getPlugin().getMessageHandler().sendMessage(node, player);
             }
         }, delay);
     }
