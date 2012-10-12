@@ -73,6 +73,18 @@ public class xAuthPlayer {
         return this.isLocked;
     }
 
+    public void lockPlayer() {
+        this.setIsLocked(true);
+    }
+
+    public void activatePlayer() {
+        this.setIsLocked(false);
+    }
+
+    public void setIsLocked(boolean locked) {
+        this.isLocked = locked;
+    }
+
     public Status getStatus() {
         return status;
     }

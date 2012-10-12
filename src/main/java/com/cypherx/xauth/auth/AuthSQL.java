@@ -219,9 +219,6 @@ public class AuthSQL extends Auth {
     }
 
     private boolean isValidEmail(String email) {
-        if (!plugin.getConfig().getBoolean("registration.validate-email"))
-            return true;
-
-        return EmailValidatorFactory.EMAIL.isValid(email);
+        return !plugin.getConfig().getBoolean("registration.validate-email") || EmailValidatorFactory.EMAIL.isValid(email);
     }
 }

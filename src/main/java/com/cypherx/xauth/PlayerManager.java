@@ -30,12 +30,13 @@ import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.sql.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PlayerManager {
     private final xAuth plugin;
-    private final ConcurrentMap<String, xAuthPlayer> players = new ConcurrentHashMap<String, xAuthPlayer>();
+    private final Map<String, xAuthPlayer> players = new HashMap<String, xAuthPlayer>();
+    private Map<Integer, String> playerIds = new HashMap<Integer, String>();
 
     public PlayerManager(final xAuth plugin) {
         this.plugin = plugin;
@@ -70,6 +71,22 @@ public class PlayerManager {
         return player;
     }
 
+    private void addPlayerId(int id, String playerName) {
+        if (!hasAccountId(id))
+            playerIds.put(id, playerName);
+    }
+
+    public xAuthPlayer getPlayerById(int id) {
+        if (hasAccountId(id))
+            return getPlayer(playerIds.get(id));
+
+        return null;
+    }
+
+    public boolean hasAccountId(int id) {
+        return playerIds.containsKey(id);
+    }
+
     private xAuthPlayer loadPlayer(String playerName) {
         Connection conn = plugin.getDatabaseController().getConnection();
         PreparedStatement ps = null;
@@ -84,6 +101,8 @@ public class PlayerManager {
             if (!rs.next())
                 return null;
 
+            addPlayerId(rs.getInt("id"), playerName);
+
             return new xAuthPlayer(playerName, rs.getInt("id"), !rs.getBoolean("active"), Status.Registered);
         } catch (SQLException e) {
             xAuthLog.severe(String.format("Failed to load player: %s", playerName), e);
@@ -95,6 +114,7 @@ public class PlayerManager {
 
     public void reload() {
         players.clear();
+        playerIds.clear();
     }
 
     public void handleReload(Player[] players) {
@@ -294,26 +314,29 @@ public class PlayerManager {
     }
 
     public boolean activateAcc(int id) {
-        return setActive(id, 1);
+        return setActive(id, true);
     }
 
     public boolean lockAcc(int id) {
-        return setActive(id, 0);
+        return setActive(id, false);
     }
 
-    private boolean setActive(int id, int active) {
+    private boolean setActive(int id, boolean active) {
         Connection conn = plugin.getDatabaseController().getConnection();
         PreparedStatement ps = null;
 
         try {
             String sql = String.format("UPDATE `%s` SET `active` = %d WHERE `id` = ?",
-                    plugin.getDatabaseController().getTable(Table.ACCOUNT), active);
+                    plugin.getDatabaseController().getTable(Table.ACCOUNT), ((active) ? 1 : 0));
             ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
             ps.executeUpdate();
+
+            getPlayerById(id).setIsLocked(!active);
+
             return true;
         } catch (SQLException e) {
-            xAuthLog.severe("Failed to " + ((active > 0) ? "activate" : "lock") + " account: " + id, e);
+            xAuthLog.severe("Failed to " + ((active) ? "activate" : "lock") + " account: " + id, e);
             return false;
         } finally {
             plugin.getDatabaseController().close(conn, ps);
@@ -374,6 +397,9 @@ public class PlayerManager {
             // set lastId
             id = rs.next() ? rs.getInt(1) : -1;
 
+            // add the user to id/player keyring
+            playerIds.put(id, user);
+
             // activate user if registration.activation is set to false in config
             if ((id > 0) && (!plugin.getConfig().getBoolean("registration.activation"))) {
                 activateAcc(id);
@@ -420,6 +446,11 @@ public class PlayerManager {
         } finally {
             plugin.getDatabaseController().close(conn, ps);
         }
+    }
+
+    public void initAccount(int accountId) {
+        if (players.remove(playerIds.get(accountId)) != null)
+            playerIds.remove(accountId);
     }
 
     public boolean createSession(int accountId, String ipAddress) throws SQLException {

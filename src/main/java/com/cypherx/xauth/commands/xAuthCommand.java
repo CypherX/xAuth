@@ -191,6 +191,8 @@ public class xAuthCommand implements CommandExecutor {
                 xAuth.getPlugin().getPlayerManager().protect(xp);
                 xAuth.getPlugin().getMessageHandler().sendMessage("admin.unregister.success.target", target);
             }
+
+            xAuth.getPlugin().getPlayerManager().initAccount(xp.getAccountId());
         } else
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.unregister.error.general", sender);
 

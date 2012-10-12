@@ -1,5 +1,5 @@
 name: xAuth
-version: 2.0.21
+version: 2.0.22
 description: Offline-mode Authentication
 author: [CypherX, lycano]
 website: https://github.com/lycano/xAuth
@@ -29,19 +29,19 @@ commands:
     description: Access all xAuth admin commands.
     aliases: [x]
     usage: |
-           /<command> register <player> <password> [email]
-           /<command> changepw <player> <new password>
-           /<command> logout <player>
-           /<command> unregister <player>
-           /<command> location set|remove [global]
-           /<command> reload
-           /<command> activate <player>
-           /<command> lock <player>           
-           /<command> get <player> status
-           /<command> profile <player>
-           /<command> config <node> <value>
-           /<command> debug [INFO,FINE,FINER,FINEST]
-           /<command> version
+           /<command> register <player> <password> [email] - register a player with password and optional email
+           /<command> changepw <player> <new password> - change the player's password
+           /<command> logout <player> - logout a player
+           /<command> unregister <player> - unregister a player
+           /<command> location set|remove [global] - set/remove a location, optionally global
+           /<command> reload - reload xauth
+           /<command> activate <player> - activate a player's account
+           /<command> lock <player> - lock a player's account
+           /<command> profile <player> - show the info page for a player
+           /<command> info <player> - see profile <player>
+           /<command> config <node> <value> - set/get configuration nodes
+           /<command> debug [INFO,FINE,FINER,FINEST] - set the debug level of the xAuth-Logger
+           /<command> version - show the current version and if activated the latest available version
 
 permissions:
   xauth.register:
