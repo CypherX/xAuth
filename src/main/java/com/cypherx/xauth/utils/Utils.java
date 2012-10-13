@@ -22,7 +22,6 @@ package com.cypherx.xauth.utils;
 import org.bukkit.ChatColor;
 
 import java.io.*;
-import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,43 +41,12 @@ public class Utils {
             } finally {
                 try {
                     in.close();
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                 }
             }
             return writer.toString();
         } else
             return "";
-    }
-
-    public static void downloadFile(File file, String location) {
-        BufferedInputStream input = null;
-        FileOutputStream output = null;
-
-        try {
-            URL url = new URL(location);
-            input = new BufferedInputStream(url.openStream());
-            output = new FileOutputStream(file);
-
-            byte data[] = new byte[1024];
-            int count;
-
-            while ((count = input.read(data)) != -1)
-                output.write(data, 0, count);
-        } catch (IOException e) {
-            xAuthLog.severe("Failed to download file: " + file.getName(), e);
-        } finally {
-            try {
-                if (input != null)
-                    input.close();
-            } catch (IOException e) {
-            }
-
-            try {
-                if (output != null)
-                    output.close();
-            } catch (IOException e) {
-            }
-        }
     }
 
     public static boolean isIPAddress(String ipAddress) {

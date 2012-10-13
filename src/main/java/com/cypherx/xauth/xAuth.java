@@ -37,7 +37,6 @@ import com.cypherx.xauth.permissions.backends.GroupManagerSupport;
 import com.cypherx.xauth.permissions.backends.PermissionsExSupport;
 import com.cypherx.xauth.strike.StrikeManager;
 import com.cypherx.xauth.updater.Updater;
-import com.cypherx.xauth.utils.Utils;
 import com.cypherx.xauth.utils.xAuthLog;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
@@ -118,14 +117,13 @@ public class xAuth extends JavaPlugin {
         }
 
         File h2File = new File("lib", "h2-" + h2Version + ".jar");
-        if (!h2File.exists() && getConfig().getBoolean("main.download-library") && !getConfig().getBoolean("mysql.enabled")) {
-            xAuthLog.info("-------------------------------");
-            xAuthLog.info("Downloading required H2 library..");
-            downloadLib(h2File);
-            xAuthLog.info("Download complete.");
-            xAuthLog.info("");
-            xAuthLog.info("Reload the server to enable xAuth.");
-            xAuthLog.info("-------------------------------");
+        if ((!h2File.exists()) && (!getConfig().getBoolean("mysql.enabled"))) {
+            xAuthLog.severe("-------------------------------");
+            xAuthLog.severe("H2 library missing!");
+            xAuthLog.severe("");
+            xAuthLog.severe("Please follow the instructions at my dev.bukkit project page");
+            xAuthLog.severe("http://dev.bukkit.org/server-mods/xAuth/pages/required-dependencies/");
+            xAuthLog.severe("-------------------------------");
 
             getServer().getPluginManager().disablePlugin(this);
             return;
@@ -233,14 +231,6 @@ public class xAuth extends JavaPlugin {
                 xAuthLog.fine("Permission backend '" + providerAlias + "' was not found as plugin or not enabled!");
             }
         }
-    }
-
-    private void downloadLib(File h2File) {
-        File dir = new File("lib");
-        if (!dir.exists())
-            dir.mkdir();
-
-        Utils.downloadFile(h2File, this.libURLPath + h2File.getName());
     }
 
     public File getJar() {

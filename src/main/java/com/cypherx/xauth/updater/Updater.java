@@ -50,7 +50,7 @@ public class Updater {
             try {
                 if (reader != null)
                     reader.close();
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
         }
     }
@@ -95,7 +95,7 @@ public class Updater {
         xAuthLog.warning("");
         xAuthLog.warning(String.format("Priority: %s", getPriority().toString()));
         xAuthLog.warning("Details: http://github.com/lycano/xAuth/");
-        xAuthLog.warning("Download: http://ci.luricos.de/public/xAuth/");
+        xAuthLog.warning("Download: http://dev.bukkit.org/server-mods/xAuth/");
         xAuthLog.warning("-------------------------------");
     }
 }
