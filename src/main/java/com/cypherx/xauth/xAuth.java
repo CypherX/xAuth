@@ -110,11 +110,8 @@ public class xAuth extends JavaPlugin {
             return;
         }
 
-        if (getConfig().getBoolean("main.check-for-updates")) {
-            Updater updater = new Updater(getDescription().getVersion());
-            if (updater.isUpdateAvailable())
-                updater.printMessage();
-        }
+        // check for update or not, depending on configuration node "main.check-for-updates"
+        this.checkUpdate();
 
         File h2File = new File("lib", "h2-" + h2Version + ".jar");
         if ((!h2File.exists()) && (!getConfig().getBoolean("mysql.enabled"))) {
@@ -280,7 +277,16 @@ public class xAuth extends JavaPlugin {
         this.reloadConfig();
         loadConfiguration();
 
+        this.checkUpdate();
         playerManager.reload();
+    }
+
+    public void checkUpdate() {
+        if (getConfig().getBoolean("main.check-for-updates")) {
+            Updater updater = new Updater(getDescription().getVersion());
+            if (updater.isUpdateAvailable())
+                updater.printMessage();
+        }
     }
 
     /**

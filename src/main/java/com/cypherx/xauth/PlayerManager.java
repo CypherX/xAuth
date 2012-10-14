@@ -136,6 +136,16 @@ public class PlayerManager {
     public void reload() {
         players.clear();
         playerIds.clear();
+
+        Player[] players = Bukkit.getServer().getOnlinePlayers();
+        if (players.length > 0)
+            this.handleReload(players);
+    }
+
+    public void releasePlayer(String playerName) {
+        xAuthPlayer xp = getPlayer(playerName);
+        playerIds.remove(xp.getAccountId());
+        players.remove(playerName);
     }
 
     public void handleReload(Player[] players) {

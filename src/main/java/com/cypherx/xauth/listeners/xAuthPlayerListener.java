@@ -141,6 +141,7 @@ public class xAuthPlayerListener implements Listener {
             playerManager.unprotect(p);
 
         xAuth.getPlugin().getAuthClass(p).offline(playerName);
+        xAuth.getPlugin().getPlayerManager().releasePlayer(playerName);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
