@@ -96,4 +96,19 @@ public class Utils {
 
         return s;
     }
+
+    public static String join(Object[] collection) {
+        return join(collection, ",");
+    }
+
+    public static String join(Object[] collection, String with) {
+        StringBuilder sb = new StringBuilder("");
+        String delim = "";
+        for (Object el: collection) {
+            sb.append(delim).append(el.toString());
+            delim = with;
+        }
+
+        return sb.toString();
+    }
 }

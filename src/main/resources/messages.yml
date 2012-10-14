@@ -113,10 +113,14 @@ admin:
     activate:
         usage: '{RED}Correct Usage: /xauth activate <player>'
         error:
-            registered: '{RED}This player is not registered!'
-            active: '{RED}This player is already active!'
-            general: '{RED}Something went wrong while activating this player!'
-        success: '{BRIGHTGREEN}{TARGET} has been activated!'
+            registered: '{RED}The player {TARGET} is not registered!'
+            registeredM: '{RED}{TARGET} aren''t registered!'
+            active: '{RED}The account for {TARGET} is already active!'
+            activeM: '{RED}The accounts for {TARGET} are already active!'
+            general: '{RED}Something went wrong while activating the account {TARGET}!'
+            generalM: '{RED}Something went wrong while activating the accounts!'            
+        success: '{BRIGHTGREEN}The account for {TARGET} has been activated!'
+        successM: '{BRIGHTGREEN}{TARGET} accounts have been activated!'
     profile:
         usage: '{RED}Correct Usage: /xauth profile [player]'
         error:
@@ -127,10 +131,21 @@ admin:
     lock:
         usage: '{RED}Correct Usage: /xauth lock <player>'
         error:
-            registered: '{RED}This player is not registered!'
-            locked: '{RED}This player is already locked!'
-            general: '{RED}Something went wrong while locking this player!'
-        success: '{BRIGHTGREEN}{TARGET} has been locked!'
+            registered: '{RED}The player {TARGET} is not registered!'
+            registeredM: '{RED}The players {TARGET} aren''t registered!'
+            locked: '{RED}The account for {TARGET} is already locked!'
+            lockedM: '{RED}The accounts for {TARGET} are already locked!'
+            general: '{RED}Something went wrong while locking the account {TARGET}!'
+            generalM: '{RED}Something went wrong while locking the accounts!'            
+        success: '{BRIGHTGREEN}The account for {TARGET} has been locked!'
+        successM: '{BRIGHTGREEN}{TARGET} accounts have been locked!'
+    count:
+        usage: '{RED}Correct Usage: /xauth count <all|active|locked>'
+        error:
+            general: '{RED}Something went wrong while counting the accounts!'
+        successAll: '{BRIGHTGREEN}{TARGET} accounts are currently registered'
+        successA: '{BRIGHTGREEN}{TARGET} accounts are currently active'
+        successL: '{BRIGHTGREEN}{TARGET} accounts are currently locked'
     config:
         usage: '{RED}Correct Usage: /xauth config <node> <value>'
         error:

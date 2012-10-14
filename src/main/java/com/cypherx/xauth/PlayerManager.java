@@ -21,6 +21,7 @@ package com.cypherx.xauth;
 
 import com.cypherx.xauth.database.Table;
 import com.cypherx.xauth.exceptions.xAuthPlayerUnprotectException;
+import com.cypherx.xauth.utils.Utils;
 import com.cypherx.xauth.utils.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer.Status;
 import org.bukkit.Bukkit;
@@ -30,7 +31,9 @@ import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PlayerManager {
@@ -81,6 +84,24 @@ public class PlayerManager {
             return getPlayer(playerIds.get(id));
 
         return null;
+    }
+
+    public List<xAuthPlayer> getPlayers(List<String> playerNames) {
+        List<xAuthPlayer> xPlayers = new ArrayList<xAuthPlayer>();
+        for (String playerName: playerNames) {
+            xPlayers.add(getPlayer(playerName));
+        }
+
+        return xPlayers;
+    }
+
+    public List<xAuthPlayer> getPlayersByIds(List<Integer> accountIds) {
+        List<xAuthPlayer> xPlayers = new ArrayList<xAuthPlayer>();
+        for (int accountId: accountIds) {
+            xPlayers.add(getPlayerById(accountId));
+        }
+
+        return xPlayers;
     }
 
     public boolean hasAccountId(int id) {
@@ -314,14 +335,14 @@ public class PlayerManager {
     }
 
     public boolean activateAcc(int id) {
-        return setActive(id, true);
+        return setActiveState(id, true);
     }
 
     public boolean lockAcc(int id) {
-        return setActive(id, false);
+        return setActiveState(id, false);
     }
 
-    private boolean setActive(int id, boolean active) {
+    private boolean setActiveState(int id, boolean active) {
         Connection conn = plugin.getDatabaseController().getConnection();
         PreparedStatement ps = null;
 
@@ -338,6 +359,75 @@ public class PlayerManager {
         } catch (SQLException e) {
             xAuthLog.severe("Failed to " + ((active) ? "activate" : "lock") + " account: " + id, e);
             return false;
+        } finally {
+            plugin.getDatabaseController().close(conn, ps);
+        }
+    }
+
+    public boolean activateAll() {
+        return setAllActiveStates(true, null);
+    }
+
+    public boolean lockAll() {
+        return setAllActiveStates(false, null);
+    }
+
+    public boolean setAllActiveStates(boolean state, Integer[] excludeIds) {
+        Connection conn = plugin.getDatabaseController().getConnection();
+        PreparedStatement ps = null;
+
+        try {
+            String query = "UPDATE `%s` SET `active` = %d";
+            if ((excludeIds != null) && (excludeIds.length > 0))
+                query = "UPDATE `%s` SET `active` = %d WHERE `id` NOT IN (" + Utils.join(excludeIds) + ")";
+
+            String sql = String.format(query, plugin.getDatabaseController().getTable(Table.ACCOUNT), ((state) ? 1 : 0));
+            ps = conn.prepareStatement(sql);
+            ps.executeUpdate();
+
+            // clear cache
+            reload();
+
+            return true;
+        } catch (SQLException e) {
+            xAuthLog.severe("Failed to " + ((state) ? "activate" : "lock") + " accounts", e);
+            return false;
+        } finally {
+            plugin.getDatabaseController().close(conn, ps);
+        }
+    }
+
+    public Integer countAll() {
+        return getActiveStatesCount(false, true);
+    }
+
+    public Integer countActive() {
+        return getActiveStatesCount(true, false);
+    }
+
+    public Integer countLocked() {
+        return getActiveStatesCount(false, false);
+    }
+
+    private Integer getActiveStatesCount(boolean state, boolean bypassState) {
+        Connection conn = plugin.getDatabaseController().getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT COUNT(*) AS `state` FROM `%s` WHERE `active` = %d";
+            if (bypassState)
+                query = "SELECT COUNT(*) AS `state` FROM `%s`";
+
+            String sql = String.format(query, plugin.getDatabaseController().getTable(Table.ACCOUNT), ((state) ? 1 : 0));
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            rs.next();
+
+            return rs.getInt("state");
+        } catch (SQLException e) {
+            xAuthLog.severe("Failed to check " + ((state) ? "active" : "lock") + " state", e);
+            return null;
         } finally {
             plugin.getDatabaseController().close(conn, ps);
         }

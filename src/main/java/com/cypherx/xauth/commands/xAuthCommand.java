@@ -31,6 +31,8 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 public class xAuthCommand implements CommandExecutor {
@@ -57,10 +59,12 @@ public class xAuthCommand implements CommandExecutor {
                 return locationCommand(sender, args);
             else if (subCommand.equals("reload"))
                 return reloadCommand(sender, args);
-            else if (subCommand.equals("activate"))
+            else if ((subCommand.equals("activate")) || (subCommand.equals("unlock")))
                 return activateCommand(sender, args);
             else if (subCommand.equals("lock"))
                 return lockCommand(sender, args);
+            else if (subCommand.equals("count"))
+                return countCommand(sender, args);
             else if (subCommand.equals("config") || subCommand.equals("conf"))
                 return configCommand(sender, args);
             else if (subCommand.equals("profile") || subCommand.equals("info"))
@@ -268,6 +272,10 @@ public class xAuthCommand implements CommandExecutor {
     }
 
     private boolean activateCommand(CommandSender sender, String[] args) {
+        return activateCommand(sender, args, false);
+    }
+
+    private boolean activateCommand(CommandSender sender, String[] args, boolean force) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.activate")) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
@@ -277,13 +285,21 @@ public class xAuthCommand implements CommandExecutor {
         }
 
         String targetName = args[1];
+        force = ((args.length > 2) && (args[2].equals("force")));
         xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(targetName);
+        if (targetName.equals("*")) {
+            Integer countState = xAuth.getPlugin().getPlayerManager().countLocked();
+            boolean success = xAuth.getPlugin().getPlayerManager().setAllActiveStates(true, null);
+
+            xAuth.getPlugin().getMessageHandler().sendMessage(success ? "admin.activate.successM" : "admin.activate.error.generalM", sender, countState.toString());
+            return true;
+        }
 
         if (!xp.isRegistered()) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.activate.error.registered", sender);
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.activate.error.registered", sender, targetName);
             return true;
-        } else if (xAuth.getPlugin().getPlayerManager().isActive(xp.getAccountId())) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.activate.error.active", sender);
+        } else if ((!force) && (xAuth.getPlugin().getPlayerManager().isActive(xp.getAccountId()))) {
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.activate.error.active", sender, targetName);
             return true;
         }
 
@@ -294,6 +310,10 @@ public class xAuthCommand implements CommandExecutor {
     }
 
     private boolean lockCommand(CommandSender sender, String[] args) {
+        return lockCommand(sender, args, false);
+    }
+
+    private boolean lockCommand(CommandSender sender, String[] args, boolean force) {
         if (!xAuth.getPermissionManager().has(sender, "xauth.admin.lock")) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
@@ -303,18 +323,70 @@ public class xAuthCommand implements CommandExecutor {
         }
 
         String targetName = args[1];
+        force = ((args.length > 2) && (args[2].equals("force")));
         xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(targetName);
+        if (targetName.equals("*")) {
+            Integer countState = xAuth.getPlugin().getPlayerManager().countActive();
+            if (sender instanceof Player) {
+                xp = xAuth.getPlugin().getPlayerManager().getPlayer(sender.getName());
+                if (countState > 0)
+                    countState--;
+            }
+
+            boolean success = xAuth.getPlugin().getPlayerManager().setAllActiveStates(false, new Integer[]{xp.getAccountId()});
+
+            xAuth.getPlugin().getMessageHandler().sendMessage(success ? "admin.lock.successM" : "admin.lock.error.generalM", sender, countState.toString());
+            return true;
+        }
 
         if (!xp.isRegistered()) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.lock.error.registered", sender);
             return true;
-        } else if (!xAuth.getPlugin().getPlayerManager().isActive(xp.getAccountId())) {
+        } else if ((!force) && (!xAuth.getPlugin().getPlayerManager().isActive(xp.getAccountId()))) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.lock.error.locked", sender);
             return true;
         }
 
         boolean success = xAuth.getPlugin().getPlayerManager().lockAcc(xp.getAccountId());
         xAuth.getPlugin().getMessageHandler().sendMessage(success ? "admin.lock.success" : "admin.lock.error.general", sender, targetName);
+
+        return true;
+    }
+
+    private boolean countCommand(CommandSender sender, String[] args) {
+        if (!xAuth.getPermissionManager().has(sender, "xauth.admin.count")) {
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+            return true;
+        } else if (args.length < 2) {
+            xAuth.getPlugin().getMessageHandler().sendMessage("admin.count.usage", sender);
+            return true;
+        }
+
+        Integer count = 0;
+        Integer mode = -1;
+        String modeName = args[1];
+        List<Integer> modesIds = Arrays.asList(0, 1, 2);
+        List<String> modeNames = Arrays.asList("all", "active", "locked");
+        if (modeNames.contains(modeName))
+            mode = modesIds.get(modeNames.indexOf(modeName));
+
+        switch(mode) {
+            case 0:
+                count = xAuth.getPlugin().getPlayerManager().countAll();
+                xAuth.getPlugin().getMessageHandler().sendMessage("admin.count.successAll", sender, count.toString());
+                break;
+            case 1:
+                count = xAuth.getPlugin().getPlayerManager().countActive();
+                xAuth.getPlugin().getMessageHandler().sendMessage("admin.count.successA", sender, count.toString());
+                break;
+            case 2:
+                count = xAuth.getPlugin().getPlayerManager().countLocked();
+                xAuth.getPlugin().getMessageHandler().sendMessage("admin.count.successL", sender, count.toString());
+                break;
+            default:
+                xAuth.getPlugin().getMessageHandler().sendMessage("admin.count.usage", sender);
+                break;
+        }
 
         return true;
     }

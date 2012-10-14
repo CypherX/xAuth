@@ -1,5 +1,5 @@
 name: xAuth
-version: 2.0.23
+version: 2.0.24
 description: Offline-mode Authentication
 author: [CypherX, lycano]
 website: https://github.com/lycano/xAuth
@@ -37,6 +37,7 @@ commands:
            /<command> reload - reload xauth
            /<command> activate <player> - activate a player's account
            /<command> lock <player> - lock a player's account
+           /<command> count <all|active|locked> - Display the number of accounts for each state
            /<command> profile <player> - show the info page for a player
            /<command> info <player> - see profile <player>
            /<command> config <node> <value> - set/get configuration nodes
@@ -58,6 +59,7 @@ permissions:
         xauth.admin.location: true
         xauth.admin.reload: true
         xauth.admin.activate: true
+        xauth.admin.count: true
         xauth.admin.lock: true
         xauth.admin.config: true
         xauth.admin.profile: true
@@ -84,6 +86,9 @@ permissions:
     default: op
   xauth.admin.activate:
     description: Allows you to activate a player's account.
+    default: op
+  xauth.admin.count:
+    description: Allows you to count the account states.
     default: op
   xauth.admin.lock:
     description: Allows you to lock a player's account.
