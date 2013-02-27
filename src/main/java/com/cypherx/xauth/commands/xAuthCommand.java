@@ -25,7 +25,7 @@ import com.cypherx.xauth.utils.xAuthLog;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthPlayer.Status;
-import com.martiansoftware.jsap.CommandLineTokenizer;
+import com.cypherx.xauth.utils.CommandLineTokenizer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -486,12 +486,15 @@ public class xAuthCommand implements CommandExecutor {
             if ((xp.isOnline()) && xp.isAuthenticated()) {
                 sb.append(ChatColor.WHITE + "DisplayName : ").append(((xp.isAuthenticated()) ? xp.getPlayer().getDisplayName() : xp.getPlayerName())).append("\n");
             }
+            sb.append(ChatColor.WHITE + "Locked : ").append(((xp.isLocked()) ? "{true}" : "{false}")).append("\n");
             sb.append(ChatColor.WHITE + "Authenticated : ").append(((xp.isAuthenticated()) ? "{true}" : "{false}")).append("\n");
 
+            if (xp.isOnline())
+                sb.append(ChatColor.WHITE + "GameMode : ").append(xp.getGameMode()).append("\n");
+
             if (xp.getLoginTime() != null) {
-                sb.append(ChatColor.WHITE + "Last login: ").append(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(xp.getLoginTime())).append("\n");
+                sb.append(ChatColor.WHITE + "Last login: ").append(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(xp.getLoginTime()));
             }
-            sb.append(ChatColor.WHITE + "Locked : ").append(((xp.isLocked()) ? "{true}" : "{false}"));
         }
 
         message = sb.toString()

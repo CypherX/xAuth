@@ -22,7 +22,7 @@ package com.cypherx.xauth.commands;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthPlayer;
 import com.cypherx.xauth.xAuthPlayer.Status;
-import com.martiansoftware.jsap.CommandLineTokenizer;
+import com.cypherx.xauth.utils.CommandLineTokenizer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -37,6 +37,11 @@ public class LogoutCommand implements CommandExecutor {
         args = CommandLineTokenizer.tokenize(args);
 
         if (sender instanceof Player) {
+            if (!xAuth.getPermissionManager().has(sender, "xauth.logout")) {
+                xAuth.getPlugin().getMessageHandler().sendMessage("logout.permission", sender);
+                return true;
+            }
+
             xAuthPlayer p = xAuth.getPlugin().getPlayerManager().getPlayer((Player) sender);
             String response = null;
 

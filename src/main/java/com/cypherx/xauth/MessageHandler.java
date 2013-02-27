@@ -19,7 +19,7 @@
  */
 package com.cypherx.xauth;
 
-import com.cypherx.xauth.utils.Utils;
+import com.cypherx.xauth.utils.xAuthUtils;
 import com.cypherx.xauth.utils.xAuthLog;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -110,7 +110,7 @@ public class MessageHandler {
         message = message.replace("{NEWLINE}", "\n");
 
         // replace colors
-        message = Utils.replaceColors(message);
+        message = xAuthUtils.replaceColors(message);
 
         return message;
     }

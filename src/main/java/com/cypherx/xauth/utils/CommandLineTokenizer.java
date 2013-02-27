@@ -8,7 +8,7 @@
  * Slightly modified by CypherX to clean up warnings.
  */
 
-package com.martiansoftware.jsap;
+package com.cypherx.xauth.utils;
 
 import java.util.ArrayList;
 import java.util.List;

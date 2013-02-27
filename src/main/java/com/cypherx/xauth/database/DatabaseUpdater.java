@@ -19,7 +19,7 @@
  */
 package com.cypherx.xauth.database;
 
-import com.cypherx.xauth.utils.Utils;
+import com.cypherx.xauth.utils.xAuthUtils;
 import com.cypherx.xauth.exceptions.TableUpdateException;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.utils.xAuthLog;
@@ -182,7 +182,7 @@ public class DatabaseUpdater {
     }
 
     private String loadSQL(String path, String tblName) {
-        String sql = Utils.streamToString(plugin.getResource(path));
+        String sql = xAuthUtils.streamToString(plugin.getResource(path));
         sql = sql.replace("{TABLE}", tblName);
         sql = sql.replace("{TABLE_ACCOUNT}",
 

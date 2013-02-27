@@ -1,6 +1,6 @@
 name: xAuth
-version: 2.0.26
-description: Offline-mode Authentication
+version: 2.0.31
+description: Advanced Authentication Plugin
 author: [CypherX, lycano]
 website: https://github.com/lycano/xAuth
 main: com.cypherx.xauth.xAuth
@@ -48,6 +48,15 @@ permissions:
   xauth.register:
     description: Allows players/groups to register when new registrations are disabled.
     default: false
+  xauth.login:
+    description: Allows players to login with their registered password.
+    default: true
+  xauth.logout:
+    description: Allows players to use the logout command.
+    default: false
+  xauth.changepassword:
+    description: Allows players to change their own password.
+    default: true
   xauth.admin.*:
     description: Grants access to all xAuth admin commands
     children:

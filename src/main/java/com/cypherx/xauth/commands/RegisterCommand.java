@@ -23,7 +23,7 @@ import com.cypherx.xauth.auth.Auth;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.utils.xAuthLog;
 import com.cypherx.xauth.xAuthPlayer;
-import com.martiansoftware.jsap.CommandLineTokenizer;
+import com.cypherx.xauth.utils.CommandLineTokenizer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,6 +38,11 @@ public class RegisterCommand implements CommandExecutor {
         args = CommandLineTokenizer.tokenize(args);
 
         if (sender instanceof Player) {
+            if (!xAuth.getPermissionManager().has(sender, "xauth.register")) {
+                xAuth.getPlugin().getMessageHandler().sendMessage("register.permission", sender);
+                return true;
+            }
+
             xAuthPlayer p = xAuth.getPlugin().getPlayerManager().getPlayer((Player) sender);
 
             if ((xAuth.getPlugin().getConfig().getBoolean("registration.require-email") && args.length < 2) || args.length < 1) {

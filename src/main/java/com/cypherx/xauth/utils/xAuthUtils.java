@@ -25,7 +25,7 @@ import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Utils {
+public class xAuthUtils {
     public static String streamToString(InputStream in) {
         if (in != null) {
             Writer writer = new StringWriter();

@@ -21,11 +21,10 @@ package com.cypherx.xauth;
 
 import com.cypherx.xauth.database.Table;
 import com.cypherx.xauth.exceptions.xAuthPlayerUnprotectException;
-import com.cypherx.xauth.utils.Utils;
 import com.cypherx.xauth.utils.xAuthLog;
+import com.cypherx.xauth.utils.xAuthUtils;
 import com.cypherx.xauth.xAuthPlayer.Status;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -159,6 +158,7 @@ public class PlayerManager {
                     plugin.getAuthClass(xp).offline(p.getName());
                 } else {
                     xp.setStatus(Status.Authenticated);
+                    xp.setGameMode(p.getGameMode());
                     plugin.getAuthClass(xp).online(p.getName());
                 }
             } else if (mustRegister(p)) {
@@ -229,9 +229,9 @@ public class PlayerManager {
 
         plugin.getPlayerDataHandler().storeData(xp, p);
 
-        xp.setCreative(p.getGameMode().equals(GameMode.CREATIVE));
-        if (xp.isCreativeMode())
-            p.setGameMode(GameMode.SURVIVAL);
+        // set GameMode for xAuthPlayer when protecting player to whatever it is currently if its unequal to the xAuthPlayer GameMode
+        if (!p.getGameMode().equals(xp.getGameMode()))
+            xp.setGameMode(p.getGameMode());
 
         xp.setLastNotifyTime(new Timestamp(System.currentTimeMillis()));
 
@@ -265,8 +265,9 @@ public class PlayerManager {
 
         plugin.getPlayerDataHandler().restoreData(xp, p.getName());
 
-        if (xp.isCreativeMode())
-            p.setGameMode(GameMode.CREATIVE);
+        // only set player GameMode when the xAuthPlayer has another state.
+        if (!xp.getGameMode().equals(p.getGameMode()))
+            p.setGameMode(xp.getGameMode());
 
         // guest protection cancel task. See @PlayerManager.protect(xAuthPlayer p)
         int timeoutTaskId = xp.getTimeoutTaskId();
@@ -389,7 +390,7 @@ public class PlayerManager {
         try {
             String query = "UPDATE `%s` SET `active` = %d";
             if ((excludeIds != null) && (excludeIds.length > 0))
-                query = "UPDATE `%s` SET `active` = %d WHERE `id` NOT IN (" + Utils.join(excludeIds) + ")";
+                query = "UPDATE `%s` SET `active` = %d WHERE `id` NOT IN (" + xAuthUtils.join(excludeIds) + ")";
 
             String sql = String.format(query, plugin.getDatabaseController().getTable(Table.ACCOUNT), ((state) ? 1 : 0));
             ps = conn.prepareStatement(sql);

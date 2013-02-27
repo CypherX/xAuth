@@ -20,6 +20,7 @@
 package com.cypherx.xauth;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -32,6 +33,7 @@ public class xAuthPlayer {
     private PlayerData playerData;
     private Timestamp lastNotifyTime;
     private Timestamp loginTime;
+    private GameMode gameMode;
     private boolean creativeMode;
     private int timeoutTaskId = -1;
     private boolean isProtected = false;
@@ -58,7 +60,7 @@ public class xAuthPlayer {
     }
 
     public Player getPlayer() {
-        return Bukkit.getServer().getPlayerExact(playerName);
+        return Bukkit.getPlayerExact(playerName);
     }
 
     public int getAccountId() {
@@ -118,11 +120,19 @@ public class xAuthPlayer {
     }
 
     public boolean isCreativeMode() {
-        return creativeMode;
+        return (this.gameMode.equals(GameMode.CREATIVE));
     }
 
-    public void setCreative(boolean creativeMode) {
-        this.creativeMode = creativeMode;
+    public boolean isAdventureMode() {
+        return (this.gameMode.equals(GameMode.ADVENTURE));
+    }
+
+    public boolean isSurvivalMode() {
+        return (this.gameMode.equals(GameMode.SURVIVAL));
+    }
+
+    public void setGameMode(GameMode newGameMode) {
+        this.gameMode = newGameMode;
     }
 
     public int getTimeoutTaskId() {
@@ -154,7 +164,7 @@ public class xAuthPlayer {
     }
 
     public boolean isOnline() {
-        Player player = Bukkit.getPlayerExact(playerName);
+        Player player = this.getPlayer();
         return ((player != null) && (player.isOnline()));
     }
 
@@ -186,5 +196,9 @@ public class xAuthPlayer {
         Guest, // not registered
         Registered, // registered but not logged in
         Authenticated // logged in
+    }
+
+    public GameMode getGameMode() {
+        return this.gameMode;
     }
 }

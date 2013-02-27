@@ -9,6 +9,7 @@ join:
 
 register:
     usage: '{RED}Correct Usage: /register <password> [email]'
+    permission: 'You do not have permission to use the register command!'
     success: '{BRIGHTGREEN}You have successfully registered!{NEWLINE}{BRIGHTGREEN}You may now log in using /login <password>'
     error:
         disabled: '{RED}Registrations are currently disabled!'
@@ -20,6 +21,7 @@ register:
 
 login:
     usage: '{RED}Correct Usage: /login <password>'
+    permission: 'You do not have permission to use the login command!'
     success: '{BRIGHTGREEN}You are now logged in!'
     error:
         registered: '{RED}You are not registered!'
@@ -29,12 +31,14 @@ login:
         general: '{RED}Something went wrong while logging you in!'
 
 logout:
+    permission: 'You do not have permission to use the logout command!'
     success: '{BRIGHTGREEN}You have been logged out!'
     error:
         logged: '{RED}You are not logged in!'
         general: '{RED}Something went wrong while logging you out!'
 
 quit:
+    permission: 'You do not have permission to use the quit command!'
     success: '{BRIGHTGREEN}Client closed connection.'
     error:
         logged: '{RED}You are not logged in!'
@@ -42,6 +46,7 @@ quit:
 
 changepw:
     usage: '{RED}Correct Usage: /changepw <old password> <new password>'
+    permission: 'You do not have permission to use the changepassword command!'
     success: '{BRIGHTGREEN}Password changed!'
     error:
         disabled: '{RED}Password changes are currently disabled.'

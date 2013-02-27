@@ -20,7 +20,7 @@
 package com.cypherx.xauth.listeners;
 
 import com.cypherx.xauth.PlayerManager;
-import com.cypherx.xauth.utils.Utils;
+import com.cypherx.xauth.utils.xAuthUtils;
 import com.cypherx.xauth.utils.xAuthLog;
 import com.cypherx.xauth.xAuth;
 import com.cypherx.xauth.xAuthPlayer;
@@ -82,7 +82,7 @@ public class xAuthPlayerListener implements Listener {
         }
 
         String ipAddress = event.getAddress().getHostAddress();
-        if (Utils.isIPAddress(ipAddress))
+        if (xAuthUtils.isIPAddress(ipAddress))
             if (xAuth.getPlugin().getStrikeManager().isLockedOut(ipAddress, p.getName()))
                 event.disallow(Result.KICK_OTHER, xAuth.getPlugin().getMessageHandler().getNode("join.error.lockout"));
 
@@ -98,6 +98,7 @@ public class xAuthPlayerListener implements Listener {
 
         xAuthPlayer xp = playerManager.getPlayer(p, xAuth.getPlugin().getConfig().getBoolean("main.reload-on-join"));
         xp.setConnectTime(new Timestamp(System.currentTimeMillis()));
+        xp.setGameMode(p.getGameMode());
 
         String node = "";
         boolean protect = false;
@@ -326,7 +327,7 @@ public class xAuthPlayerListener implements Listener {
             }
         }
 
-        return !(xAuth.getPlugin().getConfig().getBoolean("filter.blank-name") && Utils.isWhitespace(pName));
+        return !(xAuth.getPlugin().getConfig().getBoolean("filter.blank-name") && xAuthUtils.isWhitespace(pName));
     }
 
     private void scheduleDelayedProtect(final xAuthPlayer xp) {

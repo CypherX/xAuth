@@ -65,38 +65,38 @@ public class xAuthLog {
     }
 
     public static void info(String msg) {
-        logger.log(Level.INFO, "[" + getLoggerName() + "] " + Utils.replaceColors(msg));
+        logger.log(Level.INFO, "[" + getLoggerName() + "] " + xAuthUtils.replaceColors(msg));
     }
 
     public static void fine(String msg) {
-        logger.log(Level.FINE, "[" + getLoggerName() + "] " + Utils.replaceColors(msg));
+        logger.log(Level.FINE, "[" + getLoggerName() + "] " + xAuthUtils.replaceColors(msg));
     }
 
     public static void finer(String msg) {
-        logger.log(Level.FINER, "[" + getLoggerName() + "] " + Utils.replaceColors(msg));
+        logger.log(Level.FINER, "[" + getLoggerName() + "] " + xAuthUtils.replaceColors(msg));
     }
 
     public static void finest(String msg) {
-        logger.log(Level.FINEST, "[" + getLoggerName() + "] " + Utils.replaceColors(msg));
+        logger.log(Level.FINEST, "[" + getLoggerName() + "] " + xAuthUtils.replaceColors(msg));
     }
 
     public static void warning(String msg) {
-        logger.log(Level.WARNING, "[" + getLoggerName() + "] " + Utils.replaceColors(msg));
+        logger.log(Level.WARNING, "[" + getLoggerName() + "] " + xAuthUtils.replaceColors(msg));
     }
 
     public static void severe(String msg) {
-        logger.log(Level.SEVERE, "[" + getLoggerName() + "] " + Utils.replaceColors(msg));
+        logger.log(Level.SEVERE, "[" + getLoggerName() + "] " + xAuthUtils.replaceColors(msg));
     }
 
     public static void info(String msg, Throwable e) {
-        logger.log(Level.INFO, "[" + getLoggerName() + "] " + Utils.replaceColors(msg), e);
+        logger.log(Level.INFO, "[" + getLoggerName() + "] " + xAuthUtils.replaceColors(msg), e);
     }
 
     public static void warning(String msg, Throwable e) {
-        logger.log(Level.WARNING, "[" + getLoggerName() + "] " + Utils.replaceColors(msg), e);
+        logger.log(Level.WARNING, "[" + getLoggerName() + "] " + xAuthUtils.replaceColors(msg), e);
     }
 
     public static void severe(String msg, Throwable e) {
-        logger.log(Level.SEVERE, "[" + getLoggerName() + "] " + Utils.replaceColors(msg), e);
+        logger.log(Level.SEVERE, "[" + getLoggerName() + "] " + xAuthUtils.replaceColors(msg), e);
     }
 }
