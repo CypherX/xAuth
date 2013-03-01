@@ -1,5 +1,6 @@
 main:
-    auto-disable: true
+    auto-disable: false
+    check-premium: true
     check-for-updates: true
     reload-on-join: false
 mysql:
@@ -17,6 +18,8 @@ mysql:
         session: sessions
 permissions:
     backend: bukkit
+    use-material-names: true
+    debug: false
 authurl:
     enabled: false
     url: http://localhost
@@ -38,6 +41,8 @@ registration:
     activation: false
     require-login: true
 password:
+    default-type: 0
+    convert-password: false
     min-length: 6
     allow-change: true
     complexity:
@@ -50,16 +55,21 @@ guest:
     notify-cooldown: 5
     hide-inventory: true
     protect-location: true
-    allowed-commands:
-    - register
-    - login
-    - l
     restrict:
         player:
             chat: true
             interact: true
             move: true
             pickup: true
+            command:
+                register: false
+                login: false
+                l: false
+            damage: true
+            regain: true
+            level: true
+            splash: true
+            target: true
         block:
             place: true
             break: true
@@ -80,6 +90,7 @@ filter:
     allowed: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_
     disallowed: ''
     blank-name: true
+    commands: true
 groups:
-    guest: ''
-    authenticated: ''
+    move-on-register: 'Novice'
+    auto-assign: false

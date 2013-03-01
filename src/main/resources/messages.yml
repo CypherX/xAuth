@@ -2,6 +2,7 @@ join:
     register: '{RED}You are not registered.{NEWLINE}{RED}Please register using /register <password>.'
     login: '{RED}Please log in using /login <password>.'
     resume: '{BRIGHTGREEN}Welcome back, your login session has been resumed.'
+    non-premium: 'Non-premium user ''{TARGET}'' detected'
     error:
         lockout: 'You are temporarily locked out for exceeding the incorrect password threshold.'
         name: 'Your name contains one or more illegal characters.'
@@ -9,7 +10,7 @@ join:
 
 register:
     usage: '{RED}Correct Usage: /register <password> [email]'
-    permission: 'You do not have permission to use the register command!'
+    permission: '{RED}You do not have permission to use the register command!'
     success: '{BRIGHTGREEN}You have successfully registered!{NEWLINE}{BRIGHTGREEN}You may now log in using /login <password>'
     error:
         disabled: '{RED}Registrations are currently disabled!'
@@ -21,24 +22,24 @@ register:
 
 login:
     usage: '{RED}Correct Usage: /login <password>'
-    permission: 'You do not have permission to use the login command!'
+    permission: '{RED}You do not have permission to use the login command!'
     success: '{BRIGHTGREEN}You are now logged in!'
     error:
         registered: '{RED}You are not registered!'
         authenticated: '{RED}You are already logged in!'
         password: '{RED}Incorrect password!'
-        active: '{RED}Your account is not activated!'
+        active: '{RED}Your account is locked!'
         general: '{RED}Something went wrong while logging you in!'
 
 logout:
-    permission: 'You do not have permission to use the logout command!'
+    permission: '{RED}You do not have permission to use the logout command!'
     success: '{BRIGHTGREEN}You have been logged out!'
     error:
         logged: '{RED}You are not logged in!'
         general: '{RED}Something went wrong while logging you out!'
 
 quit:
-    permission: 'You do not have permission to use the quit command!'
+    permission: '{RED}You do not have permission to use the quit command!'
     success: '{BRIGHTGREEN}Client closed connection.'
     error:
         logged: '{RED}You are not logged in!'
@@ -46,7 +47,7 @@ quit:
 
 changepw:
     usage: '{RED}Correct Usage: /changepw <old password> <new password>'
-    permission: 'You do not have permission to use the changepassword command!'
+    permission: '{RED}You do not have permission to use the changepassword command!'
     success: '{BRIGHTGREEN}Password changed!'
     error:
         disabled: '{RED}Password changes are currently disabled.'
@@ -55,18 +56,26 @@ changepw:
         invalid: '{RED}Your new password does not meet complexity requirements!'
         general: '{RED}Something went wrong while changing your password!'
 
+resetpw:
+    usage: '{BRIGHTGREEN}Use /resetpw [set] to reset your password or set your secret message.'
+    reset-usage: '{BRIGHTGREEN}Use /changepw <new password> to reset your password.'
+    permission: '{RED}You do not have permission to use the resetpassword command!'
+
 authurl:
     registration: '{RED}AuthURL registration is disabled.'
     changepw: '{RED}AuthURL does not support password changes.'
+    resetpw: '{RED}AuthURL does not support password resets.'
 
 misc:
     illegal: '{GRAY}You must be logged in to do that!'
     timeout: 'You have taken too long to log in!'
     strikeout: 'You have entered too many invalid passwords!'
     reloaded: '{RED}Server reloaded, you must log in.'
+    active: '{RED}Your account is locked! Please contact an admin.'
+    access-denied: '{RED}The access to ''{TARGET}'' is restricted'
 
 admin:
-    permission: 'You do not have permission to use this command!'
+    permission: '{RED}You do not have permission to use this command!'
     debug: 'Debugging level set to %s'
     register:
         usage: '{RED}Correct Usage: /xauth register <player> <password> [email]'
@@ -75,10 +84,20 @@ admin:
             registered: '{RED}This player is already registered!'
             general: '{RED}Something went wrong while creating an account for {TARGET}'
     changepw:
-        usage: '{RED}Correct Usage: /xauth changepw <player> <new password>'
+        usage: '{RED}Correct Usage: /xauth changepw <player> <new password> [pwtype]'
         success: '{TARGET}''s {BRIGHTGREEN}password has been changed!'
         error:
             registered: '{RED}This player is not registered!'
+            general: '{RED}Something went wrong while changing {TARGET}''s password!'
+    resetpw:
+        usage: '{RED}Correct Usage: /xauth resetpw <player> [pwtype]'
+        success:
+            command: '{TARGET}''s {BRIGHTGREEN}password has been reset!'
+            player: '{BRIGHTGREEN}Your password has been changed!'
+            target: '{BRIGHTGREEN}Your Password has been reset by an Administrator!'
+        error:
+            registered: '{RED}This player is not registered!'
+            not-online: '{RED}This player is not online!'
             general: '{RED}Something went wrong while changing {TARGET}''s password!'
     logout:
         usage: '{RED}Correct Usage: /xauth logout <player>'
@@ -126,6 +145,13 @@ admin:
             generalM: '{RED}Something went wrong while activating the accounts!'            
         success: '{BRIGHTGREEN}The account for {TARGET} has been activated!'
         successM: '{BRIGHTGREEN}{TARGET} accounts have been activated!'
+    checkpaid:
+        usage '{RED}Correct Usage: /xauth checkpaid <players>'
+        error:
+            general: '{RED}The account for ''{TARGET}'' could not be validated as paid'
+        success:
+            account: '{BRIGHTGREEN}The account for ''{TARGET}'' has been validates as paid'
+            all: '{BRIGHTGREEN}You have {TARGET} premium users'
     profile:
         usage: '{RED}Correct Usage: /xauth profile [player]'
         error:
@@ -145,12 +171,15 @@ admin:
         success: '{BRIGHTGREEN}The account for {TARGET} has been locked!'
         successM: '{BRIGHTGREEN}{TARGET} accounts have been locked!'
     count:
-        usage: '{RED}Correct Usage: /xauth count <all|active|locked>'
+        usage: '{RED}Correct Usage: /xauth count <all|active|locked|premium|non-premium>'
         error:
             general: '{RED}Something went wrong while counting the accounts!'
-        successAll: '{BRIGHTGREEN}{TARGET} accounts are currently registered'
-        successA: '{BRIGHTGREEN}{TARGET} accounts are currently active'
-        successL: '{BRIGHTGREEN}{TARGET} accounts are currently locked'
+        success:
+            all: '{BRIGHTGREEN}{TARGET} accounts are currently registered'
+            active: '{BRIGHTGREEN}{TARGET} accounts are currently active'
+            locked: '{BRIGHTGREEN}{TARGET} accounts are currently locked'
+            premium: '{BRIGHTGREEN}{TARGET} accounts are premium'
+            non-premium: '{RED}{TARGET} accounts are non-premium'
     config:
         usage: '{RED}Correct Usage: /xauth config <node> <value>'
         error:
