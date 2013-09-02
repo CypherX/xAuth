@@ -242,6 +242,10 @@ public abstract class PermissionBackend {
 
     public abstract boolean hasGroup(Player player, String groupName);
 
+    public abstract boolean hasGroup(String playerName, String groupName);
+
     public abstract void joinGroup(Player player, String groupName);
+
+    public abstract void joinGroup(String playerName, String groupName);
 
 }

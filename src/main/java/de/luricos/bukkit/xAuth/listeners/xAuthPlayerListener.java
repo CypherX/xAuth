@@ -209,8 +209,8 @@ public class xAuthPlayerListener extends xAuthEventListener {
         return allowed;
     }
 
-    private void sendCommandRestrictedMessage(final xAuthPlayer xp, final PlayerCommandPreprocessEvent event, final PlayerRestrictionHandler restrictionHandler, String[] command) {
-        playerManager.sendNotice(xp, restrictionHandler.getRestrictionNode().getAction() + '.' + command);
+    private void sendCommandRestrictedMessage(final xAuthPlayer xp, final PlayerCommandPreprocessEvent event, final PlayerRestrictionHandler restrictionHandler, String[] commands) {
+        playerManager.sendNotice(xp, restrictionHandler.getRestrictionNode().getAction() + '.' + commands[0]);
         event.setMessage("/");
         event.setCancelled(true);
     }

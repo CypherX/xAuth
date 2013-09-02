@@ -22,7 +22,6 @@ package de.luricos.bukkit.xAuth.permissions.backends;
 import de.luricos.bukkit.xAuth.permissions.PermissionBackend;
 import de.luricos.bukkit.xAuth.permissions.PermissionManager;
 import de.luricos.bukkit.xAuth.utils.xAuthLog;
-import org.anjocaido.groupmanager.dataholder.OverloadedWorldHolder;
 import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
@@ -69,7 +68,13 @@ public class GroupManagerSupport extends PermissionBackend {
     }
 
     @Override
+    public boolean hasGroup(String playerName, String groupName) {
+        return true;
+    }
+
+    @Override
     public void joinGroup(Player player, String groupName) {
+        /*
         if (this.hasGroup(player, groupName))
             return;
 
@@ -79,6 +84,11 @@ public class GroupManagerSupport extends PermissionBackend {
 
         worldHolder.getUser(player.getName()).setGroup(worldHolder.getGroup(groupName));
         xAuthLog.info("Essentials user '" + player.getName() + "' created and joined group '" + groupName + "'");
+        */
+    }
+
+    @Override
+    public void joinGroup(String playerName, String groupName) {
     }
 
 }

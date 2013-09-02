@@ -113,19 +113,30 @@ public class PermissionsExSupport extends PermissionBackend {
 
     @Override
     public boolean hasGroup(Player player, String groupName) {
-        PermissionUser user = provider.getUser(player);
+        return hasGroup(player.getName(), groupName);
+    }
+
+    public boolean hasGroup(String playerName, String groupName) {
+        PermissionUser user = provider.getUser(playerName);
         return user != null && user.getAllGroups().containsKey(groupName);
     }
 
     @Override
     public void joinGroup(Player player, String groupName) {
-        PermissionUser user = provider.getUser(player);
-        if (hasGroup(player, groupName))
+        joinGroup(player.getName(), groupName);
+    }
+
+    @Override
+    public void joinGroup(String playerName, String groupName) {
+        PermissionUser user = provider.getUser(playerName);
+        if (hasGroup(playerName, groupName)) {
+            xAuthLog.info("PermissionsEx user '" + playerName + "' is already assigned to group '" + groupName + "'");
             return;
+        }
 
         user.addGroup(groupName);
         user.setGroups(new String[]{groupName});
-        xAuthLog.info("PermissionsEx user '" + player.getName() + "' assigned to group '" + groupName + "'");
+        xAuthLog.info("PermissionsEx user '" + playerName + "' assigned to group '" + groupName + "'");
     }
 
 }

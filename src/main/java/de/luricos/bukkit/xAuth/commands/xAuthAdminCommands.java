@@ -20,6 +20,7 @@
 package de.luricos.bukkit.xAuth.commands;
 
 import de.luricos.bukkit.xAuth.auth.AuthMethod;
+import de.luricos.bukkit.xAuth.events.xAuthRegisterEvent;
 import de.luricos.bukkit.xAuth.password.PasswordType;
 import de.luricos.bukkit.xAuth.updater.Updater;
 import de.luricos.bukkit.xAuth.utils.CommandLineTokenizer;
@@ -102,9 +103,18 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
         if (response != null)
             xAuth.getPlugin().getMessageHandler().sendMessage(response, sender, targetName);
 
-        if (success)
-            xAuthLog.info(sender.getName() + " has registered an account for " + targetName);
+        if (success) {
+            // set registered user to target group
+            boolean autoAssignGroup = xAuth.getPlugin().getConfig().getBoolean("groups.auto-assign", false);
+            String joinGroupName = xAuth.getPlugin().getConfig().getString("groups.move-on-register", null);
+            if ((autoAssignGroup) && (joinGroupName != null)) {
+                xAuth.getPermissionManager().joinGroup(targetName, joinGroupName);
 
+                this.callEvent(xAuthRegisterEvent.Action.PLAYER_GROUP_CHANGED, xp.getStatus());
+            }
+
+            xAuthLog.info(sender.getName() + " has registered an account for " + targetName);
+        }
         return true;
     }
 
@@ -534,7 +544,14 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
         }
 
         String targetName = (args.length > 1) ? args[1] : sender.getName();
-        xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(targetName);
+
+        xAuthPlayer xp;
+        try {
+            Integer accountId = Integer.parseInt(targetName);
+            xp = xAuth.getPlugin().getPlayerManager().getPlayerById(accountId);
+        } catch (Exception e) {
+            xp = xAuth.getPlugin().getPlayerManager().getPlayer(targetName);
+        }
 
         StringBuilder sb = new StringBuilder("------ xAuth Profile ------").append("\n");
         String message = "";

@@ -31,7 +31,7 @@ commands:
     usage: |
            /<command> register <player> <password> [email] - register a player with password and optional email
            /<command> changepw <player> <new password> - change the player's password
-           /<command> reset <player> [pwtype] - reset the player's password so he can set it by himself. Only works when he is online. If the connection is lost the account will be locked.
+           /<command> resetpw <player> [pwtype] - reset the player's password so he can set it by himself. Only works when he is online. If the connection is lost the account will be locked.
            /<command> logout <player> - logout a player
            /<command> unregister <player> - unregister a player
            /<command> location set|remove [global] - set/remove a location, optionally global

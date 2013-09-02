@@ -55,7 +55,15 @@ public class BukkitSupport extends PermissionBackend {
     }
 
     @Override
+    public boolean hasGroup(String playerName, String groupName) {
+        return true;
+    }
+
+    @Override
     public void joinGroup(Player player, String groupName) {
     }
 
+    @Override
+    public void joinGroup(String playerName, String groupName) {
+    }
 }

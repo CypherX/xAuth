@@ -83,8 +83,12 @@ public class PlayerManager {
     }
 
     public xAuthPlayer getPlayerById(int id) {
+        return getPlayerById(id, false);
+    }
+
+    public xAuthPlayer getPlayerById(int id, boolean reload) {
         if (hasAccountId(id))
-            return getPlayer(playerIds.get(id));
+            return getPlayer(playerIds.get(id), reload);
 
         return null;
     }

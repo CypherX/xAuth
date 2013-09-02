@@ -68,8 +68,8 @@ public class RegisterCommand extends xAuthCommand implements CommandExecutor {
                 xAuth.getPlugin().getPlayerManager().doLogin(xp);
 
             // set registered user to target group
-            boolean autoAssignGroup = xAuth.getPlugin().getConfig().getBoolean("guests.auto-assign", false);
-            String joinGroupName = xAuth.getPlugin().getConfig().getString("guests.move-on-register", null);
+            boolean autoAssignGroup = xAuth.getPlugin().getConfig().getBoolean("groups.auto-assign", false);
+            String joinGroupName = xAuth.getPlugin().getConfig().getString("groups.move-on-register", null);
             if ((autoAssignGroup) && (joinGroupName != null)) {
                 xAuth.getPermissionManager().joinGroup(player, joinGroupName);
 

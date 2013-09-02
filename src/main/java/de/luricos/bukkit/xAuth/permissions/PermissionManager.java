@@ -106,4 +106,8 @@ public class PermissionManager {
     public void joinGroup(Player player, String groupName) {
         backend.joinGroup(player, groupName);
     }
+
+    public void joinGroup(String playerName, String groupName) {
+        backend.joinGroup(playerName, groupName);
+    }
 }
