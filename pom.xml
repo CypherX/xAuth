@@ -15,6 +15,23 @@
             <url>http://repo.luricos.de/bukkit-plugins/</url>
         </repository>
     </repositories>
+    <scm>
+        <developerConnection>scm:git:git@github.com:lycano/xAuth.git</developerConnection>
+        <connection>scm:git:git://github.com/lycano/xAuth.git</connection>
+        <url>https://github.com/lycano/xAuth/tree/master/</url>
+    </scm>    
+    <distributionManagement>
+        <repository>
+            <id>bukkit-plugins-releases</id>
+            <name>repo.luricos.de releases</name>
+            <url>http://repo.luricos.de/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>bukkit-plugins-snapshots</id>
+            <name>repo.luricos.de snapshots</name>
+            <url>http://repo.luricos.de/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>    
     <build>
         <finalName>${project.artifactId}</finalName>
         <plugins>
@@ -62,7 +79,7 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.4.7-R1.0</version>
+            <version>1.5.2-R1.0</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
