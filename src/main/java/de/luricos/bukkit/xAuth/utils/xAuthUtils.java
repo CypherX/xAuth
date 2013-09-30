@@ -28,26 +28,27 @@ import java.util.regex.Pattern;
 public class xAuthUtils {
 
     public static String streamToString(InputStream in) {
-        if (in != null) {
-            Writer writer = new StringWriter();
-
-            char[] buffer = new char[1024];
-            try {
-                Reader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-                int n;
-                while ((n = reader.read(buffer)) != -1)
-                    writer.write(buffer, 0, n);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    in.close();
-                } catch (IOException ignored) {
-                }
-            }
-            return writer.toString();
-        } else
+        if (in == null)
             return "";
+
+
+        Writer writer = new StringWriter();
+
+        char[] buffer = new char[1024];
+        try {
+            Reader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            int n;
+            while ((n = reader.read(buffer)) != -1)
+                writer.write(buffer, 0, n);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                in.close();
+            } catch (IOException ignored) {
+            }
+        }
+        return writer.toString();
     }
 
     public static boolean isIPAddress(String ipAddress) {

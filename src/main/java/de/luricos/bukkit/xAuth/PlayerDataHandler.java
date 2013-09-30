@@ -254,7 +254,7 @@ public class PlayerDataHandler {
             ResultSet rs = null;
 
             try {
-                String sql = String.format("SELECT `items`, `armor`, `location`, `potioneffects`, `fireticks`, `remainingair` FROM `%s` WHERE `playername` = ?",
+                String sql = String.format("SELECT * FROM `%s` WHERE `playername` = ?",
                         plugin.getDatabaseController().getTable(Table.PLAYERDATA));
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, playerName);

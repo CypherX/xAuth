@@ -31,10 +31,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -104,6 +101,7 @@ public class DatabaseUpdater {
             // Time to update~
             if (updateVersion > currentVersion && currentVersion > -1) {
                 Connection conn = dbCon.getConnection();
+                String lastSql = "";
 
                 try {
                     // Let's not commit changes as they get executed (in case of error)
@@ -118,8 +116,11 @@ public class DatabaseUpdater {
                         String[] updateSql = loadSQL(updateFile, tblName).split(";");
 
                         // ANOTHER LOOP (Loop through each query)
-                        for (String sql : updateSql)
+                        for (String sql : updateSql) {
+                            lastSql = sql;
+                            xAuthLog.info(String.format("Updating table [%s] to revision [%s]", tblName, formatVersion(getUpdateVersion(updateFile))));
                             executeQuery(sql + ";", conn);
+                        }
 
                         // Let's commit those changes now that no errors have occurred
                         conn.commit();
@@ -128,7 +129,7 @@ public class DatabaseUpdater {
 
                     xAuthLog.info(String.format("Table [%s] updated to revision [%s]", tblName, formatVersion(currentVersion)));
                 } catch (xAuthTableUpdateException e) {
-                    xAuthLog.severe(String.format("Something went wrong while updating table [%s] to revision [%s]", tblName, formatVersion(currentVersion + 1)), e);
+                xAuthLog.severe(String.format("An error occurred while updating table [%s] to revision [%s] while executing query '%s'", tblName, formatVersion(currentVersion + 1), lastSql), e);
 
                     try {
                         // oh noes, an error has occurred! quick, rollback any changes from this update
@@ -158,9 +159,13 @@ public class DatabaseUpdater {
             //Loop through contents of jar to get update file names and latest version
             while (entries.hasMoreElements()) {
                 String name = entries.nextElement().getName();
-                if (name.startsWith(updatePath) && name.endsWith(".sql"))
+                if (name.startsWith(updatePath) && name.endsWith(".sql")) {
                     updateFiles.add(name);
+                }
             }
+
+            // keep the natural file order
+            Collections.sort(updateFiles);
         } catch (IOException e) {
             xAuthLog.severe("Failed to load update files for table: " + tblId, e);
         }

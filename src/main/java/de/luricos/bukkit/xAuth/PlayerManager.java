@@ -121,7 +121,7 @@ public class PlayerManager {
         ResultSet rs = null;
 
         try {
-            String sql = String.format("SELECT `id`,`active`, `resetpw`, `pwtype`, `premium` FROM `%s` WHERE `playername` = ?",
+            String sql = String.format("SELECT * FROM `%s` WHERE `playername` = ?",
                     plugin.getDatabaseController().getTable(Table.ACCOUNT));
             ps = conn.prepareStatement(sql);
             ps.setString(1, playerName);
