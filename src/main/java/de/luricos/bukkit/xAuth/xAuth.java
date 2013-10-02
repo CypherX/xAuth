@@ -33,6 +33,7 @@ import de.luricos.bukkit.xAuth.permissions.backends.BukkitSupport;
 import de.luricos.bukkit.xAuth.permissions.backends.GroupManagerSupport;
 import de.luricos.bukkit.xAuth.permissions.backends.PermissionsExSupport;
 import de.luricos.bukkit.xAuth.strike.StrikeManager;
+import de.luricos.bukkit.xAuth.tasks.xAuthTasks;
 import de.luricos.bukkit.xAuth.updater.Updater;
 import de.luricos.bukkit.xAuth.utils.xAuthLog;
 import org.bukkit.Bukkit;
@@ -160,7 +161,7 @@ public class xAuth extends JavaPlugin {
         databaseController.runUpdater();
 
         // Initialize ALL THE CLASSES
-        playerManager = new PlayerManager(this);
+        playerManager = new PlayerManager(this, new xAuthTasks(this.getConfig().getInt("guest.timeout")));
         playerDataHandler = new PlayerDataHandler(this);
         passwordHandler = new PasswordHandler(this);
         locationManager = new LocationManager(this);

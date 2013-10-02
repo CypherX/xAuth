@@ -25,7 +25,6 @@ import de.luricos.bukkit.xAuth.utils.xAuthLog;
 import de.luricos.bukkit.xAuth.utils.xAuthUtils;
 import de.luricos.bukkit.xAuth.xAuth;
 import de.luricos.bukkit.xAuth.xAuthPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -93,6 +92,8 @@ public class xAuthPlayerListener extends xAuthEventListener {
         if (player == null || !player.isOnline())
             return;
 
+        String playerName = player.getName();
+
         xAuthPlayer xp = playerManager.getPlayer(player, xAuth.getPlugin().getConfig().getBoolean("main.reload-on-join"));
         xp.setConnectTime(new Timestamp(System.currentTimeMillis()));
         xp.setGameMode(player.getGameMode());
@@ -103,7 +104,7 @@ public class xAuthPlayerListener extends xAuthEventListener {
         if (xp.isRegistered() || xAuth.getPlugin().isAuthURL()) {
             if ((!xp.isLocked()) && (playerManager.checkSession(xp))) {
                 xp.setStatus(xAuthPlayer.Status.AUTHENTICATED);
-                xAuth.getPlugin().getAuthClass(xp).online(player.getName());
+                xAuth.getPlugin().getAuthClass(xp).online(playerName);
                 node = "join.resume";
             } else {
                 xp.setStatus(xAuthPlayer.Status.REGISTERED);
@@ -120,13 +121,13 @@ public class xAuthPlayerListener extends xAuthEventListener {
 
         if (protect) {
             xp.setProtected(true);
-            scheduleDelayedProtect(xp);
+            playerManager.getTasks().scheduleDelayedProtectTask(playerName);
         }
 
         if (!node.isEmpty())
-            sendDelayedMessage(player, node, 1);
+            playerManager.getTasks().scheduleDelayedMessageTask(playerName, node);
 
-        scheduleDelayedPremiumCheck(xp);
+        playerManager.getTasks().scheduleDelayedPremiumCheck(playerName);
 
         this.callEvent(xAuthPlayerJoinEvent.Action.PLAYER_JOINED);
     }
@@ -150,8 +151,11 @@ public class xAuthPlayerListener extends xAuthEventListener {
         if (xp.isProtected())
             playerManager.unprotect(xp);
 
-        xAuth.getPlugin().getAuthClass(xp).offline(playerName);
-        xAuth.getPlugin().getPlayerManager().releasePlayer(playerName);
+        xAuth plugin = xAuth.getPlugin();
+
+        plugin.getAuthClass(xp).offline(playerName);
+        plugin.getPlayerManager().releasePlayer(playerName);
+        plugin.getPlayerManager().getTasks().cancelTasks(playerName);
 
         this.callEvent(xAuthPlayerQuitEvent.Action.PLAYER_DISCONNECTED);
     }
@@ -336,57 +340,6 @@ public class xAuthPlayerListener extends xAuthEventListener {
         }
 
         return !(xAuth.getPlugin().getConfig().getBoolean("filter.blank-name") && xAuthUtils.isWhitespace(pName));
-    }
-
-    private void scheduleDelayedProtect(final xAuthPlayer xp) {
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(xAuth.getPlugin(), new Runnable() {
-            public void run() {
-                playerManager.protect(xp);
-            }
-        }, 1);
-    }
-
-    /**
-     * Used to check the playername against mojang paid check jsp
-     * This method is used to block non-premium accounts to join the server when in PremiumMode
-     *
-     * @param xp xAuthPlayer
-     */
-    private void scheduleDelayedPremiumCheck(final xAuthPlayer xp) {
-        if (!xAuth.getPlugin().isPremiumMode())
-            return;
-
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(xAuth.getPlugin(), new Runnable() {
-            public void run() {
-                if ((!xp.isOnline()) || (!xp.isRegistered()))
-                    return;
-
-                String playerName = xp.getPlayerName();
-                boolean userIsPremium = playerManager.checkPremiumUser(playerName);
-                if (!userIsPremium) {
-                    xAuthLog.info(xAuth.getPlugin().getMessageHandler().getNode("join.non-premium", null, playerName));
-                    return;
-                }
-
-                xAuth.getPlugin().getPlayerManager().setPremium(xp.getAccountId(), userIsPremium);
-            }
-        }, 1);
-    }
-
-    /**
-     * Send Messages delayed and only if the task is not already running (prevents spammy consoles)
-     *
-     * @param player Player The player object
-     * @param node Stirng MessageHandler node
-     * @param delay int Define delay
-     */
-    private void sendDelayedMessage(final Player player, final String node, final int delay) {
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(xAuth.getPlugin(), new Runnable() {
-            public void run() {
-                if (player.isOnline())
-                    xAuth.getPlugin().getMessageHandler().sendMessage(node, player);
-            }
-        }, delay);
     }
 
     /**

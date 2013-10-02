@@ -35,7 +35,6 @@ public class xAuthPlayer {
     private Timestamp lastNotifyTime;
     private Timestamp loginTime;
     private GameMode gameMode;
-    private int timeoutTaskId = -1;
     private boolean isProtected = false;
     private boolean isLocked = true;
     private boolean isReset = false;
@@ -156,14 +155,6 @@ public class xAuthPlayer {
 
     public void setGameMode(GameMode newGameMode) {
         this.gameMode = newGameMode;
-    }
-
-    public int getTimeoutTaskId() {
-        return timeoutTaskId;
-    }
-
-    public void setTimeoutTaskId(int timeoutTaskId) {
-        this.timeoutTaskId = timeoutTaskId;
     }
 
     public boolean isProtected() {

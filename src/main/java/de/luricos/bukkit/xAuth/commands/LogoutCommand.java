@@ -61,6 +61,7 @@ public class LogoutCommand extends xAuthCommand implements CommandExecutor {
             response = "logout.error.logged";
 
         xAuth.getPlugin().getMessageHandler().sendMessage(response, player);
+        //@TODO do we need idle kick after logout? Should it also respect mustRegister?
 
         return true;
     }

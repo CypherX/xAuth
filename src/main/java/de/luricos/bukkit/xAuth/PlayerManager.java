@@ -25,6 +25,8 @@ import de.luricos.bukkit.xAuth.events.xAuthPlayerProtectEvent;
 import de.luricos.bukkit.xAuth.events.xAuthPlayerUnProtectEvent;
 import de.luricos.bukkit.xAuth.exceptions.xAuthPlayerUnprotectException;
 import de.luricos.bukkit.xAuth.restrictions.PlayerRestrictionHandler;
+import de.luricos.bukkit.xAuth.tasks.xAuthTask;
+import de.luricos.bukkit.xAuth.tasks.xAuthTasks;
 import de.luricos.bukkit.xAuth.updater.HTTPRequest;
 import de.luricos.bukkit.xAuth.utils.xAuthLog;
 import de.luricos.bukkit.xAuth.utils.xAuthUtils;
@@ -43,9 +45,11 @@ public class PlayerManager {
     private final xAuth plugin;
     private final Map<String, xAuthPlayer> players = new HashMap<String, xAuthPlayer>();
     private Map<Integer, String> playerIds = new HashMap<Integer, String>();
+    private xAuthTasks playerTasks;
 
-    public PlayerManager(final xAuth plugin) {
+    public PlayerManager(final xAuth plugin, xAuthTasks playerTasks) {
         this.plugin = plugin;
+        this.playerTasks = playerTasks;
     }
 
     public xAuthPlayer getPlayer(Player player) {
@@ -155,6 +159,10 @@ public class PlayerManager {
         players.remove(playerName.toLowerCase());
     }
 
+    public xAuthTasks getTasks() {
+        return this.playerTasks;
+    }
+
     public void handleReload(Player[] players) {
         for (Player p : players) {
             xAuthPlayer xp = getPlayer(p.getName());
@@ -245,20 +253,11 @@ public class PlayerManager {
 
         int timeout = plugin.getConfig().getInt("guest.timeout");
         if (timeout > 0 && xp.isRegistered())
-            xp.setTimeoutTaskId(scheduleTimeoutTask(p, timeout));
+            this.getTasks().scheduleKickTimeoutTask(p.getName());
 
         xp.setProtected(true);
 
         this.callEvent(xAuthPlayerProtectEvent.Action.PLAYER_PROTECTED);
-    }
-
-    private int scheduleTimeoutTask(final Player player, final int timeout) {
-        return Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-            public void run() {
-                if (player.isOnline())
-                    player.kickPlayer(plugin.getMessageHandler().getNode("misc.timeout"));
-            }
-        }, plugin.getConfig().getInt("guest.timeout") * 20);
     }
 
     public void unprotect(final xAuthPlayer xp) {
@@ -280,10 +279,9 @@ public class PlayerManager {
             xp.setGameMode(p.getGameMode());
 
         // guest protection cancel task. See @PlayerManager.protect(final xAuthPlayer p)
-        int timeoutTaskId = xp.getTimeoutTaskId();
+        int timeoutTaskId = this.getTasks().getPlayerTask(p.getName(), xAuthTask.xAuthTaskType.KICK_TIMEOUT).getTaskId();
         if (timeoutTaskId > -1) {
-            Bukkit.getScheduler().cancelTask(timeoutTaskId);
-            xp.setTimeoutTaskId(-1);
+            this.getTasks().cancelTasks(p.getName());
         }
 
         xp.setProtected(false);
