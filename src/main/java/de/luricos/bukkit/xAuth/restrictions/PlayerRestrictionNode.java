@@ -45,7 +45,6 @@ public class PlayerRestrictionNode {
     private boolean useMaterialNames = true;
 
     public PlayerRestrictionNode(final String message) {
-        // remove all async tags from start
         this.splitEventName = message.split("\\.");
         this.eventName = splitEventName[this.splitEventName.length - 1];
         this.splitEventName = eventName.split("(?=\\p{Upper})");

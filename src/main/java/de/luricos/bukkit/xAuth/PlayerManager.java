@@ -45,11 +45,11 @@ public class PlayerManager {
     private final xAuth plugin;
     private final Map<String, xAuthPlayer> players = new HashMap<String, xAuthPlayer>();
     private Map<Integer, String> playerIds = new HashMap<Integer, String>();
-    private xAuthTasks playerTasks;
+    private xAuthTasks tasks;
 
-    public PlayerManager(final xAuth plugin, xAuthTasks playerTasks) {
+    public PlayerManager(final xAuth plugin, xAuthTasks tasks) {
         this.plugin = plugin;
-        this.playerTasks = playerTasks;
+        this.tasks = tasks;
     }
 
     public xAuthPlayer getPlayer(Player player) {
@@ -160,7 +160,7 @@ public class PlayerManager {
     }
 
     public xAuthTasks getTasks() {
-        return this.playerTasks;
+        return this.tasks;
     }
 
     public void handleReload(Player[] players) {

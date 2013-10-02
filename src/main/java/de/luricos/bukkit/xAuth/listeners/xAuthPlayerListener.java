@@ -179,7 +179,7 @@ public class xAuthPlayerListener extends xAuthEventListener {
     }
 
     private boolean hasPlayerChatPermission(Player player, Event event) {
-        return new PlayerRestrictionHandler(player, event.getEventName(), player).hasPermission();
+        return new PlayerRestrictionHandler(player, "PlayerChatEvent", player).hasPermission();
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
