@@ -30,11 +30,9 @@ import java.util.Map;
 
 public class xAuthTasks {
 
-    private final int kickTimeout;
     private Map<Integer, xAuthTask> playerTaskList = new HashMap<Integer, xAuthTask>();
 
-	public xAuthTasks(int kickTimeout) {
-        this.kickTimeout = kickTimeout;
+	public xAuthTasks() {
 	}
 
     /**
@@ -42,8 +40,8 @@ public class xAuthTasks {
      *
      * @param playerName The players name
      */
-    public void scheduleKickTimeoutTask(String playerName) {
-        this.scheduleSyncDelayedTask(playerName, xAuthTask.xAuthTaskType.KICK_TIMEOUT, new TimeoutTask(playerName), this.kickTimeout * 20);
+    public void scheduleKickTimeoutTask(String playerName, int delay) {
+        this.scheduleSyncDelayedTask(playerName, xAuthTask.xAuthTaskType.KICK_TIMEOUT, new TimeoutTask(playerName), delay * 20);
     }
 
     /**

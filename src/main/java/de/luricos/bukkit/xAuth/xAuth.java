@@ -161,7 +161,7 @@ public class xAuth extends JavaPlugin {
         databaseController.runUpdater();
 
         // Initialize ALL THE CLASSES
-        playerManager = new PlayerManager(this, new xAuthTasks(this.getConfig().getInt("guest.timeout")));
+        playerManager = new PlayerManager(this, new xAuthTasks());
         playerDataHandler = new PlayerDataHandler(this);
         passwordHandler = new PasswordHandler(this);
         locationManager = new LocationManager(this);

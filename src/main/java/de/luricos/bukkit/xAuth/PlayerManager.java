@@ -253,7 +253,7 @@ public class PlayerManager {
 
         int timeout = plugin.getConfig().getInt("guest.timeout");
         if (timeout > 0 && xp.isRegistered())
-            this.getTasks().scheduleKickTimeoutTask(p.getName());
+            this.getTasks().scheduleKickTimeoutTask(p.getName(), timeout);
 
         xp.setProtected(true);
 
