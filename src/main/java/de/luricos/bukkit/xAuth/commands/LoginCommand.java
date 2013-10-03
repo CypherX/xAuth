@@ -45,6 +45,11 @@ public class LoginCommand extends xAuthCommand implements CommandExecutor {
         if (!this.isAllowedCommand(player, "login.permission", "login"))
             return true;
 
+        if (xAuth.getPlugin().getPlayerManager().getPlayer(player).isAuthenticated()) {
+            xAuth.getPlugin().getMessageHandler().sendMessage("login.error.authenticated", player);
+            return true;
+        }
+
         xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(player, true);
 
         if (args.length < 1) {
@@ -70,8 +75,9 @@ public class LoginCommand extends xAuthCommand implements CommandExecutor {
                 this.callEvent(xAuthLoginEvent.Action.PLAYER_LOGIN, xp.getStatus());
 
                 xAuthLog.info(playerName + " authenticated");
-            } else
+            } else {
                 response = "login.error.general";
+            }
         }
 
         if (response != null)
