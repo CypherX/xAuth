@@ -37,13 +37,10 @@ public class QuitCommand extends xAuthCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         args = CommandLineTokenizer.tokenize(args);
 
-        if (!(sender instanceof Player))
-            return false;
-
-        Player player = (Player) sender;
-        if (!this.isAllowedCommand(player, "quit.permission", "quit"))
+        if (!this.isAllowedCommand(sender, "quit.permission", "quit"))
             return true;
 
+        Player player = (Player) sender;
         xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(player);
         String playerName = xp.getName();
         String response = null;

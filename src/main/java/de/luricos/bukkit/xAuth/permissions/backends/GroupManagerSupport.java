@@ -52,6 +52,8 @@ public class GroupManagerSupport extends PermissionBackend {
     public void reload() {
         provider = null;
         xAuthLog.info("Detached from GroupManagerSupport");
+
+        this.initialize();
     }
 
     @Override

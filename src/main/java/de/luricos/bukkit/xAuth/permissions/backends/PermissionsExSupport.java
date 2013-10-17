@@ -21,7 +21,6 @@ package de.luricos.bukkit.xAuth.permissions.backends;
 
 import de.luricos.bukkit.xAuth.permissions.PermissionBackend;
 import de.luricos.bukkit.xAuth.utils.xAuthLog;
-import de.luricos.bukkit.xAuth.xAuth;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
@@ -48,10 +47,6 @@ public class PermissionsExSupport extends PermissionBackend {
 
     @Override
     public void initialize() {
-        if (!(xAuth.getPermissionManager() == null)) {
-            return;
-        }
-
         Plugin testPlugin = Bukkit.getServer().getPluginManager().getPlugin(getProviderName());
         if ((testPlugin != null) && (Bukkit.getServer().getPluginManager().isPluginEnabled(getProviderName()))) {
             final String version = testPlugin.getDescription().getVersion();
@@ -72,6 +67,8 @@ public class PermissionsExSupport extends PermissionBackend {
     public void reload() {
         provider = null;
         xAuthLog.info("Detached from Permissions plugin '" + getProviderName() + "'.");
+
+        this.initialize();
     }
 
     /**

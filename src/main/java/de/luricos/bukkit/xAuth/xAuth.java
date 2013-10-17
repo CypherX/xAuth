@@ -294,6 +294,8 @@ public class xAuth extends JavaPlugin {
     }
 
     public void reload() {
+        xAuthLog.info("-- Internal reload in progress");
+
         // unregister event-listeners from this plugin
         HandlerList.unregisterAll(this);
 
@@ -316,6 +318,8 @@ public class xAuth extends JavaPlugin {
 
         // re-register events
         this.registerEvents();
+
+        xAuthLog.info("-- Reload finished");
     }
 
     public void checkUpdate() {

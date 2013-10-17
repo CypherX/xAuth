@@ -38,13 +38,10 @@ public class LoginCommand extends xAuthCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         args = CommandLineTokenizer.tokenize(args);
 
-        if (!(sender instanceof Player))
-            return false;
-
-        Player player = (Player) sender;
-        if (!this.isAllowedCommand(player, "login.permission", "login"))
+        if (!this.isAllowedCommand(sender, "login.permission", "login"))
             return true;
 
+        Player player = (Player) sender;
         if (xAuth.getPlugin().getPlayerManager().getPlayer(player).isAuthenticated()) {
             xAuth.getPlugin().getMessageHandler().sendMessage("login.error.authenticated", player);
             return true;

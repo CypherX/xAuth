@@ -24,6 +24,8 @@ import de.luricos.bukkit.xAuth.restrictions.PlayerRestrictionHandler;
 import de.luricos.bukkit.xAuth.xAuth;
 import de.luricos.bukkit.xAuth.xAuthPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 /**
@@ -77,6 +79,10 @@ public class xAuthCommand {
 
     protected void callEvent(final xAuthResetPasswordEvent.Action action, final xAuthPlayer.Status status) {
         this.callEvent(new xAuthResetPasswordEvent(action, status));
+    }
+
+    protected boolean isAllowedCommand(final CommandSender sender, final String messageNode, final String... command) {
+        return (sender instanceof ConsoleCommandSender) || this.isAllowedCommand((Player) sender, messageNode, command);
     }
 
     protected boolean isAllowedCommand(final Player player, final String messageNode, final String... command) {

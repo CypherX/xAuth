@@ -74,7 +74,7 @@ public class MessageHandler {
     }
 
     public void sendMessage(String node, CommandSender sender) {
-        sendMessage(node, sender, null);
+        this.sendMessage(node, sender, null);
     }
 
     public void sendMessage(String node, CommandSender sender, String targetName) {

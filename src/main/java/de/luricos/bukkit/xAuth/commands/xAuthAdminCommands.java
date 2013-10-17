@@ -83,10 +83,10 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean registerCommand(CommandSender sender, String[] args) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.register")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.register"))
             return true;
-        } else if (args.length < 3) {
+
+        if (args.length < 3) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.register.usage", sender);
             return true;
         }
@@ -119,10 +119,10 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean changePwCommand(CommandSender sender, String[] args) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.changepw")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.changepw"))
             return true;
-        } else if (args.length < 3) {
+
+        if (args.length < 3) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.changepw.usage", sender);
             return true;
         }
@@ -148,10 +148,10 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean resetPasswordCommand(CommandSender sender, String[] args) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.resetpw")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.resetpw"))
             return true;
-        } else if (args.length > 3) {
+
+        if (args.length > 3) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.resetpw.usage", sender);
             return true;
         } else if (args.length < 2) {
@@ -184,10 +184,10 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean logoutCommand(CommandSender sender, String[] args) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.logout")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.logout"))
             return true;
-        } else if (args.length < 2) {
+
+        if (args.length < 2) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.logout.usage", sender);
             return true;
         }
@@ -225,10 +225,10 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean unregisterCommand(CommandSender sender, String[] args) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.unregister")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.unregister"))
             return true;
-        } else if (args.length < 2) {
+
+        if (args.length < 2) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.unregister.usage", sender);
             return true;
         }
@@ -267,10 +267,10 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
         }
 
         Player player = (Player) sender;
-        if (!xAuth.getPermissionManager().has(player, "xauth.allow.player.command.xauth.location")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", player);
+        if (!this.isAllowedCommand(player, "admin.permission", "xauth.location"))
             return true;
-        } else if (args.length < 2 || !(args[1].equals("set") || args[1].equals("remove"))) {
+
+        if (args.length < 2 || !(args[1].equals("set") || args[1].equals("remove"))) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.location.usage", player);
             return true;
         }
@@ -318,10 +318,8 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean reloadCommand(CommandSender sender, String[] args) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.reload")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.reload"))
             return true;
-        }
 
         xAuth.getPlugin().reload();
         xAuth.getPlugin().getMessageHandler().sendMessage("admin.reload", sender);
@@ -333,10 +331,10 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean activateCommand(CommandSender sender, String[] args, boolean force) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.activate")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.activate"))
             return true;
-        } else if (args.length < 2) {
+
+        if (args.length < 2) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.activate.usage", sender);
             return true;
         }
@@ -371,10 +369,10 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean lockCommand(CommandSender sender, String[] args, boolean force) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.lock")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.lock"))
             return true;
-        } else if (args.length < 2) {
+
+        if (args.length < 2) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.lock.usage", sender);
             return true;
         }
@@ -411,10 +409,10 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean countCommand(CommandSender sender, String[] args) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.count")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.count"))
             return true;
-        } else if (args.length < 2) {
+
+        if (args.length < 2) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.count.usage", sender);
             return true;
         }
@@ -458,10 +456,10 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean configCommand(CommandSender sender, String[] args) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.config")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.config"))
             return true;
-        } else if (args.length < 2) {
+
+        if (args.length < 2) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.config.usage", sender);
             return true;
         }
@@ -530,10 +528,10 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean profileCommand(CommandSender sender, String[] args) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.profile")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.profile"))
             return true;
-        } else if (args.length > 2) {
+
+        if (args.length > 2) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.profile.usage", sender);
             return true;
         }
@@ -590,6 +588,9 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean debugCommand(CommandSender sender, String[] args) {
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.config"))
+            return true;
+
         if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.config")) {
             xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
             return true;
@@ -611,10 +612,8 @@ public class xAuthAdminCommands extends xAuthCommand implements CommandExecutor 
     }
 
     private boolean versionCommand(CommandSender sender, String[] args) {
-        if (!xAuth.getPermissionManager().has(sender, "xauth.allow.player.command.xauth.version")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("admin.permission", sender);
+        if (!this.isAllowedCommand(sender, "admin.permission", "xauth.version"))
             return true;
-        }
 
         xAuthLog.info("Version command executed... checking for latest version");
         xAuth.getPlugin().getMessageHandler().sendMessage(String.format(xAuth.getPlugin().getMessageHandler().getNode("version.current-version"), xAuth.getPlugin().getDescription().getVersion()), sender);

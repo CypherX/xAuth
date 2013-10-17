@@ -194,6 +194,7 @@ public class xAuthPlayerListener extends xAuthEventListener {
 
     private boolean canExecuteCommand(final Player player, final PlayerCommandPreprocessEvent event) {
         String[] commands = event.getMessage().toLowerCase().replaceFirst("/", "").split("\\s");
+
         // filter only foreign commands
         if (xAuth.getPlugin().getCommands().contains(commands[0]))
             return true;

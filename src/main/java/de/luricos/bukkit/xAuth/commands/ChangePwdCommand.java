@@ -39,13 +39,10 @@ public class ChangePwdCommand extends xAuthCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         args = CommandLineTokenizer.tokenize(args);
 
-        if (!(sender instanceof Player))
-            return false;
-
-        Player player = (Player) sender;
-        if (!this.isAllowedCommand(player, "changepw.permission", "changepw"))
+        if (!this.isAllowedCommand(sender, "changepw.permission", "changepw"))
             return true;
 
+        Player player = (Player) sender;
         xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(player);
 
         if (xp.isGuest()) {

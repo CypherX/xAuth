@@ -42,6 +42,8 @@ public class BukkitSupport extends PermissionBackend {
     @Override
     public void reload() {
         xAuthLog.info("Detached from BukkitSupport");
+
+        this.initialize();
     }
 
     @Override
