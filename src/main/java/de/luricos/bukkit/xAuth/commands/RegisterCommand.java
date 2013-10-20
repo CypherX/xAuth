@@ -45,7 +45,7 @@ public class RegisterCommand extends xAuthCommand implements CommandExecutor {
         xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(player);
 
         if ((xAuth.getPlugin().getConfig().getBoolean("registration.require-email") && args.length < 2) || args.length < 1) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("register.usage", xp.getPlayer());
+            this.getMessageHandler().sendMessage("register.usage", xp.getPlayer());
             return true;
         }
 
@@ -58,7 +58,7 @@ public class RegisterCommand extends xAuthCommand implements CommandExecutor {
 
         String response = a.getResponse();
         if (response != null)
-            xAuth.getPlugin().getMessageHandler().sendMessage(response, xp.getPlayer());
+            this.getMessageHandler().sendMessage(response, xp.getPlayer());
 
         if (success) {
             if (!xAuth.getPlugin().getConfig().getBoolean("registration.require-login"))

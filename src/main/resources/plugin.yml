@@ -73,10 +73,15 @@ permissions:
         xauth.allow.player.command.xauth.location: true
         xauth.allow.player.command.xauth.reload: true
         xauth.allow.player.command.xauth.activate: true
-        xauth.allow.player.command.xauth.count: true
         xauth.allow.player.command.xauth.lock: true
+        xauth.allow.player.command.xauth.count: true
         xauth.allow.player.command.xauth.config: true
         xauth.allow.player.command.xauth.profile: true
+        xauth.allow.player.command.xauth.debug: true
+        xauth.allow.player.command.xauth.version: true
+        xauth.allow.player.command.xauth.update: true
+        xauth.allow.player.command.xauth.upgrade: true
+        xauth.allow.player.bypass.acclimit: true
   xauth.allow.player.command.xauth.register:
     description: Allows you to register other players
     default: op
@@ -104,20 +109,30 @@ permissions:
   xauth.allow.player.command.xauth.activate:
     description: Allows you to activate a player's account.
     default: op
+  xauth.allow.player.command.xauth.lock:
+    description: Allows you to lock a player's account.
+    default: op
   xauth.allow.player.command.xauth.count:
     description: Allows you to count the account states.
     default: op
-  xauth.allow.player.command.xauth.lock:
-    description: Allows you to lock a player's account.
-    default: op    
   xauth.allow.player.command.xauth.config:
     description: Allows you to modify the configuration via a command.
     default: op
   xauth.allow.player.command.xauth.profile:
     description: Allows you to display a <players> profile
     default: op
-  xauth.bypass.acclimit:
+  xauth.allow.player.command.xauth.debug:
+    description: Allows you to change permissions debug settings
+    default: op
+  xauth.allow.player.command.xauth.version:
+    description: Allows you to display the current version
+    default: op
+  xauth.allow.player.command.xauth.update:
+    description: Allows you to check for an update
+    default: op
+  xauth.allow.player.command.xauth.upgrade:
+    description: Allows you to upgrade the plugin
+    default: op
+  xauth.allow.player.bypass.acclimit:
     description: Allows you to bypass the account limit and register an unlimited amount of accounts.
-  xauth.allow.player.command.version:
-    description: Show plugin version / Remote version
-    default: true
+    default: op

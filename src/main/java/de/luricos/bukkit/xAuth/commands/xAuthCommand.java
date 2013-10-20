@@ -19,6 +19,7 @@
  */
 package de.luricos.bukkit.xAuth.commands;
 
+import de.luricos.bukkit.xAuth.MessageHandler;
 import de.luricos.bukkit.xAuth.events.*;
 import de.luricos.bukkit.xAuth.restrictions.PlayerRestrictionHandler;
 import de.luricos.bukkit.xAuth.xAuth;
@@ -32,6 +33,8 @@ import org.bukkit.entity.Player;
  * @author lycano
  */
 public class xAuthCommand {
+
+    private MessageHandler messageHandler = xAuth.getPlugin().getMessageHandler();
 
     protected void callEvent(final xAuthChangePasswordEvent event) {
         Bukkit.getPluginManager().callEvent(event);
@@ -91,5 +94,9 @@ public class xAuthCommand {
             xAuth.getPlugin().getMessageHandler().sendMessage(messageNode, player);
 
         return allowed;
+    }
+
+    protected MessageHandler getMessageHandler() {
+        return this.messageHandler;
     }
 }

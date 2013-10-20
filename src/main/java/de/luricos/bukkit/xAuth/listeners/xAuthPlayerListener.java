@@ -96,7 +96,6 @@ public class xAuthPlayerListener extends xAuthEventListener {
 
         xAuthPlayer xp = playerManager.getPlayer(player, xAuth.getPlugin().getConfig().getBoolean("main.reload-on-join"));
         xp.setConnectTime(new Timestamp(System.currentTimeMillis()));
-        xp.setGameMode(player.getGameMode());
 
         String node = "";
         boolean protect = false;
@@ -104,6 +103,7 @@ public class xAuthPlayerListener extends xAuthEventListener {
         if (xp.isRegistered() || xAuth.getPlugin().isAuthURL()) {
             if ((!xp.isLocked()) && (playerManager.checkSession(xp))) {
                 xp.setStatus(xAuthPlayer.Status.AUTHENTICATED);
+                xp.setGameMode(player.getGameMode()); // update xp gamemode
                 xAuth.getPlugin().getAuthClass(xp).online(playerName);
                 node = "join.resume";
             } else {
@@ -116,7 +116,6 @@ public class xAuthPlayerListener extends xAuthEventListener {
             xp.setStatus(xAuthPlayer.Status.GUEST);
             node = "join.register";
             protect = true;
-            //playerManager.protect(xp);
         }
 
         if (protect) {
@@ -314,6 +313,7 @@ public class xAuthPlayerListener extends xAuthEventListener {
         // update gamemode settings for xAuthPlayer class
         Player player = event.getPlayer();
         xAuthPlayer xp = playerManager.getPlayer(player);
+
         xp.setGameMode(event.getNewGameMode());
 
         this.callEvent(xAuthPlayerGameModeChangeEvent.Action.GAMEMODE_CHANGED, xp.getStatus());

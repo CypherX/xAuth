@@ -31,6 +31,7 @@ import de.luricos.bukkit.xAuth.updater.HTTPRequest;
 import de.luricos.bukkit.xAuth.utils.xAuthLog;
 import de.luricos.bukkit.xAuth.utils.xAuthUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -135,7 +136,7 @@ public class PlayerManager {
 
             addPlayerId(rs.getInt("id"), playerName);
 
-            return new xAuthPlayer(playerName, rs.getInt("id"), !rs.getBoolean("active"), rs.getBoolean("resetpw"), xAuthPlayer.Status.REGISTERED, rs.getInt("pwtype"), rs.getBoolean("premium"));
+            return new xAuthPlayer(playerName, rs.getInt("id"), !rs.getBoolean("active"), rs.getBoolean("resetpw"), xAuthPlayer.Status.REGISTERED, rs.getInt("pwtype"), rs.getBoolean("premium"), GameMode.valueOf(plugin.getConfig().getString("guest.gamemode", Bukkit.getDefaultGameMode().name())));
         } catch (SQLException e) {
             xAuthLog.severe(String.format("Failed to load player: %s", playerName), e);
             return null;
@@ -174,7 +175,7 @@ public class PlayerManager {
                     plugin.getAuthClass(xp).offline(p.getName());
                 } else {
                     xp.setStatus(xAuthPlayer.Status.AUTHENTICATED);
-                    xp.setGameMode(p.getGameMode());
+                    // remove xp.setGameMode(Bukkit.getDefaultGameMode()) - Moved to xAuthPlayer constructor
                     plugin.getAuthClass(xp).online(p.getName());
                 }
             } else if (mustRegister(p)) {
@@ -245,9 +246,8 @@ public class PlayerManager {
 
         plugin.getPlayerDataHandler().storeData(xp, p);
 
-        // set GameMode for xAuthPlayer when protecting player to whatever it is currently if its unequal to the xAuthPlayer GameMode
-        if (!p.getGameMode().equals(xp.getGameMode()))
-            xp.setGameMode(p.getGameMode());
+        // set GameMode to configured guest gamemode
+        p.setGameMode(GameMode.valueOf(plugin.getConfig().getString("guest.gamemode", Bukkit.getDefaultGameMode().name())));
 
         xp.setLastNotifyTime(new Timestamp(System.currentTimeMillis()));
 
@@ -274,9 +274,7 @@ public class PlayerManager {
 
         plugin.getPlayerDataHandler().restoreData(xp, p.getName());
 
-        // update xAuthPlayer gameMode
-        if (!xp.getGameMode().equals(p.getGameMode()))
-            xp.setGameMode(p.getGameMode());
+        // moved p.setGameMode(xp.getGameMode()) to doLogin
 
         // guest protection cancel task. See @PlayerManager.protect(final xAuthPlayer p)
         int timeoutTaskId = this.getTasks().getPlayerTask(p.getName(), xAuthTask.xAuthTaskType.KICK_TIMEOUT).getTaskId();

@@ -43,14 +43,14 @@ public class xAuthPlayer {
     private Timestamp connectTime;
 
     public xAuthPlayer(String playerName) {
-        this(playerName, -1, true, false, Status.GUEST, PasswordType.DEFAULT.getTypeId(), false);
+        this(playerName, -1, true, false, Status.GUEST, PasswordType.DEFAULT.getTypeId(), false, Bukkit.getDefaultGameMode());
     }
 
     public xAuthPlayer(String playerName, int accountId) {
-        this(playerName, accountId, true, false, Status.GUEST, PasswordType.DEFAULT.getTypeId(), false);
+        this(playerName, accountId, true, false, Status.GUEST, PasswordType.DEFAULT.getTypeId(), false, Bukkit.getDefaultGameMode());
     }
 
-    public xAuthPlayer(String playerName, int accountId, boolean locked, boolean isReset, Status status, int pwType, boolean isPremium) {
+    public xAuthPlayer(String playerName, int accountId, boolean locked, boolean isReset, Status status, int pwType, boolean isPremium, GameMode gameMode) {
         this.playerName = playerName;
         this.accountId = accountId;
         this.isLocked = locked;
@@ -58,7 +58,7 @@ public class xAuthPlayer {
         this.isPremium = isPremium;
         this.status = status;
         this.pwType = PasswordType.getType(pwType);
-        this.gameMode = Bukkit.getDefaultGameMode();
+        this.gameMode = gameMode;
     }
 
     public String getName() {

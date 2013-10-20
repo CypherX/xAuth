@@ -46,12 +46,12 @@ public class ChangePwdCommand extends xAuthCommand implements CommandExecutor {
         xAuthPlayer xp = xAuth.getPlugin().getPlayerManager().getPlayer(player);
 
         if (xp.isGuest()) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("changepw.error.logged", xp.getPlayer());
+            this.getMessageHandler().sendMessage("changepw.error.logged", xp.getPlayer());
             return true;
         }
 
         if (xp.isLocked()) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("misc.active", xp.getPlayer());
+            this.getMessageHandler().sendMessage("misc.active", xp.getPlayer());
             return true;
         }
 
@@ -63,17 +63,17 @@ public class ChangePwdCommand extends xAuthCommand implements CommandExecutor {
 
     private boolean changePwCommand(xAuthPlayer xp, Player p, String[] args) {
         if (!xp.isAuthenticated()) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("changepw.error.logged", xp.getPlayer());
+            this.getMessageHandler().sendMessage("changepw.error.logged", xp.getPlayer());
             return true;
         }
 
         if (args.length < 2) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("changepw.usage", xp.getPlayer());
+            this.getMessageHandler().sendMessage("changepw.usage", xp.getPlayer());
             return true;
         }
 
         if (!xAuth.getPermissionManager().has(p, "xauth.allow.player.command.changepw")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("changepw.permission", p);
+            this.getMessageHandler().sendMessage("changepw.permission", p);
             return true;
         }
 
@@ -85,7 +85,7 @@ public class ChangePwdCommand extends xAuthCommand implements CommandExecutor {
 
         String response = a.getResponse();
         if (response != null)
-            xAuth.getPlugin().getMessageHandler().sendMessage(response, xp.getPlayer());
+            this.getMessageHandler().sendMessage(response, xp.getPlayer());
 
         if (success) {
             xAuthLog.info(xp.getName() + " has changed their password");
@@ -98,12 +98,12 @@ public class ChangePwdCommand extends xAuthCommand implements CommandExecutor {
 
     private boolean resetPwCommand(xAuthPlayer xp, Player p, String[] args) {
         if (args.length != 1) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("resetpw.reset-usage", xp.getPlayer());
+            this.getMessageHandler().sendMessage("resetpw.reset-usage", xp.getPlayer());
             return true;
         }
 
         if (!xAuth.getPermissionManager().has(p, "xauth.allow.player.command.resetpw")) {
-            xAuth.getPlugin().getMessageHandler().sendMessage("resetpw.permission", p);
+            this.getMessageHandler().sendMessage("resetpw.permission", p);
             return true;
         }
 
@@ -113,7 +113,7 @@ public class ChangePwdCommand extends xAuthCommand implements CommandExecutor {
 
         String response = a.getResponse();
         if (response != null)
-            xAuth.getPlugin().getMessageHandler().sendMessage(response, xp.getPlayer());
+            this.getMessageHandler().sendMessage(response, xp.getPlayer());
 
         if (success) {
             xAuthLog.info(xp.getName() + " has changed their password");

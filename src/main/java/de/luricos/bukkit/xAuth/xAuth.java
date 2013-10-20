@@ -57,8 +57,9 @@ public class xAuth extends JavaPlugin {
     private LocationManager locationManager;
     private StrikeManager strikeManager;
 
-    protected PermissionManager permissionManager;
-    protected Configuration config;
+    private PermissionManager permissionManager;
+    private Configuration config;
+    private Updater updater;
 
     private List<String> commands = new ArrayList<String>();
 
@@ -110,7 +111,10 @@ public class xAuth extends JavaPlugin {
             return;
         }
 
-        // check for update or not, depending on configuration node "main.check-for-updates"
+        // init the updater
+        this.initUpdater();
+
+        // check for update if updater is enabled
         this.checkUpdate();
 
         File h2File = new File("lib", "h2-" + h2Version + ".jar");
@@ -304,6 +308,7 @@ public class xAuth extends JavaPlugin {
         this.config = this.getConfig();
         messageHandler.reloadConfig();
 
+        this.initUpdater();
         this.checkUpdate();
 
         playerManager.reload();
@@ -322,12 +327,12 @@ public class xAuth extends JavaPlugin {
         xAuthLog.info("-- Reload finished");
     }
 
+    public void initUpdater() {
+        this.updater = new Updater(this, 35934, this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
+    }
+
     public void checkUpdate() {
-        if (this.getConfig().getBoolean("main.check-for-updates")) {
-            Updater updater = new Updater(getDescription().getVersion());
-            if (updater.isUpdateAvailable())
-                updater.printMessage();
-        }
+        this.updater.run();
     }
 
     public boolean isAutoDisable(){
@@ -337,6 +342,26 @@ public class xAuth extends JavaPlugin {
     public boolean isPremiumMode() {
         return this.getConfig().getBoolean("main.check-premium");
     }
+
+    /**
+     * Get the Updater.
+     *
+     * @return the Updater
+     */
+    public static Updater getUpdater() {
+        try {
+            if (!isPluginAvailable()) {
+                // show warnings only to externals
+                if (xAuthLog.getLevel().intValue() < Level.WARNING.intValue())
+                    throw new xAuthNotAvailable("This plugin is not ready yet.");
+            }
+        } catch (xAuthNotAvailable e) {
+            xAuthLog.warning(e.getMessage());
+        }
+
+        return ((xAuth) getPlugin()).updater;
+    }
+
 
     /**
      * Get the permissionManager.

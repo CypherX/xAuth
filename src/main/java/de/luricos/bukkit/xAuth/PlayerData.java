@@ -19,6 +19,7 @@
  */
 package de.luricos.bukkit.xAuth;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -32,37 +33,44 @@ public class PlayerData {
     private Collection<PotionEffect> potEffects;
     private int fireTicks;
     private int remainingAir;
+    private GameMode gameMode;
 
-    public PlayerData(ItemStack[] items, ItemStack[] armor, Location location, Collection<PotionEffect> potEffects, int fireTicks, int remainingAir) {
+    public PlayerData(ItemStack[] items, ItemStack[] armor, Location location, Collection<PotionEffect> potEffects, int fireTicks, int remainingAir, GameMode gameMode) {
         this.items = items;
         this.armor = armor;
         this.location = location;
         this.potEffects = potEffects;
         this.fireTicks = fireTicks;
         this.remainingAir = remainingAir;
+        this.gameMode = gameMode;
     }
 
     public ItemStack[] getItems() {
-        return items;
+        return this.items;
     }
 
     public ItemStack[] getArmor() {
-        return armor;
+        return this.armor;
     }
 
     public Location getLocation() {
-        return location;
+        return this.location;
     }
 
     public Collection<PotionEffect> getPotionEffects() {
-        return potEffects;
+        return this.potEffects;
     }
 
     public int getFireTicks() {
-        return fireTicks;
+        return this.fireTicks;
     }
 
     public int getRemainingAir() {
-        return remainingAir;
+        return this.remainingAir;
     }
+
+    public GameMode getGameMode() {
+        return this.gameMode;
+    }
+
 }

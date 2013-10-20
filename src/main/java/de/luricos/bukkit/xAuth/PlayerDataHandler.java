@@ -23,6 +23,7 @@ import de.luricos.bukkit.xAuth.database.Table;
 import de.luricos.bukkit.xAuth.exceptions.xAuthPlayerDataException;
 import de.luricos.bukkit.xAuth.utils.xAuthLog;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
@@ -55,12 +56,13 @@ public class PlayerDataHandler {
         Collection<PotionEffect> potEffects = p.getActivePotionEffects();
         int fireTicks = p.isDead() ? 0 : p.getFireTicks();
         int remainingAir = p.getRemainingAir();
+        GameMode gameMode = p.getGameMode();
 
         String strItems = null;
         String strArmor = null;
         String strLoc = null;
         String strPotFx = buildPotFxString(potEffects);
-        xp.setPlayerData(new PlayerData(items, armor, loc, potEffects, fireTicks, remainingAir));
+        xp.setPlayerData(new PlayerData(items, armor, loc, potEffects, fireTicks, remainingAir, gameMode));
 
         boolean hideInv = plugin.getConfig().getBoolean("guest.hide-inventory");
         boolean hideLoc = plugin.getConfig().getBoolean("guest.protect-location");
@@ -95,10 +97,10 @@ public class PlayerDataHandler {
             try {
                 String sql;
                 if (plugin.getDatabaseController().isMySQL())
-                    sql = String.format("INSERT IGNORE INTO `%s` VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    sql = String.format("INSERT IGNORE INTO `%s` VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                             plugin.getDatabaseController().getTable(Table.PLAYERDATA));
                 else
-                    sql = String.format("INSERT INTO `%s` SELECT ?, ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `%s` WHERE `playername` = ?)",
+                    sql = String.format("INSERT INTO `%s` SELECT ?, ?, ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `%s` WHERE `playername` = ?)",
                             plugin.getDatabaseController().getTable(Table.PLAYERDATA), plugin.getDatabaseController().getTable(Table.PLAYERDATA));
 
                 ps = conn.prepareStatement(sql);
@@ -109,8 +111,9 @@ public class PlayerDataHandler {
                 ps.setString(5, strPotFx);
                 ps.setInt(6, fireTicks);
                 ps.setInt(7, remainingAir);
+                ps.setString(8, gameMode.name());
                 if (!plugin.getDatabaseController().isMySQL())
-                    ps.setString(8, p.getName());
+                    ps.setString(9, p.getName());
                 ps.executeUpdate();
             } catch (SQLException e) {
                 xAuthLog.severe("Failed to insert player data into database!", e);
@@ -238,6 +241,7 @@ public class PlayerDataHandler {
         Collection<PotionEffect> potFx = null;
         int fireTicks = 0;
         int remainingAir = 300;
+        GameMode gameMode = xp.getGameMode();
 
         // Use cached copy of player data, if it exists
         PlayerData playerData = xp.getPlayerData();
@@ -248,6 +252,7 @@ public class PlayerDataHandler {
             potFx = playerData.getPotionEffects();
             fireTicks = playerData.getFireTicks();
             remainingAir = playerData.getRemainingAir();
+            gameMode = playerData.getGameMode();
         } else {
             Connection conn = plugin.getDatabaseController().getConnection();
             PreparedStatement ps = null;
@@ -277,6 +282,7 @@ public class PlayerDataHandler {
 
                     fireTicks = rs.getInt("fireticks");
                     remainingAir = rs.getInt("remainingair");
+                    gameMode = GameMode.valueOf(rs.getString("gamemode"));
                 }
             } catch (SQLException e) {
                 xAuthLog.severe("Failed to load playerdata from database for player: " + playerName, e);
@@ -320,6 +326,7 @@ public class PlayerDataHandler {
 
             player.setFireTicks(fireTicks);
             player.setRemainingAir(remainingAir);
+            player.setGameMode(gameMode);
         } catch (xAuthPlayerDataException e) {
             xAuthLog.severe(e.getMessage());
         }

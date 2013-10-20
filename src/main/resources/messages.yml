@@ -1,3 +1,5 @@
+# xAuth v2.4.4 Language File
+# THIS HEADER IS USED AS A SIGNATURE. PLEASE DO NOT REMOVE.
 join:
     register: '{RED}You are not registered.{NEWLINE}{RED}Please register using /register <password>.'
     login: '{RED}Please log in using /login <password>.'
@@ -190,6 +192,17 @@ admin:
         value: '{BRIGHTGREEN}%s: {WHITE}%s'
 version:
     current-version: '{BRIGHTGREEN}xAuth version: %s'
-    update-available: '{BRIGHTGREEN}New version %s available. Check your server.log for download instructions.'
-    no-update-needed: '{BRIGHTGREEN}Latest xAuth version %s is installed. No update needed.'
+    updater:
+        disabled: '{RED}The server administrator has disabled the updating system.'
+        autoupdate: '{BRIGHTGREEN}Type /xauth upgrade if you would like to automatically update.'
+        update-available: '{BRIGHTGREEN}A new version is available: %s, a release for %s available at %s.'
+        update-inprogress: '{BRIGHTGREEN}Upgrade in progress.'
+        update-finished: '{BRIGHTGREEN}The update was successfully downloaded. Latest version %s will become active after server restart.'
+        no-update-needed: '{BRIGHTGREEN}The latest version %s is already installed.'
+        error:
+            download: '{RED}The updater found an update, but was unable to download it.'
+            dbo: '{RED}The updater was unable to contact dev.bukkit.org to download the file.'
+            noversion: '{RED}When running the version check, the file on DBO did not matched the right format.'
+            badid: 'The id provided by the plugin running the updater was invalid and doesn''t exist on DBO.'
+            apikey: 'The server administrator has improperly configured their API key in the configuration.'
     success: '{BRIGHTGREEN}Latest xAuth version is %s'

@@ -65,9 +65,9 @@ public class QuitCommand extends xAuthCommand implements CommandExecutor {
         if (kickPlayer) {
             this.callEvent(xAuthQuitEvent.Action.PLAYER_QUIT, xp.getStatus());
 
-            xp.getPlayer().kickPlayer(xAuth.getPlugin().getMessageHandler().getNode(response));
+            xp.getPlayer().kickPlayer(this.getMessageHandler().getNode(response));
         } else {
-            xAuth.getPlugin().getMessageHandler().sendMessage(response, xp.getPlayer());
+            this.getMessageHandler().sendMessage(response, xp.getPlayer());
         }
 
         return true;

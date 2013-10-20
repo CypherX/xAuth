@@ -1,7 +1,6 @@
 main:
     auto-disable: false
     check-premium: true
-    check-for-updates: true
     reload-on-join: false
 mysql:
     enabled: false
@@ -15,6 +14,7 @@ mysql:
         location: locations
         lockout: lockouts
         playerdata: playerdata
+        playerstorage: playerstorage
         session: sessions
 permissions:
     backend: bukkit
@@ -55,6 +55,7 @@ guest:
     notify-cooldown: 5
     hide-inventory: true
     protect-location: true
+    gamemode: 'ADVENTURE'
     restrict:
         player:
             chat: true

@@ -24,7 +24,8 @@ public enum Table {
     LOCATION("locations"),
     LOCKOUT("lockouts"),
     PLAYERDATA("playerdata"),
-    SESSION("sessions");
+    SESSION("sessions"),
+    PLAYERSTORAGE("playerstorage");
 
     private String name;
 

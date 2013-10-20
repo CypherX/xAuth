@@ -28,6 +28,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MessageHandler {
     private final xAuth plugin;
@@ -37,39 +39,58 @@ public class MessageHandler {
 
     public MessageHandler(final xAuth plugin) {
         this.plugin = plugin;
-        this.configFile = new File(plugin.getDataFolder(), fileName);
+        this.configFile = new File(plugin.getDataFolder(), this.fileName);
+        this.config = YamlConfiguration.loadConfiguration(this.configFile);
+
+        this.updateConfig();
+    }
+
+    public void updateConfig() {
+        YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(this.plugin.getResource(this.fileName));
+
+        // check if current messages file is different from resource messages. If not create a backup of the current one.
+        if ((this.config.options().header() == null) || (!(this.config.options().header().equals(newConfig.options().header())))) {
+            String backupDateString = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date().getTime());
+
+            xAuthLog.info("New messages.yml found in plugin. Creating backup of the current one.");
+            try {
+                this.config.save(new File(plugin.getDataFolder(), "messages-" + backupDateString + ".yml"));
+
+                this.config = newConfig;
+                this.saveConfig();
+            } catch (IOException e) {
+                xAuthLog.severe("Could not save a backup of message configuration to messages-" + backupDateString + ".yml", e);
+            }
+        }
     }
 
     public FileConfiguration getConfig() {
-        if (config == null) {
-            reloadConfig();
-        }
-
-        return config;
+        return this.config;
     }
 
     public void reloadConfig() {
-        if (configFile == null) {
-            configFile = new File(plugin.getDataFolder(), fileName);
+        if (this.config == null) {
+            this.configFile = new File(plugin.getDataFolder(), "messages.yml");
         }
-        config = YamlConfiguration.loadConfiguration(configFile);
+        this.config = YamlConfiguration.loadConfiguration(this.configFile);
 
-        InputStream defConfigStream = plugin.getResource(fileName);
+        // Look for defaults in the jar
+        InputStream defConfigStream = plugin.getResource("messages.yml");
         if (defConfigStream != null) {
             YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-            config.setDefaults(defConfig);
+            this.config.setDefaults(defConfig);
         }
     }
 
     public void saveConfig() {
-        if (config == null || configFile == null) {
+        if (this.config == null || this.configFile == null) {
             return;
         }
 
         try {
-            getConfig().save(configFile);
+            this.getConfig().save(this.configFile);
         } catch (IOException e) {
-            xAuthLog.severe("Could not save message configuration to " + configFile, e);
+            xAuthLog.severe("Could not save message configuration to " + this.configFile, e);
         }
     }
 
