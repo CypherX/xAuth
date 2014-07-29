@@ -1,9 +1,7 @@
 main:
-    auto-disable: true
-    check-for-updates: true
-    download-library: true
+    auto-disable: false
+    check-premium: true
     reload-on-join: false
-
 mysql:
     enabled: false
     host: localhost
@@ -16,22 +14,24 @@ mysql:
         location: locations
         lockout: lockouts
         playerdata: playerdata
+        playerstorage: playerstorage
         session: sessions
-
+permissions:
+    backend: bukkit
+    use-material-names: true
+    debug: false
 authurl:
     enabled: false
-    url: http://google.com
+    url: http://localhost
     registration: false
     status: false
     groups: false
     broadcast-login: false
-
 single-session:
     reverse: true
     guests:
         reverse: false
         immunity-length: 5
-
 registration:
     enabled: true
     forced: true
@@ -40,8 +40,9 @@ registration:
     account-limit: 0
     activation: false
     require-login: true
-
 password:
+    default-type: 0
+    convert-password: false
     min-length: 6
     allow-change: true
     complexity:
@@ -49,43 +50,48 @@ password:
         uppercase: false
         number: false
         symbol: false
-
 guest:
     timeout: 300
     notify-cooldown: 5
     hide-inventory: true
     protect-location: true
-    allowed-commands:
-        - register
-        - login
-        - l
+    gamemode: 'ADVENTURE'
     restrict:
         player:
             chat: true
             interact: true
             move: true
             pickup: true
+            command:
+                register: false
+                login: false
+                l: false
+            damage: true
+            regain: true
+            level: true
+            splash: true
+            target: true
         block:
             place: true
             break: true
         entity:
             damage: true
             target: true
-
 session:
     length: 3600
     verifyip: true
     godmode-length: 5
-
 strikes:
     amount: 5
     lockout-length: 3600
-
 account:
-    track-last-login: false
-
+    track-last-login: true
 filter:
-    min-length: 2
-    allowed: ''
+    min-length: 3
+    allowed: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_
     disallowed: ''
     blank-name: true
+    commands: true
+groups:
+    move-on-register: 'Novice'
+    auto-assign: false
